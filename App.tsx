@@ -208,13 +208,7 @@ const App: React.FC = () => {
               </div>
             </div>
 
-            <div clasName="flex flex-col items-end gap-2">
-                <div className="flex gap-8 text-xs font-bold tracking-[0.2em] uppercase font-mono">
-                  <a href="#" className="hover:text-orange-600 transition-colors">Instagram</a>
-                  <a href="#" className="hover:text-orange-600 transition-colors">Github</a>
-                  <a href="#" className="hover:text-orange-600 transition-colors">Bookings</a>
-                </div>
-            </div>
+            
          </div>
          <div className="max-w-7xl mx-auto mt-12 flex flex-col md:flex-row justify-between items-center gap-4 text-[10px] text-stone-600 uppercase font-mono tracking-widest">
             <span>© {new Date().getFullYear()} SOLAR_STATIC_SYSTEMS</span>
