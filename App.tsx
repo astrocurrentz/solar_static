@@ -185,7 +185,13 @@ const App: React.FC = () => {
               </h2>
               <div className="mt-12 flex flex-col gap-3">
                 <span className="text-xs font-mono text-orange-600 font-bold tracking-widest">/// INITIALIZE CONTACT</span>
-                <a href="mailto:connect@solarstatic.xyz" className="text-3xl hover:text-orange-600 transition-colors font-display font-bold">connect@solarstatic.xyz</a>
+                <a 
+                  href="https://www.instagram.com/solar.static27/" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-3xl hover:text-orange-600 transition-colors font-display font-bold">
+                  @solar.static27
+                </a>
                 <p className="text-stone-500 font-mono text-sm">Terran, Solar // The Void</p>
               </div>
             </div>

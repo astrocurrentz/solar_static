@@ -4,29 +4,29 @@ import { Artwork, NavItem } from './types';
 
 export const ARTWORKS: Artwork[] = [
   {
-    id: 'WOOD', // Represents Growth/Creativity (BaZi Element)
-    title: 'SYSTEM_PATCH_ALPHA',
-    description: 'Dermal modification protocol. Tattoo flash set featuring geometric cyber-sigils.',
+    id: 'fire_1', // Represents Growth/Creativity (BaZi Element)
+    title: 'THE_APEX_ARC',
+    description: 'Sever the noise. Lethal focus.',
     // Path starts with /assets because 'public' is the root folder for the browser
-    imageUrl: '/assets/images/patch_01.jpg', 
+    imageUrl: 'assets/images/fire series-01.png', 
     type: 'graphic',
-    year: '2024'
+    year: '2026'
   },
   {
-    id: 'FIRE', // Represents Passion/Visuality
-    title: 'SOLAR_FLARE_V2',
-    description: 'Generative entropy. Midjourney iteration exploring the concept of "Yang Fire".',
-    imageUrl: '/assets/images/generated_art_01.jpg',
+    id: 'fire_2', // Represents Passion/Visuality
+    title: 'THE_CORE_CRUCIBLE',
+    description: 'Pain into fuel. Internal combustion.',
+    imageUrl: 'assets/images/fire series-02.png',
     type: 'motion',
-    year: '2025'
+    year: '2026'
   },
   {
-    id: 'METAL', // Represents Structure/Code
-    title: 'THE_OPERATOR',
-    description: 'Identity verification. Portrait of the architect behind the static.',
-    imageUrl: '/assets/images/me.jpg',
+    id: 'fire_3', // Represents Structure/Code
+    title: 'PROTOCOL_WILDFILRE',
+    description: 'Total release. Uncontained energy.',
+    imageUrl: 'assets/images/fire series-03.png',
     type: 'graphic',
-    year: '1993'
+    year: '2026'
   }
 ];
 
