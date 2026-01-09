@@ -183,16 +183,28 @@ const App: React.FC = () => {
               <h2 className="text-[12vw] leading-none font-black font-display text-white/5 select-none tracking-tighter">
                 END_LOG
               </h2>
-              <div className="mt-12 flex flex-col gap-3">
-                <span className="text-xs font-mono text-orange-600 font-bold tracking-widest">/// INITIALIZE CONTACT</span>
+              <div className="mt-12 flex flex-col gap-2">
+                <span className="text-xs font-mono text-orange-600 font-bold tracking-widest mb-2">/// INITIALIZE CONTACT</span>
+                
+                {/* Brand Account */}
                 <a 
                   href="https://www.instagram.com/solar.static27/" 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="text-3xl hover:text-orange-600 transition-colors font-display font-bold">
+                  className="text-3xl hover:text-orange-600 transition-colors font-display font-bold leading-tight">
                   @solar.static27
                 </a>
-                <p className="text-stone-500 font-mono text-sm">Terran, Solar // The Void</p>
+
+                {/* Personal Account */}
+                <a 
+                  href="https://www.instagram.com/current_astro_" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-3xl hover:text-orange-600 transition-colors font-display font-bold leading-tight">
+                  @current_astro_
+                </a>
+
+                <p className="text-stone-500 font-mono text-sm mt-4">Terran, Solar // The Void</p>
               </div>
             </div>
 
