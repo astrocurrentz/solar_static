@@ -196,7 +196,7 @@ const App: React.FC = () => {
               </div>
             </div>
 
-            <div className="flex flex-col items-end gap-2">
+            <div clasName="flex flex-col items-end gap-2">
                 <div className="flex gap-8 text-xs font-bold tracking-[0.2em] uppercase font-mono">
                   <a href="#" className="hover:text-orange-600 transition-colors">Instagram</a>
                   <a href="#" className="hover:text-orange-600 transition-colors">Github</a>
