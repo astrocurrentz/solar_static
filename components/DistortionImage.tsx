@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React from 'react';
 
 interface DistortionImageProps {
   src: string;
@@ -13,7 +13,7 @@ const DistortionImage: React.FC<DistortionImageProps> = ({ src, alt, className =
       <img 
         src={src} 
         alt={alt} 
-        className="w-full h-full object-cover transition-all duration-700 ease-in-out group-hover:scale-105 group-hover:grayscale grayscale-0 filter"
+        className="h-full w-full object-cover filter transition-transform duration-700 ease-in-out group-hover:scale-105"
         style={{ filter: 'url(#noise-displacement)' }}
       />
       
@@ -23,7 +23,7 @@ const DistortionImage: React.FC<DistortionImageProps> = ({ src, alt, className =
         style={{ 
             backgroundImage: `url(${src})`,
             transform: 'translateX(-4px)',
-            filter: 'hue-rotate(90deg)'
+            filter: 'sepia(1) hue-rotate(-18deg) saturate(1.35)'
         }}
       />
       <div 
@@ -31,12 +31,12 @@ const DistortionImage: React.FC<DistortionImageProps> = ({ src, alt, className =
         style={{ 
             backgroundImage: `url(${src})`,
             transform: 'translateX(4px)',
-            filter: 'hue-rotate(-90deg)'
+            filter: 'sepia(1) hue-rotate(10deg) saturate(0.9)'
         }}
       />
 
       {/* Scanline Overlay */}
-      <div className="absolute inset-0 bg-[linear-gradient(rgba(18,16,11,0)_50%,rgba(0,0,0,0.1)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] bg-[length:100%_4px,3px_100%] pointer-events-none z-10 opacity-20" />
+      <div className="absolute inset-0 bg-[linear-gradient(rgba(40,33,25,0)_50%,rgba(40,33,25,0.18)_50%),linear-gradient(90deg,rgba(201,115,56,0.08),rgba(229,216,189,0.03),rgba(165,77,39,0.08))] bg-[length:100%_4px,3px_100%] pointer-events-none z-10 opacity-30" />
     </div>
   );
 };

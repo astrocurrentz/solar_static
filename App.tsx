@@ -6,11 +6,43 @@ import DistortionImage from './components/DistortionImage';
 import NoiseOverlay from './components/NoiseOverlay';
 import AudioVisualizer from './components/AudioVisualizer';
 import { ARTWORKS } from './constants';
-import { Play, ArrowDown, Eye, Hash } from 'lucide-react';
+import { Play, ArrowDown, Hash } from 'lucide-react';
+
+const TRACKS = [
+  'Protocol: Wildfire',
+  'The Apex Vector',
+  'Lazarus Sequence (Bass Only)',
+];
+
+const HERO_BACKGROUND = {
+  background: 'linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-primary) 48%, var(--bg-secondary) 100%)',
+};
+
+const AUDIO_BACKGROUND = {
+  background: 'linear-gradient(180deg, var(--bg-secondary) 0%, var(--bg-primary) 100%)',
+};
+
+const WARM_OVERLAY = {
+  background:
+    'radial-gradient(circle at center, rgba(201, 115, 56, 0.18) 0%, rgba(165, 77, 39, 0.08) 35%, rgba(40, 33, 25, 0) 70%)',
+};
+
+const HERO_GLOW = {
+  background:
+    'radial-gradient(circle at 76% 24%, rgba(201, 115, 56, 0.2) 0%, rgba(165, 77, 39, 0.06) 34%, rgba(40, 33, 25, 0) 72%)',
+};
+
+const CREAM_STROKE = {
+  WebkitTextStroke: '2px var(--bg-light)',
+};
+
+const THIN_CREAM_STROKE = {
+  WebkitTextStroke: '1px var(--bg-light)',
+};
 
 const App: React.FC = () => {
   return (
-    <div className="relative min-h-screen cursor-none bg-[#e5e5e5] selection:bg-orange-600 selection:text-white">
+    <div className="relative min-h-screen cursor-none bg-[var(--bg-primary)] text-[var(--text-primary)]">
       <CustomCursor />
       <NoiseOverlay />
       <Navigation />
@@ -26,90 +58,97 @@ const App: React.FC = () => {
       </svg>
 
       {/* HERO SECTION */}
-      <section id="hero" className="min-h-screen flex flex-col justify-center px-6 md:px-24 pt-20 relative border-b border-stone-400 border-dashed">
+      <section
+        id="hero"
+        className="relative isolate flex min-h-screen flex-col justify-center overflow-hidden border-b border-dashed border-[var(--border-soft)] px-6 pt-20 md:px-24"
+        style={HERO_BACKGROUND}
+      >
+        <div className="absolute inset-0 -z-10 opacity-80" style={HERO_GLOW} />
+        <div className="absolute inset-0 -z-10 opacity-70" style={WARM_OVERLAY} />
+
         <div className="max-w-7xl w-full mx-auto">
-          <div className="mb-6 flex items-center gap-4 text-xs font-bold tracking-[0.2em] text-orange-600 font-mono">
-             <div className="w-2 h-2 bg-orange-600 rounded-none animate-pulse" />
+          <div className="mb-6 flex items-center gap-4 font-mono text-xs font-bold tracking-[0.2em] text-[var(--accent-secondary)]">
+             <div className="h-2 w-2 rounded-none bg-[var(--accent-secondary)] animate-pulse" />
              <span>SYSTEM_ONLINE // V.2026</span>
           </div>
 
-          <h1 className="text-[13vw] leading-[0.8] font-black font-display tracking-tighter mix-blend-darken select-none">
-            <span className="block hover:text-orange-600 transition-colors duration-300">SOLAR</span>
+          <h1 className="select-none font-display text-[13vw] font-black leading-[0.8] tracking-tighter text-[var(--text-primary)]">
+            <span className="block transition-colors duration-300 hover:text-[var(--accent-secondary)]">SOLAR</span>
             <span className="block pl-[8vw] relative z-10">
-              <span className="absolute -left-12 top-1/2 -translate-y-1/2 text-sm font-mono font-normal tracking-widest opacity-60 -rotate-90 origin-right hidden md:block text-stone-500">
+              <span className="absolute -left-12 top-1/2 hidden -translate-y-1/2 -rotate-90 origin-right font-mono text-sm font-normal tracking-widest text-[var(--text-secondary)] opacity-60 md:block">
                 (CYBER_METAPHYSICS)
               </span>
               <GlitchText text="STATIC" />
             </span>
-            <span className="block text-right pr-[2vw] text-outline text-transparent stroke-black stroke-2 opacity-80" style={{ WebkitTextStroke: '2px #1c1917' }}>
+            <span className="block pr-[2vw] text-right text-transparent opacity-60" style={CREAM_STROKE}>
               RITUALS
             </span>
           </h1>
 
-          <div className="mt-24 flex flex-col md:flex-row justify-between items-end gap-10">
+          <div className="mt-24 flex flex-col items-end justify-between gap-10 md:flex-row">
             <div className="max-w-lg">
-              <p className="text-sm md:text-base leading-relaxed font-mono text-stone-700 font-medium">
-                <span className="bg-black text-white px-1">/// MISSION:</span> Injecting code into flesh. 
+              <p className="font-mono text-sm font-medium leading-relaxed text-[var(--text-secondary)] md:text-base">
+                <span className="bg-[var(--bg-light)] px-1 text-[var(--text-dark)]">/// MISSION:</span> Injecting code into flesh.
                 <br/>
-                A digital archive of cyber-sigilism tattoos, visual artifacts, and industrial noise. 
+                A digital archive of cyber-sigilism tattoos, visual artifacts, and industrial noise.
                 <br/>
                 Designed in Terra, Solar.
               </p>
             </div>
             
-            <a href="#gallery" className="group flex items-center gap-4 text-lg font-bold hover:text-orange-600 transition-colors">
-              <div className="w-12 h-12 border border-current flex items-center justify-center group-hover:bg-orange-600 group-hover:border-orange-600 group-hover:text-white transition-all bg-white">
+            <a href="#gallery" className="group flex items-center gap-4 text-lg font-bold text-[var(--text-primary)] transition-colors hover:text-[var(--accent-secondary)]">
+              <div className="flex h-12 w-12 items-center justify-center border border-[var(--border-strong)] bg-[var(--surface-tint)] transition-all group-hover:border-[var(--accent-primary)] group-hover:bg-[var(--accent-primary)] group-hover:text-[var(--text-primary)]">
                 <ArrowDown size={20} className="group-hover:animate-bounce" />
               </div>
-              <span className="font-mono tracking-widest text-sm">ACCESS PROTOCOLS</span>
+              <span className="font-mono text-sm tracking-widest">ACCESS PROTOCOLS</span>
             </a>
           </div>
         </div>
         
         {/* Decorative Grid Background */}
-        <div className="absolute top-0 right-0 w-1/4 h-full border-l border-stone-300 -z-10 hidden lg:block opacity-50" />
-        <div className="absolute bottom-20 left-0 w-full h-[1px] bg-stone-300" />
+        <div className="absolute top-0 right-0 hidden h-full w-1/4 border-l border-[var(--border-soft)] opacity-50 lg:block" />
+        <div className="absolute bottom-20 left-0 h-[1px] w-full bg-[var(--border-soft)]" />
       </section>
 
       {/* GALLERY SECTION */}
-      <section id="gallery" className="py-32 px-6 md:px-24 bg-[#e5e5e5]">
+      <section id="gallery" className="bg-[var(--bg-light)] px-6 py-32 text-[var(--text-dark)] md:px-24">
         <div className="max-w-7xl mx-auto">
-           <div className="flex items-baseline justify-between mb-24 border-b-2 border-stone-900 pb-6">
-              <h2 className="text-6xl md:text-8xl font-display font-black tracking-tighter">
+           <div className="mb-24 flex items-baseline justify-between border-b-2 border-[var(--border-dark-strong)] pb-6">
+              <h2 className="font-display text-6xl font-black tracking-tighter md:text-8xl">
                 ARTIFACTS
               </h2>
-              <span className="font-mono text-xs md:text-sm tracking-widest text-orange-600 font-bold">
+              <span className="font-mono text-xs font-bold tracking-widest text-[var(--accent-primary)] md:text-sm">
                 [ DB_LOADED: {ARTWORKS.length} ]
               </span>
            </div>
 
-           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-32">
+           <div className="grid grid-cols-1 gap-x-8 gap-y-32 md:grid-cols-2 lg:grid-cols-3">
               {ARTWORKS.map((art, index) => (
                 <div key={art.id} className={`group ${index === 1 ? 'md:mt-40' : ''}`}>
                   <div className="relative mb-8">
-                    <div className="absolute -top-6 -left-6 font-mono text-5xl text-stone-300 font-bold -z-10 select-none group-hover:text-orange-600/20 transition-colors">
+                    <div className="absolute -top-6 -left-6 -z-10 select-none font-mono text-5xl font-bold text-[var(--text-dark-ghost)] transition-colors group-hover:text-[var(--glow-accent)]">
                       {index < 9 ? `0${index + 1}` : index + 1}
                     </div>
-                    <div className="relative overflow-hidden border border-stone-900 bg-stone-900">
+                    <div className="relative overflow-hidden border border-[var(--border-dark-strong)] bg-[var(--bg-secondary)]">
                       <DistortionImage 
                         src={art.imageUrl} 
                         alt={art.title} 
-                        className="aspect-[3/4] w-full object-cover grayscale contrast-125 group-hover:grayscale-0 group-hover:contrast-100 transition-all duration-700 ease-out"
+                        className="aspect-[3/4] w-full grayscale contrast-125 transition-all duration-700 ease-out group-hover:grayscale-0 group-hover:contrast-100"
                       />
-                      <div className="absolute inset-0 bg-orange-600/20 opacity-0 group-hover:opacity-100 mix-blend-overlay transition-opacity duration-300" />
+                      <div className="absolute inset-0 bg-[var(--glow-accent)] opacity-0 mix-blend-overlay transition-opacity duration-300 group-hover:opacity-100" />
                     </div>
                     
-                    <div className="absolute bottom-0 right-0 bg-black text-white px-4 py-2 text-xs font-bold font-mono uppercase translate-y-1/2 opacity-0 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 flex items-center gap-2">
+                    <div className="absolute bottom-0 right-0 flex translate-y-1/2 items-center gap-2 bg-[var(--bg-primary)] px-4 py-2 font-mono text-xs font-bold uppercase text-[var(--text-primary)] opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
                        <Hash size={12} /> DECODE SIGNAL
                     </div>
                   </div>
 
-                  <div className="border-l border-stone-900 pl-6 transition-all group-hover:border-orange-600">
-                    <div className="flex justify-between items-baseline mb-3">
-                       <h3 className="text-xl font-bold font-display uppercase tracking-wide">{art.title}</h3>
-                       <span className="text-[10px] font-mono border border-stone-400 px-1.5 py-0.5 text-stone-600">SYS.v{art.year}</span>
+                  <div className="border-l border-[var(--border-dark-strong)] pl-6 transition-all group-hover:border-[var(--accent-primary)]">
+                    <div className="mb-3 flex items-baseline justify-between">
+                       <h3 className="font-display text-xl font-bold uppercase tracking-wide">{art.title}</h3>
+                       <span className="border border-[var(--border-dark)] bg-[var(--surface-light)] px-1.5 py-0.5 font-mono text-[10px] text-[var(--text-dark-soft)]">SYS.v{art.year}</span>
                     </div>
-                    <p className="text-xs text-stone-600 font-mono leading-relaxed uppercase tracking-wide group-hover:text-stone-900">
+                    <p className="font-mono text-xs uppercase leading-relaxed tracking-wide text-[var(--text-dark-soft)] transition-colors group-hover:text-[var(--text-dark)]">
                       {art.description}
                     </p>
                   </div>
@@ -120,55 +159,63 @@ const App: React.FC = () => {
       </section>
 
       {/* MARQUEE SEPARATOR */}
-      <div className="py-16 bg-[#1c1917] text-[#e5e5e5] overflow-hidden whitespace-nowrap flex select-none border-y border-orange-600">
+      <div
+        className="flex select-none overflow-hidden whitespace-nowrap border-y border-[var(--accent-primary)] bg-[var(--bg-primary)] py-16 text-[var(--text-primary)]"
+        style={{ boxShadow: '0 0 30px var(--glow-accent)' }}
+      >
         {[...Array(6)].map((_, i) => (
-          <div key={i} className="animate-marquee flex items-center gap-12 mx-6 opacity-80">
-            <span className="text-5xl font-display font-black italic">SYSTEM_OVERRIDE</span>
-            <span className="text-2xl font-mono text-orange-600 animate-pulse">///</span>
-            <span className="text-5xl font-display font-black text-transparent stroke-white" style={{ WebkitTextStroke: '1px #e5e5e5' }}>WEAR_THE_STATIC</span>
-            <span className="text-2xl font-mono text-orange-600 animate-pulse">///</span>
-            <span className="text-5xl font-display font-black">IGNITION_SEQUENCE</span>
-            <span className="text-2xl font-mono text-orange-600 animate-pulse">///</span>
+          <div key={i} className="animate-marquee mx-6 flex items-center gap-12 opacity-80">
+            <span className="font-display text-5xl font-black italic">SYSTEM_OVERRIDE</span>
+            <span className="animate-pulse font-mono text-2xl text-[var(--accent-secondary)]">///</span>
+            <span className="font-display text-5xl font-black text-transparent" style={THIN_CREAM_STROKE}>WEAR_THE_STATIC</span>
+            <span className="animate-pulse font-mono text-2xl text-[var(--accent-secondary)]">///</span>
+            <span className="font-display text-5xl font-black">IGNITION_SEQUENCE</span>
+            <span className="animate-pulse font-mono text-2xl text-[var(--accent-secondary)]">///</span>
           </div>
         ))}
       </div>
 
       {/* AUDIO SECTION */}
-      <section id="audio" className="py-32 px-6 md:px-24 bg-[#e5e5e5] relative overflow-hidden">
-         <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-20 items-center relative z-10">
+      <section
+        id="audio"
+        className="relative overflow-hidden px-6 py-32 text-[var(--text-primary)] md:px-24"
+        style={AUDIO_BACKGROUND}
+      >
+         <div className="absolute inset-0 opacity-80" style={WARM_OVERLAY} />
+         <div className="relative z-10 mx-auto grid max-w-6xl grid-cols-1 items-center gap-20 lg:grid-cols-2">
             <div>
-               <div className="inline-block border border-orange-600 text-orange-600 px-3 py-1 text-[10px] font-bold tracking-widest font-mono mb-8 uppercase">
+               <div className="mb-8 inline-block border border-[var(--accent-secondary)] px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-widest text-[var(--accent-secondary)]">
                  Resonance_Chamber // Terra_Lab
                </div>
-               <h2 className="text-6xl md:text-8xl font-display font-black mb-8 leading-[0.85] uppercase">
+               <h2 className="mb-8 font-display text-6xl font-black uppercase leading-[0.85] md:text-8xl">
                  Sonic <br/>
-                 <span className="text-transparent stroke-black" style={{ WebkitTextStroke: '2px #1c1917' }}>Rituals</span>
+                 <span className="text-transparent" style={CREAM_STROKE}>Rituals</span>
                </h2>
-               <p className="text-base font-mono text-stone-700 mb-12 leading-relaxed border-l-2 border-orange-600 pl-6 max-w-md">
+               <p className="mb-12 max-w-md border-l-2 border-[var(--accent-primary)] pl-6 font-mono text-base leading-relaxed text-[var(--text-secondary)]">
                  Math-rock precision meets Shoegaze distortion. 
                  <br/><br/>
                  Auditory hallucinations designed to resonate with specific tattoo protocols. High-gain frequencies for the modern void.
                </p>
                
                <div className="space-y-2">
-                 {['Protocol: Wildfire', 'The Apex Vector', 'Lazarus Sequence (Bass Only)'].map((track, i) => (
-                   <div key={i} className="flex items-center gap-6 group cursor-pointer border border-stone-300 p-4 hover:bg-stone-900 hover:text-white hover:border-stone-900 transition-all duration-300">
-                      <div className="w-6 h-6 flex items-center justify-center text-orange-600 group-hover:text-white transition-colors">
+                 {TRACKS.map((track, i) => (
+                   <div key={i} className="group flex cursor-pointer items-center gap-6 border border-[var(--border-soft)] bg-[var(--surface-tint)] p-4 transition-all duration-300 hover:border-[var(--bg-light)] hover:bg-[var(--bg-light)] hover:text-[var(--text-dark)]">
+                      <div className="flex h-6 w-6 items-center justify-center text-[var(--accent-secondary)] transition-colors group-hover:text-[var(--accent-primary)]">
                         <Play size={14} fill="currentColor" />
                       </div>
-                      <span className="font-bold font-mono uppercase tracking-widest text-sm">{track}</span>
-                      <span className="ml-auto text-xs font-mono opacity-50">0{i+2}:4{i*2}</span>
+                      <span className="font-mono text-sm font-bold uppercase tracking-widest">{track}</span>
+                      <span className="ml-auto font-mono text-xs opacity-50">0{i + 2}:4{i * 2}</span>
                    </div>
                  ))}
                </div>
             </div>
 
-            <div className="relative h-full min-h-[400px] flex items-center justify-center border border-stone-300 bg-stone-200/50">
+            <div className="relative flex h-full min-h-[400px] items-center justify-center border border-[var(--border-soft)] bg-[var(--surface-tint)]">
                {/* Decorative background elements */}
-               <div className="absolute top-0 right-0 p-4 font-mono text-[10px] text-stone-500">
+               <div className="absolute right-0 top-0 p-4 font-mono text-[10px] text-[var(--text-secondary)]">
                  VISUALIZER_ACTIVE
                </div>
-               <div className="absolute bottom-0 left-0 p-4 font-mono text-[10px] text-stone-500">
+               <div className="absolute bottom-0 left-0 p-4 font-mono text-[10px] text-[var(--text-secondary)]">
                  INPUT: MIC_SOURCE
                </div>
                <AudioVisualizer />
@@ -177,21 +224,21 @@ const App: React.FC = () => {
       </section>
 
       {/* FOOTER */}
-      <footer id="contact" className="bg-[#111] text-[#e5e5e5] pt-32 pb-12 px-6 md:px-24">
-         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-start md:items-end gap-16 border-b border-white/20 pb-20">
+      <footer id="contact" className="bg-[var(--bg-primary)] px-6 pb-12 pt-32 text-[var(--text-primary)] md:px-24">
+         <div className="mx-auto flex max-w-7xl flex-col items-start justify-between gap-16 border-b border-[var(--border-soft)] pb-20 md:flex-row md:items-end">
             <div>
-              <h2 className="text-[12vw] leading-none font-black font-display text-white/5 select-none tracking-tighter">
+              <h2 className="select-none font-display text-[12vw] font-black leading-none tracking-tighter text-[var(--text-ghost)]">
                 END_LOG
               </h2>
               <div className="mt-12 flex flex-col gap-2">
-                <span className="text-xs font-mono text-orange-600 font-bold tracking-widest mb-2">/// INITIALIZE CONTACT</span>
+                <span className="mb-2 font-mono text-xs font-bold tracking-widest text-[var(--accent-secondary)]">/// INITIALIZE CONTACT</span>
                 
                 {/* Brand Account */}
                 <a 
                   href="https://www.instagram.com/solar.static27/" 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="text-3xl hover:text-orange-600 transition-colors font-display font-bold leading-tight">
+                  className="font-display text-3xl font-bold leading-tight transition-colors hover:text-[var(--accent-secondary)]">
                   @solar.static27
                 </a>
 
@@ -200,17 +247,17 @@ const App: React.FC = () => {
                   href="https://www.instagram.com/current_astro_" 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="text-3xl hover:text-orange-600 transition-colors font-display font-bold leading-tight">
+                  className="font-display text-3xl font-bold leading-tight transition-colors hover:text-[var(--accent-secondary)]">
                   @current_astro_
                 </a>
 
-                <p className="text-stone-500 font-mono text-sm mt-4">Terran, Solar // The Void</p>
+                <p className="mt-4 font-mono text-sm text-[var(--text-secondary)]">Terran, Solar // The Void</p>
               </div>
             </div>
 
             
          </div>
-         <div className="max-w-7xl mx-auto mt-12 flex flex-col md:flex-row justify-between items-center gap-4 text-[10px] text-stone-600 uppercase font-mono tracking-widest">
+         <div className="mx-auto mt-12 flex max-w-7xl flex-col items-center justify-between gap-4 font-mono text-[10px] uppercase tracking-widest text-[var(--text-secondary)] md:flex-row">
             <span>© {new Date().getFullYear()} SOLAR_STATIC_SYSTEMS</span>
             <span>ALL PROTOCOLS SECURED</span>
          </div>

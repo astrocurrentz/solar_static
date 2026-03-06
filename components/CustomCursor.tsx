@@ -31,7 +31,7 @@ const CustomCursor: React.FC = () => {
     <>
       {/* Main Dot */}
       <div 
-        className="fixed top-0 left-0 w-3 h-3 bg-orange-600 rounded-full pointer-events-none z-50 mix-blend-difference transition-transform duration-100 ease-out will-change-transform"
+        className="fixed top-0 left-0 z-50 h-3 w-3 rounded-full bg-[var(--accent-secondary)] pointer-events-none mix-blend-difference transition-transform duration-100 ease-out will-change-transform"
         style={{ 
           transform: `translate(${position.x - 6}px, ${position.y - 6}px) scale(${isPointer ? 2.5 : 1})` 
         }}
@@ -39,7 +39,7 @@ const CustomCursor: React.FC = () => {
       
       {/* Trailing Ring */}
       <div 
-        className={`fixed top-0 left-0 w-8 h-8 border border-stone-800 rounded-full pointer-events-none z-40 transition-all duration-300 ease-out will-change-transform ${isHoveringText ? 'scale-150 border-dashed border-orange-400 opacity-50' : 'opacity-100'}`}
+        className={`fixed top-0 left-0 z-40 h-8 w-8 rounded-full border border-[var(--bg-light)] pointer-events-none mix-blend-difference transition-all duration-300 ease-out will-change-transform ${isHoveringText ? 'scale-150 border-dashed border-[var(--accent-secondary)] opacity-60' : 'opacity-100'}`}
         style={{ 
           transform: `translate(${position.x - 16}px, ${position.y - 16}px)` 
         }}
@@ -49,11 +49,11 @@ const CustomCursor: React.FC = () => {
       {isPointer && (
         <>
            <div 
-            className="fixed top-0 left-0 w-full h-[1px] bg-orange-600/20 pointer-events-none z-30"
+            className="fixed top-0 left-0 z-30 h-[1px] w-full bg-[var(--glow-accent)] pointer-events-none"
             style={{ top: position.y }}
            />
            <div 
-            className="fixed top-0 left-0 h-full w-[1px] bg-orange-600/20 pointer-events-none z-30"
+            className="fixed top-0 left-0 z-30 h-full w-[1px] bg-[var(--glow-accent)] pointer-events-none"
             style={{ left: position.x }}
            />
         </>

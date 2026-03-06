@@ -3,7 +3,7 @@ import { NAV_ITEMS } from '../constants';
 
 const Navigation: React.FC = () => {
   return (
-    <nav className="fixed right-0 top-0 h-screen w-20 flex flex-col justify-between items-center py-10 z-40 mix-blend-difference text-[#f2f0ea] border-l border-white/10 hidden md:flex">
+    <nav className="fixed right-0 top-0 z-40 hidden h-screen w-20 flex-col justify-between items-center border-l border-[var(--border-soft)] py-10 text-[var(--bg-light)] mix-blend-difference md:flex">
       <div className="vertical-text transform rotate-180 writing-mode-vertical-rl text-xs font-bold tracking-widest opacity-50">
         VER 2.0.4
       </div>
@@ -13,10 +13,10 @@ const Navigation: React.FC = () => {
           <a
             key={item.label}
             href={item.href}
-            className="transform -rotate-90 text-sm font-bold tracking-widest hover:text-orange-500 transition-colors relative group"
+            className="relative transform -rotate-90 text-sm font-bold tracking-widest transition-colors hover:text-[var(--accent-secondary)] group"
           >
             {item.label}
-            <span className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-1 h-1 bg-orange-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
+            <span className="absolute -bottom-4 left-1/2 h-1 w-1 -translate-x-1/2 rounded-full bg-[var(--accent-secondary)] opacity-0 transition-opacity group-hover:opacity-100" />
           </a>
         ))}
       </div>

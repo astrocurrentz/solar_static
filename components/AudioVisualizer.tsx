@@ -1,6 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
 import GlitchText from './GlitchText';
 
+const ACTIVE_WAVE = '#C97338';
+const IDLE_WAVE = 'rgba(229, 216, 189, 0.32)';
+
 const AudioVisualizer: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -27,7 +30,7 @@ const AudioVisualizer: React.FC = () => {
       ctx.clearRect(0, 0, width, height);
       
       // Styling
-      ctx.strokeStyle = isPlaying ? '#ea580c' : '#57534e'; // Orange when playing, Stone when paused
+      ctx.strokeStyle = isPlaying ? ACTIVE_WAVE : IDLE_WAVE;
       ctx.lineWidth = 2;
       ctx.beginPath();
 
@@ -58,8 +61,11 @@ const AudioVisualizer: React.FC = () => {
   }, [isPlaying]);
 
   return (
-    <div className="border border-stone-300 p-8 relative overflow-hidden group">
-      <div className="absolute top-2 left-2 text-[10px] text-orange-600 font-bold tracking-widest uppercase">
+    <div
+      className="group relative overflow-hidden border border-[var(--border-soft)] bg-[var(--surface-tint)] p-8"
+      style={{ boxShadow: '0 20px 40px var(--shadow-deep)' }}
+    >
+      <div className="absolute top-2 left-2 text-[10px] font-bold tracking-widest uppercase text-[var(--accent-secondary)]">
         Audio Processor Unit
       </div>
       
@@ -69,26 +75,26 @@ const AudioVisualizer: React.FC = () => {
         onClick={() => setIsPlaying(!isPlaying)}
       />
 
-      <div className="mt-4 flex justify-between items-end border-t border-stone-300 pt-4">
+      <div className="mt-4 flex items-end justify-between border-t border-[var(--border-soft)] pt-4">
         <div>
-           <h3 className="text-xl font-bold font-display uppercase">
+           <h3 className="text-xl font-bold font-display uppercase text-[var(--text-primary)]">
              {isPlaying ? <GlitchText text="SYSTEM_ACTIVE" /> : "SYSTEM_IDLE"}
            </h3>
-           <p className="text-xs text-stone-500 mt-1 max-w-[200px]">
+           <p className="mt-1 max-w-[200px] text-xs text-[var(--text-secondary)]">
              Click visualizations to toggle audio simulation processing.
            </p>
         </div>
         <button 
           onClick={() => setIsPlaying(!isPlaying)}
-          className="px-6 py-2 bg-stone-900 text-[#f2f0ea] hover:bg-orange-600 transition-colors uppercase text-sm font-bold tracking-wider"
+          className="bg-[var(--accent-primary)] px-6 py-2 text-sm font-bold uppercase tracking-wider text-[var(--text-primary)] transition-colors hover:bg-[var(--accent-secondary)]"
         >
           {isPlaying ? 'PAUSE' : 'INITIATE'}
         </button>
       </div>
 
       {/* Decorative corners */}
-      <div className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-orange-600" />
-      <div className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-orange-600" />
+      <div className="absolute right-0 top-0 h-4 w-4 border-r-2 border-t-2 border-[var(--accent-secondary)]" />
+      <div className="absolute bottom-0 left-0 h-4 w-4 border-b-2 border-l-2 border-[var(--accent-secondary)]" />
     </div>
   );
 };
