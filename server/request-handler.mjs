@@ -3,6 +3,12 @@ const JSON_HEADERS = {
 };
 
 const isValidEmail = (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+const hasSupabaseConfig = (env) => Boolean(env.SUPABASE_URL && env.SUPABASE_SERVICE_ROLE_KEY);
+const buildFallbackRequestNumber = () => {
+  const timestamp = new Date().toISOString().replace(/\D/g, '').slice(0, 14);
+  const entropy = Math.random().toString(36).slice(2, 6).toUpperCase();
+  return `${timestamp}${entropy}`;
+};
 
 const updateSubmissionStatus = async (submissionId, emailStatus, env, fetchImpl) => {
   const { SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY } = env;
@@ -46,11 +52,9 @@ export const submitRequest = async ({ payload, env, fetchImpl = fetch }) => {
     RESEND_API_KEY,
     REQUEST_FROM_EMAIL,
     REQUEST_TO_EMAIL = 'signal@solarstatic.xyz',
-    SUPABASE_SERVICE_ROLE_KEY,
-    SUPABASE_URL,
   } = env;
 
-  if (!RESEND_API_KEY || !REQUEST_FROM_EMAIL || !SUPABASE_SERVICE_ROLE_KEY || !SUPABASE_URL) {
+  if (!RESEND_API_KEY || !REQUEST_FROM_EMAIL) {
     return {
       statusCode: 500,
       body: { error: 'missing_env' },
@@ -58,37 +62,46 @@ export const submitRequest = async ({ payload, env, fetchImpl = fetch }) => {
   }
 
   let submissionId;
-  let requestNumber = '';
+  let requestNumber = buildFallbackRequestNumber();
+  const shouldPersistSubmission = hasSupabaseConfig(env);
 
   try {
-    const insertResponse = await fetchImpl(`${SUPABASE_URL}/rest/v1/request_submissions?select=id`, {
-      method: 'POST',
-      headers: {
-        apikey: SUPABASE_SERVICE_ROLE_KEY,
-        Authorization: `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`,
-        'Content-Type': 'application/json',
-        Prefer: 'return=representation',
-      },
-      body: JSON.stringify({
-        email,
-        message,
-        email_status: 'pending',
-      }),
-    });
+    if (shouldPersistSubmission) {
+      try {
+        const insertResponse = await fetchImpl(`${env.SUPABASE_URL}/rest/v1/request_submissions?select=id`, {
+          method: 'POST',
+          headers: {
+            apikey: env.SUPABASE_SERVICE_ROLE_KEY,
+            Authorization: `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`,
+            'Content-Type': 'application/json',
+            Prefer: 'return=representation',
+          },
+          body: JSON.stringify({
+            email,
+            message,
+            email_status: 'pending',
+          }),
+        });
 
-    if (!insertResponse.ok) {
-      const insertError = await insertResponse.text();
-      throw new Error(insertError || 'Failed to create submission');
+        if (!insertResponse.ok) {
+          const insertError = await insertResponse.text();
+          throw new Error(insertError || 'Failed to create submission');
+        }
+
+        const [record] = await insertResponse.json();
+        submissionId = Number(record?.id);
+
+        if (!Number.isFinite(submissionId)) {
+          throw new Error('Invalid submission id');
+        }
+
+        requestNumber = String(submissionId).padStart(4, '0');
+      } catch (error) {
+        console.error('Supabase request logging unavailable, continuing with fallback request number.');
+        console.error(error);
+        submissionId = undefined;
+      }
     }
-
-    const [record] = await insertResponse.json();
-    submissionId = Number(record?.id);
-
-    if (!Number.isFinite(submissionId)) {
-      throw new Error('Invalid submission id');
-    }
-
-    requestNumber = String(submissionId).padStart(4, '0');
 
     const resendResponse = await fetchImpl('https://api.resend.com/emails', {
       method: 'POST',
@@ -109,7 +122,9 @@ export const submitRequest = async ({ payload, env, fetchImpl = fetch }) => {
       throw new Error(resendError || 'Failed to send request email');
     }
 
-    await updateSubmissionStatus(submissionId, 'sent', env, fetchImpl);
+    if (submissionId) {
+      await updateSubmissionStatus(submissionId, 'sent', env, fetchImpl);
+    }
 
     return {
       statusCode: 200,
@@ -119,7 +134,7 @@ export const submitRequest = async ({ payload, env, fetchImpl = fetch }) => {
       },
     };
   } catch (error) {
-    if (submissionId) {
+    if (submissionId && shouldPersistSubmission) {
       try {
         await updateSubmissionStatus(submissionId, 'failed', env, fetchImpl);
       } catch (updateError) {
