@@ -51,7 +51,7 @@ export const submitRequest = async ({ payload, env, fetchImpl = fetch }) => {
   const {
     RESEND_API_KEY,
     REQUEST_FROM_EMAIL,
-    REQUEST_TO_EMAIL = 'signal@solarstatic.xyz',
+    REQUEST_TO_EMAIL = 'solarstatic.studio@gmail.com',
   } = env;
 
   if (!RESEND_API_KEY || !REQUEST_FROM_EMAIL) {

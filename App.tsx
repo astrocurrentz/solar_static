@@ -693,7 +693,7 @@ const App: React.FC = () => {
                 aria-label="Return home"
               >
                 <img
-                  src="/assets/brand/sss-mark-96.png"
+                  src="/assets/brand/sss-mark-favicon.svg"
                   alt="Solar Static logo"
                   className="h-12 w-12 md:h-16 md:w-16"
                   style={{ imageRendering: 'pixelated' }}
