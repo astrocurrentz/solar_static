@@ -44,7 +44,7 @@ export const handler = async (event) => {
   const {
     RESEND_API_KEY,
     REQUEST_FROM_EMAIL,
-    REQUEST_TO_EMAIL = 'solarstatic.studio@gmail.com',
+    REQUEST_TO_EMAIL = 'signal@solarstatic.xyz',
     SUPABASE_SERVICE_ROLE_KEY,
     SUPABASE_URL,
   } = process.env;
