@@ -103,10 +103,6 @@ const LANDING_CONTENT_STYLE = {
   paddingTop: 'calc(5rem + env(safe-area-inset-top, 0px))',
   paddingBottom: 'calc(2rem + env(safe-area-inset-bottom, 0px))',
 };
-const REQUEST_CONTENT_STYLE = {
-  paddingTop: 'calc(1rem + env(safe-area-inset-top, 0px))',
-  paddingBottom: 'calc(1rem + env(safe-area-inset-bottom, 0px))',
-};
 const REQUEST_PANEL_STYLE = {
   maxHeight: 'calc(100dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px) - 2rem)',
 };
@@ -500,14 +496,11 @@ const App: React.FC = () => {
                   }`}
                 >
                   <span className="relative z-10 block max-w-full pl-[2.5vw] pr-[1.5vw] md:pl-[3vw] md:pr-[1.2vw]">
-                    <span className="absolute -left-12 top-1/2 hidden -translate-y-1/2 -rotate-90 origin-right font-mono text-sm font-normal tracking-widest text-[var(--text-secondary)] opacity-60 md:block">
-                      (CYBER_METAPHYSICS)
-                    </span>
                     <GlitchText
                       texts={LOOPING_WORDS}
                       autoLoop
-                      wrapToWidth={false}
-                      truncateOnDesktop
+                      wrapToWidth
+                      wrapToWidthDesktopOnly
                       loopIntervalMs={GLITCH_LOOP_INTERVAL_MS}
                       loopIntervalOverridesMs={GLITCH_LOOP_INTERVAL_OVERRIDES_MS}
                       accentLettersEnabled={!isEthosInFront}
@@ -560,11 +553,7 @@ const App: React.FC = () => {
                       landingNavigationTimeoutRef.current = null;
                     }, BUTTON_GLITCH_NAV_DELAY_MS);
                   }}
-<<<<<<< ours
                   className="group relative z-20 flex self-start items-center gap-4 text-lg font-bold text-[var(--text-primary)] transition-colors hover:text-[var(--accent-secondary)] md:fixed md:bottom-[calc(3.45rem+env(safe-area-inset-bottom,0px))] md:right-[6vw] md:self-auto"
-=======
-                  className="group relative z-20 flex self-start items-center gap-4 text-lg font-bold text-[var(--text-primary)] transition-colors hover:text-[var(--accent-secondary)] md:self-auto"
->>>>>>> theirs
                 >
                   <div className="flex h-12 w-12 items-center justify-center border border-[var(--border-strong)] bg-[var(--surface-tint)] transition-all group-hover:border-[var(--accent-primary)] group-hover:bg-[var(--accent-primary)] group-hover:text-[var(--text-primary)]">
                     <ArrowUpRight size={20} />
@@ -591,7 +580,7 @@ const App: React.FC = () => {
           <div className="absolute inset-0 opacity-75" style={HERO_GLOW} />
           <div className="absolute inset-0 opacity-70" style={WARM_OVERLAY} />
 
-          <div className="relative z-10 flex h-full items-center justify-center px-3 sm:px-6 md:px-24" style={REQUEST_CONTENT_STYLE}>
+          <div className="request-shell relative z-10 flex h-full items-center justify-center px-3 sm:px-6 md:px-24">
             <form
               onSubmit={handleSubmit}
               className="relative h-full w-full max-w-5xl overflow-hidden border border-[var(--border-strong)] bg-[rgba(40,33,25,0.88)]"
@@ -903,6 +892,16 @@ const App: React.FC = () => {
             width: var(--request-typing-width);
             opacity: 0.28;
             border-right-color: transparent;
+          }
+        }
+        .request-shell {
+          padding-top: calc(1rem + env(safe-area-inset-top, 0px));
+          padding-bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
+        }
+        @media (min-width: 768px) {
+          .request-shell {
+            padding-top: calc(4.75rem + env(safe-area-inset-top, 0px));
+            padding-bottom: calc(4.75rem + env(safe-area-inset-bottom, 0px));
           }
         }
         .animate-noise {

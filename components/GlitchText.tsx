@@ -5,10 +5,10 @@ interface GlitchTextProps {
   texts?: string[];
   autoLoop?: boolean;
   shuffleLoop?: boolean;
-  truncateOnDesktop?: boolean;
   loopIntervalMs?: number;
   loopIntervalOverridesMs?: Record<string, number>;
   wrapToWidth?: boolean;
+  wrapToWidthDesktopOnly?: boolean;
   scrambleOnMount?: boolean;
   scrambleSignal?: number | string;
   scrambleStepMs?: number;
@@ -56,10 +56,10 @@ const GlitchText: React.FC<GlitchTextProps> = ({
   texts,
   autoLoop = false,
   shuffleLoop = true,
-  truncateOnDesktop = false,
   loopIntervalMs = 0,
   loopIntervalOverridesMs,
   wrapToWidth = true,
+  wrapToWidthDesktopOnly = false,
   scrambleOnMount = true,
   scrambleSignal,
   scrambleStepMs = SCRAMBLE_STEP_MS,
@@ -76,6 +76,7 @@ const GlitchText: React.FC<GlitchTextProps> = ({
   const [accentIndex, setAccentIndex] = useState<number | null>(null);
   const [availableWidth, setAvailableWidth] = useState(0);
   const [singleLineHeight, setSingleLineHeight] = useState(0);
+  const [isDesktopViewport, setIsDesktopViewport] = useState(() => window.matchMedia('(min-width: 768px)').matches);
   const [wrappedSequence, setWrappedSequence] = useState(sequence);
   const [playbackSequence, setPlaybackSequence] = useState(initialPlaybackSequence);
   const scrambleIntervalRef = useRef<number | null>(null);
@@ -88,6 +89,7 @@ const GlitchText: React.FC<GlitchTextProps> = ({
   const previousScrambleSignalRef = useRef<number | string | undefined>(undefined);
 
   const playbackSequenceKey = playbackSequence.join('\u0000');
+  const shouldWrapToWidth = wrapToWidth && (!wrapToWidthDesktopOnly || isDesktopViewport);
   const longestText = wrappedSequence.reduce((longest, current) => (
     current.length > longest.length ? current : longest
   ), wrappedSequence[0] ?? '');
@@ -249,11 +251,29 @@ const GlitchText: React.FC<GlitchTextProps> = ({
   }, []);
 
   useEffect(() => {
+    if (!wrapToWidthDesktopOnly) {
+      return;
+    }
+
+    const mediaQuery = window.matchMedia('(min-width: 768px)');
+    const handleMediaChange = (event: MediaQueryListEvent) => {
+      setIsDesktopViewport(event.matches);
+    };
+
+    setIsDesktopViewport(mediaQuery.matches);
+    mediaQuery.addEventListener('change', handleMediaChange);
+
+    return () => {
+      mediaQuery.removeEventListener('change', handleMediaChange);
+    };
+  }, [wrapToWidthDesktopOnly]);
+
+  useEffect(() => {
     if (!sequence.length) {
       return;
     }
 
-    const nextWrappedSequence = !wrapToWidth || !availableWidth
+    const nextWrappedSequence = !shouldWrapToWidth || !availableWidth
       ? sequence
       : sequence.map((word) => wrapWordToWidth(word, availableWidth));
 
@@ -270,7 +290,7 @@ const GlitchText: React.FC<GlitchTextProps> = ({
     });
 
     setActiveIndex(0);
-  }, [autoLoop, availableWidth, sequenceKey, shuffleLoop, wrapToWidth]);
+  }, [autoLoop, availableWidth, sequenceKey, shouldWrapToWidth, shuffleLoop]);
 
   useEffect(() => {
     if (accentLettersEnabled) {
@@ -343,7 +363,7 @@ const GlitchText: React.FC<GlitchTextProps> = ({
         aria-hidden="true"
       />
       <span className="invisible inline-block h-0 overflow-hidden whitespace-pre">{longestText}</span>
-      <span className={`absolute bottom-0 left-0 right-0 block ${truncateOnDesktop ? 'md:overflow-hidden md:text-ellipsis md:whitespace-nowrap' : ''}`}>
+      <span className="absolute bottom-0 left-0 right-0 block">
         {displayText.split('').map((char, index) => (
           char === '\n'
             ? <br key={`break-${index}`} />
