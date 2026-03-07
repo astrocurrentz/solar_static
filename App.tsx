@@ -559,7 +559,11 @@ const App: React.FC = () => {
                       landingNavigationTimeoutRef.current = null;
                     }, BUTTON_GLITCH_NAV_DELAY_MS);
                   }}
+<<<<<<< ours
                   className="group relative z-20 flex self-start items-center gap-4 text-lg font-bold text-[var(--text-primary)] transition-colors hover:text-[var(--accent-secondary)] md:fixed md:bottom-[calc(3.45rem+env(safe-area-inset-bottom,0px))] md:right-[6vw] md:self-auto"
+=======
+                  className="group relative z-20 flex self-start items-center gap-4 text-lg font-bold text-[var(--text-primary)] transition-colors hover:text-[var(--accent-secondary)] md:self-auto"
+>>>>>>> theirs
                 >
                   <div className="flex h-12 w-12 items-center justify-center border border-[var(--border-strong)] bg-[var(--surface-tint)] transition-all group-hover:border-[var(--accent-primary)] group-hover:bg-[var(--accent-primary)] group-hover:text-[var(--text-primary)]">
                     <ArrowUpRight size={20} />
@@ -586,10 +590,10 @@ const App: React.FC = () => {
           <div className="absolute inset-0 opacity-75" style={HERO_GLOW} />
           <div className="absolute inset-0 opacity-70" style={WARM_OVERLAY} />
 
-          <div className="relative z-10 flex h-full items-center justify-center px-3 sm:px-6 md:px-0" style={REQUEST_CONTENT_STYLE}>
+          <div className="relative z-10 flex h-full items-center justify-center px-3 sm:px-6 md:px-24" style={REQUEST_CONTENT_STYLE}>
             <form
               onSubmit={handleSubmit}
-              className="relative mx-auto h-full w-full max-w-5xl overflow-hidden border border-[var(--border-strong)] bg-[rgba(40,33,25,0.88)]"
+              className="relative h-full w-full max-w-5xl overflow-hidden border border-[var(--border-strong)] bg-[rgba(40,33,25,0.88)]"
               style={{ ...PANEL_SHADOW, ...REQUEST_TERMINAL_PANEL, ...REQUEST_PANEL_STYLE }}
               noValidate
             >
