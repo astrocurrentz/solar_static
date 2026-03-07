@@ -5,6 +5,7 @@ interface GlitchTextProps {
   texts?: string[];
   autoLoop?: boolean;
   shuffleLoop?: boolean;
+  truncateOnDesktop?: boolean;
   loopIntervalMs?: number;
   loopIntervalOverridesMs?: Record<string, number>;
   wrapToWidth?: boolean;
@@ -55,6 +56,7 @@ const GlitchText: React.FC<GlitchTextProps> = ({
   texts,
   autoLoop = false,
   shuffleLoop = true,
+  truncateOnDesktop = false,
   loopIntervalMs = 0,
   loopIntervalOverridesMs,
   wrapToWidth = true,
@@ -341,7 +343,7 @@ const GlitchText: React.FC<GlitchTextProps> = ({
         aria-hidden="true"
       />
       <span className="invisible inline-block h-0 overflow-hidden whitespace-pre">{longestText}</span>
-      <span className="absolute bottom-0 left-0 right-0">
+      <span className={`absolute bottom-0 left-0 right-0 block ${truncateOnDesktop ? 'md:overflow-hidden md:text-ellipsis md:whitespace-nowrap' : ''}`}>
         {displayText.split('').map((char, index) => (
           char === '\n'
             ? <br key={`break-${index}`} />

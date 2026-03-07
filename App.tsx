@@ -507,6 +507,7 @@ const App: React.FC = () => {
                       texts={LOOPING_WORDS}
                       autoLoop
                       wrapToWidth={false}
+                      truncateOnDesktop
                       loopIntervalMs={GLITCH_LOOP_INTERVAL_MS}
                       loopIntervalOverridesMs={GLITCH_LOOP_INTERVAL_OVERRIDES_MS}
                       accentLettersEnabled={!isEthosInFront}
