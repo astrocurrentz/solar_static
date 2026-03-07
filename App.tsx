@@ -45,7 +45,7 @@ const ETHOS_PARAGRAPHS = [
   'Everything we create is a reflection of the signals we receive from the universe.',
 ];
 
-const REQUEST_ENDPOINT = import.meta.env.VITE_REQUEST_ENDPOINT || '/.netlify/functions/request';
+const REQUEST_ENDPOINT = import.meta.env.VITE_REQUEST_ENDPOINT || '/api/request';
 
 const HERO_BACKGROUND = {
   background: 'linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-primary) 48%, var(--bg-secondary) 100%)',
