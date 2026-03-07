@@ -16,6 +16,12 @@ type RequestTelemetryLine = {
   durationMs: number;
   accent: boolean;
 };
+type ThanksGlitchTarget = {
+  lineIndex: number;
+  tokenIndex: number;
+  start: number;
+  end: number;
+};
 
 const LOOPING_WORDS = [
   'MUSIC',
@@ -44,6 +50,7 @@ const ETHOS_PARAGRAPHS = [
   'As inhabitants orbiting the sun, we exist within a unique field of energy, noise, and static. Solar Static is born from this condition. Our work captures, transforms, and reshapes these signals into creative forms - design, sound, visuals, and software.',
   'Everything we create is a reflection of the signals we receive from the universe.',
 ];
+const ETHOS_FULL_TEXT = ETHOS_PARAGRAPHS.join('\n\n');
 
 const REQUEST_ENDPOINT = import.meta.env.VITE_REQUEST_ENDPOINT || '/api/request';
 
@@ -76,10 +83,17 @@ const REQUEST_TERMINAL_PANEL = {
 };
 
 const GLITCH_LOOP_INTERVAL_MS = 540;
-const THANKS_MESSAGE = 'signal received. your request is now in the static.\nwe will transmit a return signal soon.';
-const THANKS_GLITCH_LOOP_INTERVAL_MS = 3400;
-const THANKS_GLITCH_STEP_MS = 18;
-const THANKS_GLITCH_REVEAL_STEP = 2.25;
+const ETHOS_GLITCH_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&?!<>';
+const ETHOS_REVEAL_STEP_MS = 8;
+const ETHOS_REVEAL_STEP = 6;
+const THANKS_MESSAGE_LINES = [
+  'signal received. your request is now in the static.',
+  'we will transmit a return signal soon.',
+];
+const THANKS_WORD_SCRAMBLE_STEP_MS = 20;
+const THANKS_WORD_SCRAMBLE_REVEAL_STEP = 2.2;
+const THANKS_GLITCH_MIN_DELAY_MS = 2500;
+const THANKS_GLITCH_MAX_DELAY_MS = 4000;
 const NOISE_ANIMATION_DURATION_MS = 450;
 const NOISE_ANIMATION_STEP_COUNT = 5;
 const ETHOS_FOREGROUND_IDLE_MS = 60_000;
@@ -91,6 +105,30 @@ const REQUEST_TELEMETRY_STATES = ['warm', 'stable', 'active', 'ready', 'sealed',
 
 const randomFrom = <T,>(items: T[]) => items[Math.floor(Math.random() * items.length)] ?? items[0];
 const randomInt = (min: number, max: number) => Math.floor(Math.random() * (max - min + 1)) + min;
+const splitTextTokens = (value: string) => value.split(/(\s+)/).filter((token) => token.length > 0);
+const THANKS_TOKENS = THANKS_MESSAGE_LINES.map(splitTextTokens);
+const THANKS_TOKEN_CANDIDATES = THANKS_TOKENS.flatMap((lineTokens, lineIndex) => (
+  lineTokens
+    .map((token, tokenIndex) => ({ token, tokenIndex, lineIndex }))
+    .filter(({ token }) => /\S/.test(token))
+));
+const ROUTE_VIEWPORT_STYLE = { minHeight: '100dvh' };
+const BOTTOM_RAIL_STYLE = { bottom: 'calc(5rem + env(safe-area-inset-bottom, 0px))' };
+const LANDING_CONTENT_STYLE = {
+  paddingTop: 'calc(5rem + env(safe-area-inset-top, 0px))',
+  paddingBottom: 'calc(2rem + env(safe-area-inset-bottom, 0px))',
+};
+const REQUEST_CONTENT_STYLE = {
+  paddingTop: 'calc(1rem + env(safe-area-inset-top, 0px))',
+  paddingBottom: 'calc(1rem + env(safe-area-inset-bottom, 0px))',
+};
+const REQUEST_PANEL_STYLE = {
+  maxHeight: 'calc(100dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px) - 2rem)',
+};
+const THANKS_CONTENT_STYLE = {
+  paddingTop: 'calc(2rem + env(safe-area-inset-top, 0px))',
+  paddingBottom: 'calc(2rem + env(safe-area-inset-bottom, 0px))',
+};
 
 const buildRequestTelemetryLine = (variant: 'primary' | 'secondary'): RequestTelemetryLine => {
   const segmentCount = variant === 'primary' ? randomInt(2, 4) : randomInt(1, 3);
@@ -139,10 +177,14 @@ const App: React.FC = () => {
   const [primaryTelemetryLines, setPrimaryTelemetryLines] = useState<RequestTelemetryLine[]>(() => buildRequestTelemetryBatch(8, 'primary'));
   const [secondaryTelemetryLines, setSecondaryTelemetryLines] = useState<RequestTelemetryLine[]>(() => buildRequestTelemetryBatch(7, 'secondary'));
   const [isEthosInFront, setIsEthosInFront] = useState(false);
+  const [ethosDisplayText, setEthosDisplayText] = useState('');
   const [landingButtonScrambleSignal, setLandingButtonScrambleSignal] = useState(0);
   const [requestButtonScrambleSignal, setRequestButtonScrambleSignal] = useState(0);
-  const [thanksTextScrambleSignal, setThanksTextScrambleSignal] = useState(0);
+  const [thanksGlitchTarget, setThanksGlitchTarget] = useState<ThanksGlitchTarget | null>(null);
+  const [thanksWordScrambleSignal, setThanksWordScrambleSignal] = useState(0);
   const ethosIdleTimeoutRef = useRef<number | null>(null);
+  const ethosScrambleIntervalRef = useRef<number | null>(null);
+  const thanksGlitchTimeoutRef = useRef<number | null>(null);
   const landingNavigationTimeoutRef = useRef<number | null>(null);
   const emailInputRef = useRef<HTMLInputElement | null>(null);
   const messageInputRef = useRef<HTMLTextAreaElement | null>(null);
@@ -180,10 +222,16 @@ const App: React.FC = () => {
     }
 
     setIsEthosInFront(false);
+    setEthosDisplayText('');
 
     if (ethosIdleTimeoutRef.current !== null) {
       window.clearTimeout(ethosIdleTimeoutRef.current);
       ethosIdleTimeoutRef.current = null;
+    }
+
+    if (ethosScrambleIntervalRef.current !== null) {
+      window.clearInterval(ethosScrambleIntervalRef.current);
+      ethosScrambleIntervalRef.current = null;
     }
   }, [route]);
 
@@ -191,6 +239,14 @@ const App: React.FC = () => {
     () => {
       if (landingNavigationTimeoutRef.current !== null) {
         window.clearTimeout(landingNavigationTimeoutRef.current);
+      }
+
+      if (ethosScrambleIntervalRef.current !== null) {
+        window.clearInterval(ethosScrambleIntervalRef.current);
+      }
+
+      if (thanksGlitchTimeoutRef.current !== null) {
+        window.clearTimeout(thanksGlitchTimeoutRef.current);
       }
     }
   ), []);
@@ -225,15 +281,54 @@ const App: React.FC = () => {
 
   useEffect(() => {
     if (route !== '/thanks') {
+      if (thanksGlitchTimeoutRef.current !== null) {
+        window.clearTimeout(thanksGlitchTimeoutRef.current);
+        thanksGlitchTimeoutRef.current = null;
+      }
+      setThanksGlitchTarget(null);
       return;
     }
 
-    const scrambleInterval = window.setInterval(() => {
-      setThanksTextScrambleSignal((currentSignal) => currentSignal + 1);
-    }, THANKS_GLITCH_LOOP_INTERVAL_MS);
+    const scheduleNextGlitch = () => {
+      thanksGlitchTimeoutRef.current = window.setTimeout(() => {
+        const randomToken = randomFrom(THANKS_TOKEN_CANDIDATES);
+        const tokenLength = randomToken?.token.length ?? 0;
+
+        if (randomToken && tokenLength > 0) {
+          const mode = randomFrom(['char', 'subword', 'word'] as const);
+          let start = 0;
+          let end = tokenLength;
+
+          if (mode === 'char') {
+            start = randomInt(0, tokenLength - 1);
+            end = start + 1;
+          } else if (mode === 'subword' && tokenLength > 2) {
+            const maxSubwordLength = Math.min(5, tokenLength);
+            const segmentLength = randomInt(2, maxSubwordLength);
+            start = randomInt(0, tokenLength - segmentLength);
+            end = start + segmentLength;
+          }
+
+          setThanksGlitchTarget({
+            lineIndex: randomToken.lineIndex,
+            tokenIndex: randomToken.tokenIndex,
+            start,
+            end,
+          });
+          setThanksWordScrambleSignal((currentSignal) => currentSignal + 1);
+        }
+
+        scheduleNextGlitch();
+      }, randomInt(THANKS_GLITCH_MIN_DELAY_MS, THANKS_GLITCH_MAX_DELAY_MS));
+    };
+
+    scheduleNextGlitch();
 
     return () => {
-      window.clearInterval(scrambleInterval);
+      if (thanksGlitchTimeoutRef.current !== null) {
+        window.clearTimeout(thanksGlitchTimeoutRef.current);
+        thanksGlitchTimeoutRef.current = null;
+      }
     };
   }, [route]);
 
@@ -306,12 +401,53 @@ const App: React.FC = () => {
     });
   };
 
+  const startEthosRevealScramble = () => {
+    if (ethosScrambleIntervalRef.current !== null) {
+      window.clearInterval(ethosScrambleIntervalRef.current);
+      ethosScrambleIntervalRef.current = null;
+    }
+
+    let iteration = 0;
+
+    ethosScrambleIntervalRef.current = window.setInterval(() => {
+      const nextText = ETHOS_FULL_TEXT
+        .split('')
+        .map((character, index) => {
+          if (character === '\n' || character === ' ' || index < iteration) {
+            return character;
+          }
+
+          return ETHOS_GLITCH_CHARS[Math.floor(Math.random() * ETHOS_GLITCH_CHARS.length)] ?? character;
+        })
+        .join('');
+
+      setEthosDisplayText(nextText);
+
+      if (iteration >= ETHOS_FULL_TEXT.length) {
+        setEthosDisplayText(ETHOS_FULL_TEXT);
+        if (ethosScrambleIntervalRef.current !== null) {
+          window.clearInterval(ethosScrambleIntervalRef.current);
+          ethosScrambleIntervalRef.current = null;
+        }
+      }
+
+      iteration += ETHOS_REVEAL_STEP;
+    }, ETHOS_REVEAL_STEP_MS);
+  };
+
   const activateEthosForeground = () => {
     setIsEthosInFront(true);
+    startEthosRevealScramble();
   };
 
   const restoreEthosBackground = () => {
     setIsEthosInFront(false);
+    setEthosDisplayText('');
+
+    if (ethosScrambleIntervalRef.current !== null) {
+      window.clearInterval(ethosScrambleIntervalRef.current);
+      ethosScrambleIntervalRef.current = null;
+    }
   };
 
   const handleEthosKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
@@ -401,16 +537,16 @@ const App: React.FC = () => {
         : 'ready';
 
   return (
-    <div className="relative h-screen overflow-hidden cursor-none bg-[var(--bg-primary)] text-[var(--text-primary)]">
+    <div className="relative h-[100dvh] min-h-[100dvh] overflow-hidden cursor-none bg-[var(--bg-primary)] text-[var(--text-primary)]">
       <CustomCursor />
       <NoiseOverlay />
 
       {route === '/' && (
-        <main className="relative h-screen overflow-hidden" style={HERO_BACKGROUND}>
+        <main className="relative h-[100dvh] min-h-[100dvh] overflow-hidden" style={{ ...HERO_BACKGROUND, ...ROUTE_VIEWPORT_STYLE }}>
           <div className="absolute inset-0 opacity-80" style={HERO_GLOW} />
           <div className="absolute inset-0 opacity-70" style={WARM_OVERLAY} />
 
-          <div className="relative z-10 h-full px-6 pb-10 pt-20 md:px-24 md:pb-12">
+          <div className="relative z-10 h-full px-4 md:px-24" style={LANDING_CONTENT_STYLE}>
             <div
               className="relative mx-auto h-full w-full max-w-7xl"
               onClick={() => {
@@ -432,17 +568,18 @@ const App: React.FC = () => {
                 }`}
               >
                 <h1
-                  className={`w-full select-none font-display font-black leading-[0.82] tracking-tighter text-[var(--text-primary)] transition-[font-size] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${
-                    isEthosInFront ? 'text-[12.8vw] md:text-[12vw]' : 'text-[14vw]'
+                  className={`w-full select-none font-display font-black leading-[0.86] tracking-tight text-[var(--text-primary)] transition-[font-size] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+                    isEthosInFront ? 'text-[clamp(2.8rem,12vw,5rem)] md:text-[12vw]' : 'text-[clamp(3rem,12.8vw,5.4rem)] md:text-[14vw]'
                   }`}
                 >
-                  <span className="relative z-10 block max-w-full pl-[8vw] pr-[2vw]">
+                  <span className="relative z-10 block max-w-full pl-[2.5vw] pr-[1.5vw] md:pl-[8vw] md:pr-[2vw]">
                     <span className="absolute -left-12 top-1/2 hidden -translate-y-1/2 -rotate-90 origin-right font-mono text-sm font-normal tracking-widest text-[var(--text-secondary)] opacity-60 md:block">
                       (CYBER_METAPHYSICS)
                     </span>
                     <GlitchText
                       texts={LOOPING_WORDS}
                       autoLoop
+                      wrapToWidth={false}
                       loopIntervalMs={GLITCH_LOOP_INTERVAL_MS}
                       loopIntervalOverridesMs={GLITCH_LOOP_INTERVAL_OVERRIDES_MS}
                       accentLettersEnabled={!isEthosInFront}
@@ -462,28 +599,21 @@ const App: React.FC = () => {
                     activateEthosForeground();
                   }}
                   onKeyDown={handleEthosKeyDown}
-                  className={`relative max-w-lg origin-bottom-left outline-none transition-[opacity,transform] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] focus-visible:opacity-100 ${
-                    isEthosInFront ? 'z-30 scale-[1.06] opacity-100 md:scale-[1.08]' : 'z-0 scale-100 opacity-60'
+                  className={`relative max-w-lg origin-bottom-left outline-none transition-opacity duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] focus-visible:opacity-100 ${
+                    isEthosInFront ? 'z-30 opacity-100' : 'z-0 opacity-65'
                   }`}
                 >
                   <p
-                    className={`font-mono font-medium leading-relaxed transition-[color,font-size] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${
-                      isEthosInFront ? 'text-base text-[var(--accent-secondary)] md:text-lg' : 'text-sm text-[var(--text-secondary)] md:text-base'
+                    className={`font-mono text-sm font-medium leading-relaxed transition-colors duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] md:text-base ${
+                      isEthosInFront ? 'text-[var(--accent-secondary)]' : 'text-[var(--text-secondary)]'
                     }`}
                   >
                     <span className={`px-1 transition-colors ${isEthosInFront ? 'bg-[var(--accent-secondary)] text-[var(--bg-primary)]' : 'bg-[var(--bg-light)] text-[var(--text-dark)]'}`}>////// SOLAR_STATIC_ETHOS:</span>
-                    {ETHOS_PARAGRAPHS.map((paragraph, index) => (
-                      <React.Fragment key={paragraph}>
-                        <br />
-                        {paragraph}
-                        {index < ETHOS_PARAGRAPHS.length - 1 && (
-                          <>
-                            <br />
-                            <br />
-                          </>
-                        )}
-                      </React.Fragment>
-                    ))}
+                    {isEthosInFront && (
+                      <span className="mt-2 block whitespace-pre-line">
+                        {ethosDisplayText}
+                      </span>
+                    )}
                   </p>
                 </div>
 
@@ -520,20 +650,20 @@ const App: React.FC = () => {
           </div>
 
           <div className="pointer-events-none absolute top-0 right-0 hidden h-full w-1/4 border-l border-[var(--border-soft)] opacity-50 lg:block" />
-          <div className="pointer-events-none absolute bottom-20 left-0 h-[1px] w-full bg-[var(--border-soft)]" />
+          <div className="pointer-events-none absolute left-0 h-[1px] w-full bg-[var(--border-soft)]" style={BOTTOM_RAIL_STYLE} />
         </main>
       )}
 
       {route === '/request' && (
-        <main className="relative h-screen overflow-hidden" style={HERO_BACKGROUND}>
+        <main className="relative h-[100dvh] min-h-[100dvh] overflow-hidden" style={{ ...HERO_BACKGROUND, ...ROUTE_VIEWPORT_STYLE }}>
           <div className="absolute inset-0 opacity-75" style={HERO_GLOW} />
           <div className="absolute inset-0 opacity-70" style={WARM_OVERLAY} />
 
-          <div className="relative z-10 flex h-full items-center justify-center px-6 py-10 md:px-24 md:py-12">
+          <div className="relative z-10 flex h-full items-center justify-center px-3 sm:px-6 md:px-24" style={REQUEST_CONTENT_STYLE}>
             <form
               onSubmit={handleSubmit}
-              className="relative w-full max-w-5xl overflow-hidden border border-[var(--border-strong)] bg-[rgba(40,33,25,0.88)]"
-              style={{ ...PANEL_SHADOW, ...REQUEST_TERMINAL_PANEL }}
+              className="relative h-full w-full max-w-5xl overflow-hidden border border-[var(--border-strong)] bg-[rgba(40,33,25,0.88)]"
+              style={{ ...PANEL_SHADOW, ...REQUEST_TERMINAL_PANEL, ...REQUEST_PANEL_STYLE }}
               noValidate
             >
               <span className="pointer-events-none absolute left-3 top-3 h-3 w-3 border-l border-t border-[var(--accent-secondary)]" />
@@ -592,17 +722,17 @@ const App: React.FC = () => {
                 </div>
               </div>
 
-              <div className="relative z-10 flex min-h-[calc(100vh-5rem)] flex-col md:min-h-[min(46rem,calc(100vh-6rem))]">
-                <div className="flex items-center justify-between gap-4 border-b border-[var(--border-soft)] px-5 py-4 font-mono text-[11px] uppercase tracking-[0.28em] text-[var(--accent-secondary)] md:px-7">
+              <div className="relative z-10 flex h-full min-h-0 flex-col">
+                <div className="flex items-center justify-between gap-3 border-b border-[var(--border-soft)] px-4 py-3 font-mono text-[9px] uppercase tracking-[0.18em] text-[var(--accent-secondary)] sm:text-[10px] md:px-7 md:py-4 md:text-[11px] md:tracking-[0.28em]">
                   <GlitchText
                     text="TRANSMISSION_CONSOLE"
                     wrapToWidth={false}
-                    className="block min-w-0 overflow-hidden whitespace-nowrap text-ellipsis text-[9px] tracking-[0.16em] md:text-[10px] md:tracking-[0.2em]"
+                    className="block min-w-0 overflow-hidden whitespace-nowrap text-ellipsis text-[8px] tracking-[0.14em] sm:text-[9px] md:text-[10px] md:tracking-[0.2em]"
                   />
                   <span className="shrink-0 text-[var(--text-secondary)]">NODE // REQUEST</span>
                 </div>
 
-                <div className="grid flex-1 gap-4 p-5 md:gap-6 md:p-7">
+                <div className="grid min-h-0 flex-1 gap-4 p-4 md:gap-6 md:p-7">
                   <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_12rem] md:items-start">
                     <div className={`border bg-[rgba(8,8,8,0.12)] transition-colors ${validationErrors.email ? 'border-[var(--accent-secondary)]' : 'border-[var(--border-soft)]'}`}>
                       <div className={`flex items-center justify-between border-b px-4 py-2 font-mono text-[10px] uppercase tracking-[0.26em] transition-colors ${validationErrors.email ? 'border-[var(--accent-secondary)] text-[var(--accent-secondary)]' : 'border-[var(--border-soft)] text-[var(--text-secondary)]'}`}>
@@ -625,7 +755,7 @@ const App: React.FC = () => {
                         placeholder="YOUR EMAIL"
                         required
                         aria-invalid={validationErrors.email ? 'true' : 'false'}
-                        className="w-full bg-transparent px-4 py-3 font-mono text-sm tracking-[0.18em] text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] focus:outline-none"
+                        className="w-full bg-transparent px-4 py-3 font-mono text-sm tracking-[0.14em] text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] focus:outline-none md:tracking-[0.18em]"
                       />
                     </div>
 
@@ -665,19 +795,19 @@ const App: React.FC = () => {
                       required
                       rows={10}
                       aria-invalid={validationErrors.message ? 'true' : 'false'}
-                      className="h-full min-h-[16rem] flex-1 resize-none bg-transparent px-4 py-4 font-mono text-sm leading-relaxed tracking-[0.12em] text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] focus:bg-[rgba(201,115,56,0.05)] focus:outline-none"
+                      className="h-full min-h-[12rem] flex-1 resize-none bg-transparent px-4 py-4 font-mono text-sm leading-relaxed tracking-[0.1em] text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] focus:bg-[rgba(201,115,56,0.05)] focus:outline-none md:min-h-[16rem] md:tracking-[0.12em]"
                     />
                   </div>
                 </div>
 
-                <div className="flex flex-col gap-4 border-t border-[var(--border-soft)] px-5 py-4 md:flex-row md:items-center md:justify-between md:px-7">
-                  <div className="font-mono text-[10px] uppercase tracking-[0.26em] text-[var(--text-secondary)]">
+                <div className="flex flex-col gap-4 border-t border-[var(--border-soft)] px-4 py-3 md:flex-row md:items-center md:justify-between md:px-7 md:py-4">
+                  <div className="font-mono text-[9px] uppercase tracking-[0.16em] text-[var(--text-secondary)] md:text-[10px] md:tracking-[0.26em]">
                     [ protocol ] solar-static uplink / encrypted static / single dispatch
                   </div>
                   <button
                     type="submit"
                     disabled={submitState === 'sending'}
-                    className="group flex w-full items-center justify-center gap-4 border border-[var(--border-strong)] bg-[rgba(201,115,56,0.14)] px-6 py-4 font-mono text-sm font-bold tracking-[0.24em] text-[var(--text-primary)] transition-all hover:border-[var(--accent-secondary)] hover:bg-[var(--accent-primary)] disabled:cursor-wait disabled:opacity-80 md:w-auto md:min-w-[20rem]"
+                    className="group flex w-full items-center justify-center gap-3 border border-[var(--border-strong)] bg-[rgba(201,115,56,0.14)] px-5 py-3 font-mono text-sm font-bold tracking-[0.2em] text-[var(--text-primary)] transition-all hover:border-[var(--accent-secondary)] hover:bg-[var(--accent-primary)] disabled:cursor-wait disabled:opacity-80 md:w-auto md:min-w-[20rem] md:gap-4 md:px-6 md:py-4 md:tracking-[0.24em]"
                   >
                     <span className="font-mono text-base text-[var(--accent-secondary)] transition-colors group-hover:text-[var(--text-primary)]">&gt;</span>
                     <GlitchText
@@ -694,17 +824,17 @@ const App: React.FC = () => {
           </div>
 
           <div className="pointer-events-none absolute top-0 right-0 hidden h-full w-1/4 border-l border-[var(--border-soft)] opacity-50 lg:block" />
-          <div className="pointer-events-none absolute bottom-20 left-0 h-[1px] w-full bg-[var(--border-soft)]" />
+          <div className="pointer-events-none absolute left-0 h-[1px] w-full bg-[var(--border-soft)]" style={BOTTOM_RAIL_STYLE} />
         </main>
       )}
 
       {route === '/thanks' && (
-        <main className="relative h-screen overflow-hidden" style={HERO_BACKGROUND}>
+        <main className="relative h-[100dvh] min-h-[100dvh] overflow-hidden" style={{ ...HERO_BACKGROUND, ...ROUTE_VIEWPORT_STYLE }}>
           <div className="absolute inset-0 opacity-75" style={HERO_GLOW} />
           <div className="absolute inset-0 opacity-70" style={WARM_OVERLAY} />
 
-          <div className="relative z-10 flex h-full items-center justify-center px-6 md:px-24">
-            <div className="flex max-w-xl flex-col items-center gap-8 text-center">
+          <div className="relative z-10 flex h-full items-center justify-center px-4 md:px-24" style={THANKS_CONTENT_STYLE}>
+            <div className="flex w-full max-w-[min(44rem,calc(100vw-2.5rem))] flex-col items-center gap-8 text-center">
               <button
                 type="button"
                 onClick={() => navigate('/')}
@@ -714,24 +844,64 @@ const App: React.FC = () => {
                 <img
                   src="/assets/brand/sss-mark-favicon.svg"
                   alt="Solar Static logo"
-                  className="h-16 w-16 md:h-20 md:w-20"
+                  className="h-20 w-20 md:h-28 md:w-28"
                   style={{ imageRendering: 'pixelated' }}
                 />
               </button>
-              <GlitchText
-                tag="p"
-                text={THANKS_MESSAGE}
-                wrapToWidth={false}
-                scrambleSignal={thanksTextScrambleSignal}
-                scrambleStepMs={THANKS_GLITCH_STEP_MS}
-                scrambleRevealStep={THANKS_GLITCH_REVEAL_STEP}
-                className="font-mono text-base leading-relaxed text-[var(--text-secondary)] md:text-lg"
-              />
+              <div className="w-full space-y-2 px-1 text-center">
+                {THANKS_TOKENS.map((lineTokens, lineIndex) => (
+                  <p
+                    key={`thanks-line-${lineIndex}`}
+                    className="font-mono text-[clamp(1.1rem,4.6vw,1.55rem)] leading-snug tracking-[0.08em] text-[var(--text-secondary)] md:text-[clamp(1.15rem,2.2vw,1.8rem)]"
+                  >
+                    {lineTokens.map((token, tokenIndex) => {
+                      if (/^\s+$/.test(token)) {
+                        return (
+                          <React.Fragment key={`space-${lineIndex}-${tokenIndex}`}>
+                            {token}
+                          </React.Fragment>
+                        );
+                      }
+
+                      const isTargetedToken = thanksGlitchTarget
+                        && thanksGlitchTarget.lineIndex === lineIndex
+                        && thanksGlitchTarget.tokenIndex === tokenIndex;
+
+                      if (!isTargetedToken) {
+                        return (
+                          <span key={`word-${lineIndex}-${tokenIndex}`}>{token}</span>
+                        );
+                      }
+
+                      const prefix = token.slice(0, thanksGlitchTarget.start);
+                      const glitchedSegment = token.slice(thanksGlitchTarget.start, thanksGlitchTarget.end);
+                      const suffix = token.slice(thanksGlitchTarget.end);
+
+                      return (
+                        <React.Fragment key={`glitch-word-${lineIndex}-${tokenIndex}`}>
+                          {prefix}
+                          <GlitchText
+                            tag="span"
+                            text={glitchedSegment}
+                            wrapToWidth={false}
+                            scrambleOnMount={false}
+                            scrambleSignal={thanksWordScrambleSignal}
+                            scrambleStepMs={THANKS_WORD_SCRAMBLE_STEP_MS}
+                            scrambleRevealStep={THANKS_WORD_SCRAMBLE_REVEAL_STEP}
+                            className="inline-block align-baseline"
+                          />
+                          {suffix}
+                        </React.Fragment>
+                      );
+                    })}
+                  </p>
+                ))}
+              </div>
             </div>
           </div>
 
           <div className="pointer-events-none absolute top-0 right-0 hidden h-full w-1/4 border-l border-[var(--border-soft)] opacity-50 lg:block" />
-          <div className="pointer-events-none absolute bottom-20 left-0 h-[1px] w-full bg-[var(--border-soft)]" />
+          <div className="pointer-events-none absolute left-0 h-[1px] w-full bg-[var(--border-soft)]" style={BOTTOM_RAIL_STYLE} />
         </main>
       )}
 

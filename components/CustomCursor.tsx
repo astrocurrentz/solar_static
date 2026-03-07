@@ -1,11 +1,39 @@
 import React, { useEffect, useState } from 'react';
 
 const CustomCursor: React.FC = () => {
+  const [isEnabled, setIsEnabled] = useState(true);
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isPointer, setIsPointer] = useState(false);
   const [isHoveringText, setIsHoveringText] = useState(false);
 
   useEffect(() => {
+    const coarsePointerMedia = window.matchMedia('(pointer: coarse)');
+    const updateCursorMode = () => {
+      setIsEnabled(!coarsePointerMedia.matches);
+    };
+
+    updateCursorMode();
+
+    if (coarsePointerMedia.addEventListener) {
+      coarsePointerMedia.addEventListener('change', updateCursorMode);
+    } else {
+      coarsePointerMedia.addListener(updateCursorMode);
+    }
+
+    return () => {
+      if (coarsePointerMedia.removeEventListener) {
+        coarsePointerMedia.removeEventListener('change', updateCursorMode);
+      } else {
+        coarsePointerMedia.removeListener(updateCursorMode);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!isEnabled) {
+      return;
+    }
+
     const handleMouseMove = (e: MouseEvent) => {
       setPosition({ x: e.clientX, y: e.clientY });
       
@@ -25,7 +53,11 @@ const CustomCursor: React.FC = () => {
 
     window.addEventListener('mousemove', handleMouseMove);
     return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, []);
+  }, [isEnabled]);
+
+  if (!isEnabled) {
+    return null;
+  }
 
   return (
     <>
