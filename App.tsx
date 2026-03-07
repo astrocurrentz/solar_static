@@ -16,12 +16,6 @@ type RequestTelemetryLine = {
   durationMs: number;
   accent: boolean;
 };
-type ThanksGlitchTarget = {
-  lineIndex: number;
-  tokenIndex: number;
-  start: number;
-  end: number;
-};
 
 const LOOPING_WORDS = [
   'MUSIC',
@@ -86,14 +80,12 @@ const GLITCH_LOOP_INTERVAL_MS = 540;
 const ETHOS_GLITCH_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&?!<>';
 const ETHOS_REVEAL_STEP_MS = 8;
 const ETHOS_REVEAL_STEP = 6;
-const THANKS_MESSAGE_LINES = [
-  'signal received. your request is now in the static.',
-  'we will transmit a return signal soon.',
+const THANKS_MESSAGE_SENTENCES = [
+  'signal received.',
+  'your request is now\nin the static.',
+  'we will transmit\na return signal soon.',
 ];
-const THANKS_WORD_SCRAMBLE_STEP_MS = 20;
-const THANKS_WORD_SCRAMBLE_REVEAL_STEP = 2.2;
-const THANKS_GLITCH_MIN_DELAY_MS = 2500;
-const THANKS_GLITCH_MAX_DELAY_MS = 4000;
+const THANKS_MESSAGE_LOOP_INTERVAL_MS = 3200;
 const NOISE_ANIMATION_DURATION_MS = 450;
 const NOISE_ANIMATION_STEP_COUNT = 5;
 const ETHOS_FOREGROUND_IDLE_MS = 60_000;
@@ -105,13 +97,6 @@ const REQUEST_TELEMETRY_STATES = ['warm', 'stable', 'active', 'ready', 'sealed',
 
 const randomFrom = <T,>(items: T[]) => items[Math.floor(Math.random() * items.length)] ?? items[0];
 const randomInt = (min: number, max: number) => Math.floor(Math.random() * (max - min + 1)) + min;
-const splitTextTokens = (value: string) => value.split(/(\s+)/).filter((token) => token.length > 0);
-const THANKS_TOKENS = THANKS_MESSAGE_LINES.map(splitTextTokens);
-const THANKS_TOKEN_CANDIDATES = THANKS_TOKENS.flatMap((lineTokens, lineIndex) => (
-  lineTokens
-    .map((token, tokenIndex) => ({ token, tokenIndex, lineIndex }))
-    .filter(({ token }) => /\S/.test(token))
-));
 const ROUTE_VIEWPORT_STYLE = { minHeight: '100dvh' };
 const BOTTOM_RAIL_STYLE = { bottom: 'calc(5rem + env(safe-area-inset-bottom, 0px))' };
 const LANDING_CONTENT_STYLE = {
@@ -180,11 +165,8 @@ const App: React.FC = () => {
   const [ethosDisplayText, setEthosDisplayText] = useState('');
   const [landingButtonScrambleSignal, setLandingButtonScrambleSignal] = useState(0);
   const [requestButtonScrambleSignal, setRequestButtonScrambleSignal] = useState(0);
-  const [thanksGlitchTarget, setThanksGlitchTarget] = useState<ThanksGlitchTarget | null>(null);
-  const [thanksWordScrambleSignal, setThanksWordScrambleSignal] = useState(0);
   const ethosIdleTimeoutRef = useRef<number | null>(null);
   const ethosScrambleIntervalRef = useRef<number | null>(null);
-  const thanksGlitchTimeoutRef = useRef<number | null>(null);
   const landingNavigationTimeoutRef = useRef<number | null>(null);
   const emailInputRef = useRef<HTMLInputElement | null>(null);
   const messageInputRef = useRef<HTMLTextAreaElement | null>(null);
@@ -244,10 +226,6 @@ const App: React.FC = () => {
       if (ethosScrambleIntervalRef.current !== null) {
         window.clearInterval(ethosScrambleIntervalRef.current);
       }
-
-      if (thanksGlitchTimeoutRef.current !== null) {
-        window.clearTimeout(thanksGlitchTimeoutRef.current);
-      }
     }
   ), []);
 
@@ -276,59 +254,6 @@ const App: React.FC = () => {
     return () => {
       window.clearInterval(primaryInterval);
       window.clearInterval(secondaryInterval);
-    };
-  }, [route]);
-
-  useEffect(() => {
-    if (route !== '/thanks') {
-      if (thanksGlitchTimeoutRef.current !== null) {
-        window.clearTimeout(thanksGlitchTimeoutRef.current);
-        thanksGlitchTimeoutRef.current = null;
-      }
-      setThanksGlitchTarget(null);
-      return;
-    }
-
-    const scheduleNextGlitch = () => {
-      thanksGlitchTimeoutRef.current = window.setTimeout(() => {
-        const randomToken = randomFrom(THANKS_TOKEN_CANDIDATES);
-        const tokenLength = randomToken?.token.length ?? 0;
-
-        if (randomToken && tokenLength > 0) {
-          const mode = randomFrom(['char', 'subword', 'word'] as const);
-          let start = 0;
-          let end = tokenLength;
-
-          if (mode === 'char') {
-            start = randomInt(0, tokenLength - 1);
-            end = start + 1;
-          } else if (mode === 'subword' && tokenLength > 2) {
-            const maxSubwordLength = Math.min(5, tokenLength);
-            const segmentLength = randomInt(2, maxSubwordLength);
-            start = randomInt(0, tokenLength - segmentLength);
-            end = start + segmentLength;
-          }
-
-          setThanksGlitchTarget({
-            lineIndex: randomToken.lineIndex,
-            tokenIndex: randomToken.tokenIndex,
-            start,
-            end,
-          });
-          setThanksWordScrambleSignal((currentSignal) => currentSignal + 1);
-        }
-
-        scheduleNextGlitch();
-      }, randomInt(THANKS_GLITCH_MIN_DELAY_MS, THANKS_GLITCH_MAX_DELAY_MS));
-    };
-
-    scheduleNextGlitch();
-
-    return () => {
-      if (thanksGlitchTimeoutRef.current !== null) {
-        window.clearTimeout(thanksGlitchTimeoutRef.current);
-        thanksGlitchTimeoutRef.current = null;
-      }
     };
   }, [route]);
 
@@ -546,9 +471,9 @@ const App: React.FC = () => {
           <div className="absolute inset-0 opacity-80" style={HERO_GLOW} />
           <div className="absolute inset-0 opacity-70" style={WARM_OVERLAY} />
 
-          <div className="relative z-10 h-full px-4 md:px-24" style={LANDING_CONTENT_STYLE}>
+          <div className="relative z-10 h-full px-4 md:px-12 xl:px-14" style={LANDING_CONTENT_STYLE}>
             <div
-              className="relative mx-auto h-full w-full max-w-7xl"
+              className="relative h-full w-full max-w-[92rem]"
               onClick={() => {
                 if (!isEthosInFront) {
                   return;
@@ -564,7 +489,9 @@ const App: React.FC = () => {
 
               <div
                 className={`pointer-events-none relative z-10 flex h-full items-center pb-44 pt-16 transition-[opacity,transform] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] md:pb-32 ${
-                  isEthosInFront ? 'scale-[0.92] opacity-30 md:scale-[0.94]' : 'scale-100 opacity-100'
+                  isEthosInFront
+                    ? 'translate-x-[14vw] translate-y-[22vh] scale-[0.78] opacity-30 md:translate-x-0 md:translate-y-0 md:scale-[0.94]'
+                    : 'translate-x-0 translate-y-0 scale-100 opacity-100'
                 }`}
               >
                 <h1
@@ -572,7 +499,7 @@ const App: React.FC = () => {
                     isEthosInFront ? 'text-[clamp(2.8rem,12vw,5rem)] md:text-[12vw]' : 'text-[clamp(3rem,12.8vw,5.4rem)] md:text-[14vw]'
                   }`}
                 >
-                  <span className="relative z-10 block max-w-full pl-[2.5vw] pr-[1.5vw] md:pl-[8vw] md:pr-[2vw]">
+                  <span className="relative z-10 block max-w-full pl-[2.5vw] pr-[1.5vw] md:pl-[3vw] md:pr-[1.2vw]">
                     <span className="absolute -left-12 top-1/2 hidden -translate-y-1/2 -rotate-90 origin-right font-mono text-sm font-normal tracking-widest text-[var(--text-secondary)] opacity-60 md:block">
                       (CYBER_METAPHYSICS)
                     </span>
@@ -632,7 +559,7 @@ const App: React.FC = () => {
                       landingNavigationTimeoutRef.current = null;
                     }, BUTTON_GLITCH_NAV_DELAY_MS);
                   }}
-                  className="group relative z-20 flex self-start items-center gap-4 text-lg font-bold text-[var(--text-primary)] transition-colors hover:text-[var(--accent-secondary)] md:self-auto"
+                  className="group relative z-20 flex self-start items-center gap-4 text-lg font-bold text-[var(--text-primary)] transition-colors hover:text-[var(--accent-secondary)] md:absolute md:bottom-0 md:right-0 md:self-auto"
                 >
                   <div className="flex h-12 w-12 items-center justify-center border border-[var(--border-strong)] bg-[var(--surface-tint)] transition-all group-hover:border-[var(--accent-primary)] group-hover:bg-[var(--accent-primary)] group-hover:text-[var(--text-primary)]">
                     <ArrowUpRight size={20} />
@@ -659,10 +586,10 @@ const App: React.FC = () => {
           <div className="absolute inset-0 opacity-75" style={HERO_GLOW} />
           <div className="absolute inset-0 opacity-70" style={WARM_OVERLAY} />
 
-          <div className="relative z-10 flex h-full items-center justify-center px-3 sm:px-6 md:px-24" style={REQUEST_CONTENT_STYLE}>
+          <div className="relative z-10 flex h-full items-center justify-center px-3 sm:px-6 md:px-0" style={REQUEST_CONTENT_STYLE}>
             <form
               onSubmit={handleSubmit}
-              className="relative h-full w-full max-w-5xl overflow-hidden border border-[var(--border-strong)] bg-[rgba(40,33,25,0.88)]"
+              className="relative mx-auto h-full w-full max-w-5xl overflow-hidden border border-[var(--border-strong)] bg-[rgba(40,33,25,0.88)]"
               style={{ ...PANEL_SHADOW, ...REQUEST_TERMINAL_PANEL, ...REQUEST_PANEL_STYLE }}
               noValidate
             >
@@ -671,6 +598,19 @@ const App: React.FC = () => {
               <span className="pointer-events-none absolute bottom-3 left-3 h-3 w-3 border-b border-l border-[var(--accent-secondary)]" />
               <span className="pointer-events-none absolute bottom-3 right-3 h-3 w-3 border-b border-r border-[var(--accent-secondary)]" />
               <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden opacity-55">
+                <div className="absolute inset-0 md:hidden">
+                  <div className="absolute left-4 right-4 top-[5.8rem] h-px overflow-hidden bg-[rgba(201,115,56,0.2)]">
+                    <span className="animate-request-mobile-scan absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-transparent via-[rgba(201,115,56,0.94)] to-transparent" />
+                  </div>
+                  <div className="absolute left-5 right-5 bottom-[10.6rem] h-px overflow-hidden bg-[rgba(201,115,56,0.16)]">
+                    <span className="animate-request-mobile-scan-delay absolute inset-y-0 left-0 w-20 bg-gradient-to-r from-transparent via-[rgba(229,216,189,0.84)] to-transparent" />
+                  </div>
+                  <div className="absolute right-11 top-[6.9rem] bottom-[8.6rem] w-px overflow-hidden bg-[rgba(201,115,56,0.18)]">
+                    <span className="animate-request-mobile-pulse absolute left-1/2 top-0 h-16 w-px -translate-x-1/2 bg-gradient-to-b from-transparent via-[rgba(201,115,56,0.96)] to-transparent" />
+                  </div>
+                  <div className="animate-request-mobile-node absolute left-6 top-[5.6rem] h-2 w-2 rounded-full border border-[rgba(201,115,56,0.58)] bg-[rgba(201,115,56,0.2)]" />
+                  <div className="animate-request-mobile-node-delay absolute right-10 bottom-[10.45rem] h-2 w-2 rounded-full border border-[rgba(229,216,189,0.42)] bg-[rgba(229,216,189,0.08)]" />
+                </div>
                 <div className="absolute left-8 top-16 h-px w-[22%] min-w-24 bg-[rgba(201,115,56,0.14)]">
                   <span className="animate-request-packet absolute inset-y-0 left-0 w-20 bg-gradient-to-r from-transparent via-[rgba(201,115,56,0.9)] to-transparent" />
                 </div>
@@ -682,6 +622,29 @@ const App: React.FC = () => {
                 </div>
                 <div className="animate-request-node absolute left-[calc(34%+20rem)] top-[10.55rem] h-2 w-2 rounded-full border border-[rgba(201,115,56,0.6)] bg-[rgba(201,115,56,0.18)]" />
                 <div className="animate-request-node-delay absolute right-[10.8rem] top-[18.3rem] h-2 w-2 rounded-full border border-[rgba(229,216,189,0.42)] bg-[rgba(229,216,189,0.08)]" />
+                <div className="absolute bottom-36 right-4 h-px w-32 bg-[rgba(201,115,56,0.16)] md:hidden">
+                  <span className="animate-request-packet absolute inset-y-0 left-0 w-14 bg-gradient-to-r from-transparent via-[rgba(201,115,56,0.85)] to-transparent" />
+                </div>
+                <div className="animate-request-node absolute bottom-[8.6rem] right-[8.5rem] h-2 w-2 rounded-full border border-[rgba(201,115,56,0.55)] bg-[rgba(201,115,56,0.16)] md:hidden" />
+                <div className="absolute bottom-24 right-4 w-40 overflow-hidden border-r border-[rgba(201,115,56,0.14)] pr-2 text-right font-mono text-[8px] uppercase tracking-[0.18em] md:hidden">
+                  <div className="space-y-1">
+                    {secondaryTelemetryLines.slice(-4).map((line) => (
+                      <div
+                        key={`mobile-${line.id}`}
+                        className={`animate-request-typing ml-auto block overflow-hidden whitespace-nowrap border-r border-[rgba(229,216,189,0.24)] pr-1 ${
+                          line.accent ? 'text-[rgba(229,216,189,0.32)]' : 'text-[rgba(229,216,189,0.18)]'
+                        }`}
+                        style={{
+                          ['--request-typing-width' as string]: `${Math.max(8, line.text.length)}ch`,
+                          ['--request-typing-duration' as string]: `${Math.max(170, Math.round(line.durationMs * 0.8))}ms`,
+                          ['--request-typing-steps' as string]: `${Math.max(6, Math.round(line.text.length * 0.68))}`,
+                        } as React.CSSProperties}
+                      >
+                        {line.text}
+                      </div>
+                    ))}
+                  </div>
+                </div>
                 <div className="absolute bottom-32 right-8 hidden w-64 overflow-hidden border-r border-[rgba(201,115,56,0.14)] pr-3 text-right font-mono text-[8px] uppercase tracking-[0.22em] md:block">
                   <div className="space-y-1">
                     {primaryTelemetryLines.map((line) => (
@@ -834,7 +797,7 @@ const App: React.FC = () => {
           <div className="absolute inset-0 opacity-70" style={WARM_OVERLAY} />
 
           <div className="relative z-10 flex h-full items-center justify-center px-4 md:px-24" style={THANKS_CONTENT_STYLE}>
-            <div className="flex w-full max-w-[min(44rem,calc(100vw-2.5rem))] flex-col items-center gap-8 text-center">
+            <div className="flex w-full max-w-[min(52rem,calc(100vw-2rem))] flex-col items-center gap-6 text-center md:gap-8">
               <button
                 type="button"
                 onClick={() => navigate('/')}
@@ -842,60 +805,26 @@ const App: React.FC = () => {
                 aria-label="Return home"
               >
                 <img
-                  src="/assets/brand/sss-mark-favicon.svg"
+                  src="/assets/brand/sss-mark-favicon.png"
                   alt="Solar Static logo"
-                  className="h-20 w-20 md:h-28 md:w-28"
+                  className="h-[11.25rem] w-[11.25rem] md:h-[15.75rem] md:w-[15.75rem]"
                   style={{ imageRendering: 'pixelated' }}
                 />
               </button>
-              <div className="w-full space-y-2 px-1 text-center">
-                {THANKS_TOKENS.map((lineTokens, lineIndex) => (
-                  <p
-                    key={`thanks-line-${lineIndex}`}
-                    className="font-mono text-[clamp(1.1rem,4.6vw,1.55rem)] leading-snug tracking-[0.08em] text-[var(--text-secondary)] md:text-[clamp(1.15rem,2.2vw,1.8rem)]"
-                  >
-                    {lineTokens.map((token, tokenIndex) => {
-                      if (/^\s+$/.test(token)) {
-                        return (
-                          <React.Fragment key={`space-${lineIndex}-${tokenIndex}`}>
-                            {token}
-                          </React.Fragment>
-                        );
-                      }
-
-                      const isTargetedToken = thanksGlitchTarget
-                        && thanksGlitchTarget.lineIndex === lineIndex
-                        && thanksGlitchTarget.tokenIndex === tokenIndex;
-
-                      if (!isTargetedToken) {
-                        return (
-                          <span key={`word-${lineIndex}-${tokenIndex}`}>{token}</span>
-                        );
-                      }
-
-                      const prefix = token.slice(0, thanksGlitchTarget.start);
-                      const glitchedSegment = token.slice(thanksGlitchTarget.start, thanksGlitchTarget.end);
-                      const suffix = token.slice(thanksGlitchTarget.end);
-
-                      return (
-                        <React.Fragment key={`glitch-word-${lineIndex}-${tokenIndex}`}>
-                          {prefix}
-                          <GlitchText
-                            tag="span"
-                            text={glitchedSegment}
-                            wrapToWidth={false}
-                            scrambleOnMount={false}
-                            scrambleSignal={thanksWordScrambleSignal}
-                            scrambleStepMs={THANKS_WORD_SCRAMBLE_STEP_MS}
-                            scrambleRevealStep={THANKS_WORD_SCRAMBLE_REVEAL_STEP}
-                            className="inline-block align-baseline"
-                          />
-                          {suffix}
-                        </React.Fragment>
-                      );
-                    })}
-                  </p>
-                ))}
+              <p className="font-mono text-[0.74rem] uppercase tracking-[0.3em] text-[var(--text-secondary)] md:text-[0.8rem]">
+                Solar Static Creative Studio
+              </p>
+              <div className="w-full max-w-[44rem] min-h-[4.7rem] px-1 text-center md:min-h-[5.2rem]">
+                <GlitchText
+                  texts={THANKS_MESSAGE_SENTENCES}
+                  autoLoop
+                  shuffleLoop={false}
+                  wrapToWidth={false}
+                  loopIntervalMs={THANKS_MESSAGE_LOOP_INTERVAL_MS}
+                  scrambleStepMs={22}
+                  scrambleRevealStep={1.8}
+                  className="block font-mono text-[clamp(0.95rem,3.8vw,1.5rem)] leading-[1.45] tracking-[0.05em] text-[var(--text-secondary)] md:text-[clamp(1rem,1.95vw,1.65rem)]"
+                />
               </div>
             </div>
           </div>
@@ -935,6 +864,23 @@ const App: React.FC = () => {
           45% { transform: scale(1.3); opacity: 0.72; }
           60% { transform: scale(1); opacity: 0.38; }
         }
+        @keyframes request-mobile-scan {
+          0% { transform: translateX(-140%); opacity: 0; }
+          16% { opacity: 0.88; }
+          72% { opacity: 0.44; }
+          100% { transform: translateX(460%); opacity: 0; }
+        }
+        @keyframes request-mobile-pulse {
+          0% { transform: translate(-50%, -120%); opacity: 0; }
+          12% { opacity: 0.84; }
+          74% { opacity: 0.46; }
+          100% { transform: translate(-50%, 560%); opacity: 0; }
+        }
+        @keyframes request-mobile-node {
+          0%, 100% { transform: scale(0.78); opacity: 0.2; }
+          40% { transform: scale(1.2); opacity: 0.76; }
+          64% { transform: scale(1); opacity: 0.34; }
+        }
         @keyframes request-typing {
           0% {
             width: 0ch;
@@ -971,6 +917,21 @@ const App: React.FC = () => {
         }
         .animate-request-node-delay {
           animation: request-node 2.2s ease-in-out infinite 0.4s;
+        }
+        .animate-request-mobile-scan {
+          animation: request-mobile-scan 2.6s linear infinite;
+        }
+        .animate-request-mobile-scan-delay {
+          animation: request-mobile-scan 2.2s linear infinite 0.45s;
+        }
+        .animate-request-mobile-pulse {
+          animation: request-mobile-pulse 2.4s linear infinite 0.2s;
+        }
+        .animate-request-mobile-node {
+          animation: request-mobile-node 1.7s ease-in-out infinite;
+        }
+        .animate-request-mobile-node-delay {
+          animation: request-mobile-node 2s ease-in-out infinite 0.35s;
         }
         .animate-request-typing {
           width: var(--request-typing-width);

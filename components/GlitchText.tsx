@@ -4,6 +4,7 @@ interface GlitchTextProps {
   text?: string;
   texts?: string[];
   autoLoop?: boolean;
+  shuffleLoop?: boolean;
   loopIntervalMs?: number;
   loopIntervalOverridesMs?: Record<string, number>;
   wrapToWidth?: boolean;
@@ -53,6 +54,7 @@ const GlitchText: React.FC<GlitchTextProps> = ({
   text,
   texts,
   autoLoop = false,
+  shuffleLoop = true,
   loopIntervalMs = 0,
   loopIntervalOverridesMs,
   wrapToWidth = true,
@@ -66,7 +68,7 @@ const GlitchText: React.FC<GlitchTextProps> = ({
 }) => {
   const sequence = texts?.length ? texts : text ? [text] : [''];
   const sequenceKey = sequence.join('\u0000');
-  const initialPlaybackSequence = autoLoop ? shuffleLoopSequence(sequence) : [...sequence];
+  const initialPlaybackSequence = autoLoop && shuffleLoop ? shuffleLoopSequence(sequence) : [...sequence];
   const [displayText, setDisplayText] = useState(initialPlaybackSequence[0] ?? '');
   const [activeIndex, setActiveIndex] = useState(0);
   const [accentIndex, setAccentIndex] = useState<number | null>(null);
@@ -153,9 +155,11 @@ const GlitchText: React.FC<GlitchTextProps> = ({
       const currentPlaybackSequence = playbackSequenceRef.current;
 
       if (nextIndex >= currentPlaybackSequence.length - 1) {
-        const nextPlaybackSequence = shuffleLoopSequence(wrappedSequenceRef.current, currentPlaybackSequence);
-        playbackSequenceRef.current = nextPlaybackSequence;
-        setPlaybackSequence(nextPlaybackSequence);
+        if (shuffleLoop) {
+          const nextPlaybackSequence = shuffleLoopSequence(wrappedSequenceRef.current, currentPlaybackSequence);
+          playbackSequenceRef.current = nextPlaybackSequence;
+          setPlaybackSequence(nextPlaybackSequence);
+        }
         setActiveIndex(0);
         return;
       }
@@ -255,7 +259,7 @@ const GlitchText: React.FC<GlitchTextProps> = ({
     setWrappedSequence(nextWrappedSequence);
 
     setPlaybackSequence((currentPlaybackSequence) => {
-      const nextPlaybackSequence = autoLoop && nextWrappedSequence.length > 1
+      const nextPlaybackSequence = autoLoop && nextWrappedSequence.length > 1 && shuffleLoop
         ? shuffleLoopSequence(nextWrappedSequence, currentPlaybackSequence)
         : [...nextWrappedSequence];
 
@@ -264,7 +268,7 @@ const GlitchText: React.FC<GlitchTextProps> = ({
     });
 
     setActiveIndex(0);
-  }, [autoLoop, availableWidth, sequenceKey, wrapToWidth]);
+  }, [autoLoop, availableWidth, sequenceKey, shuffleLoop, wrapToWidth]);
 
   useEffect(() => {
     if (accentLettersEnabled) {
