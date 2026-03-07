@@ -791,7 +791,7 @@ const App: React.FC = () => {
           <div className="absolute inset-0 opacity-70" style={WARM_OVERLAY} />
 
           <div className="relative z-10 flex h-full items-center justify-center px-4 md:px-24" style={THANKS_CONTENT_STYLE}>
-            <div className="flex w-full max-w-[min(52rem,calc(100vw-2rem))] flex-col items-center gap-6 text-center md:gap-8">
+            <div className="flex w-full max-w-[min(52rem,calc(100vw-2rem))] flex-col items-center gap-2 text-center md:gap-3">
               <button
                 type="button"
                 onClick={() => navigate('/')}
@@ -808,7 +808,7 @@ const App: React.FC = () => {
               <p className="font-mono text-[0.74rem] uppercase tracking-[0.3em] text-[var(--text-secondary)] md:text-[0.8rem]">
                 Solar Static Creative Studio
               </p>
-              <div className="w-full max-w-[44rem] min-h-[4.7rem] px-1 text-center md:min-h-[5.2rem]">
+              <div className="mt-5 w-full max-w-[44rem] min-h-[4.7rem] px-1 text-center md:mt-6 md:min-h-[5.2rem]">
                 <GlitchText
                   texts={THANKS_MESSAGE_SENTENCES}
                   autoLoop
@@ -817,7 +817,7 @@ const App: React.FC = () => {
                   loopIntervalMs={THANKS_MESSAGE_LOOP_INTERVAL_MS}
                   scrambleStepMs={22}
                   scrambleRevealStep={1.8}
-                  className="block font-mono text-[clamp(0.95rem,3.8vw,1.5rem)] leading-[1.45] tracking-[0.05em] text-[var(--text-secondary)] md:text-[clamp(1rem,1.95vw,1.65rem)]"
+                  className="block font-mono text-[clamp(0.84rem,3.1vw,1.28rem)] leading-[1.45] tracking-[0.05em] text-[var(--text-secondary)] md:text-[clamp(0.9rem,1.6vw,1.35rem)]"
                 />
               </div>
             </div>
