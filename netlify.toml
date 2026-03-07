@@ -1,0 +1,13 @@
+[build]
+  publish = "dist"
+  functions = "netlify/functions"
+
+[[redirects]]
+  from = "/request"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/thanks"
+  to = "/index.html"
+  status = 200
