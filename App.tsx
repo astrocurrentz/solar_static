@@ -76,6 +76,10 @@ const REQUEST_TERMINAL_PANEL = {
 };
 
 const GLITCH_LOOP_INTERVAL_MS = 540;
+const THANKS_MESSAGE = 'signal received. your request is now in the static.\nwe will transmit a return signal soon.';
+const THANKS_GLITCH_LOOP_INTERVAL_MS = 3400;
+const THANKS_GLITCH_STEP_MS = 18;
+const THANKS_GLITCH_REVEAL_STEP = 2.25;
 const NOISE_ANIMATION_DURATION_MS = 450;
 const NOISE_ANIMATION_STEP_COUNT = 5;
 const ETHOS_FOREGROUND_IDLE_MS = 60_000;
@@ -137,6 +141,7 @@ const App: React.FC = () => {
   const [isEthosInFront, setIsEthosInFront] = useState(false);
   const [landingButtonScrambleSignal, setLandingButtonScrambleSignal] = useState(0);
   const [requestButtonScrambleSignal, setRequestButtonScrambleSignal] = useState(0);
+  const [thanksTextScrambleSignal, setThanksTextScrambleSignal] = useState(0);
   const ethosIdleTimeoutRef = useRef<number | null>(null);
   const landingNavigationTimeoutRef = useRef<number | null>(null);
   const emailInputRef = useRef<HTMLInputElement | null>(null);
@@ -215,6 +220,20 @@ const App: React.FC = () => {
     return () => {
       window.clearInterval(primaryInterval);
       window.clearInterval(secondaryInterval);
+    };
+  }, [route]);
+
+  useEffect(() => {
+    if (route !== '/thanks') {
+      return;
+    }
+
+    const scrambleInterval = window.setInterval(() => {
+      setThanksTextScrambleSignal((currentSignal) => currentSignal + 1);
+    }, THANKS_GLITCH_LOOP_INTERVAL_MS);
+
+    return () => {
+      window.clearInterval(scrambleInterval);
     };
   }, [route]);
 
@@ -695,13 +714,19 @@ const App: React.FC = () => {
                 <img
                   src="/assets/brand/sss-mark-favicon.svg"
                   alt="Solar Static logo"
-                  className="h-12 w-12 md:h-16 md:w-16"
+                  className="h-16 w-16 md:h-20 md:w-20"
                   style={{ imageRendering: 'pixelated' }}
                 />
               </button>
-              <p className="font-mono text-base leading-relaxed text-[var(--text-secondary)] md:text-lg">
-                thanks for submitting your request, we will get back to you soon.
-              </p>
+              <GlitchText
+                tag="p"
+                text={THANKS_MESSAGE}
+                wrapToWidth={false}
+                scrambleSignal={thanksTextScrambleSignal}
+                scrambleStepMs={THANKS_GLITCH_STEP_MS}
+                scrambleRevealStep={THANKS_GLITCH_REVEAL_STEP}
+                className="font-mono text-base leading-relaxed text-[var(--text-secondary)] md:text-lg"
+              />
             </div>
           </div>
 

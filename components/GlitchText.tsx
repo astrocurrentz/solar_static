@@ -9,6 +9,8 @@ interface GlitchTextProps {
   wrapToWidth?: boolean;
   scrambleOnMount?: boolean;
   scrambleSignal?: number | string;
+  scrambleStepMs?: number;
+  scrambleRevealStep?: number;
   accentLettersEnabled?: boolean;
   className?: string;
   tag?: 'h1' | 'h2' | 'h3' | 'p' | 'span' | 'div';
@@ -56,6 +58,8 @@ const GlitchText: React.FC<GlitchTextProps> = ({
   wrapToWidth = true,
   scrambleOnMount = true,
   scrambleSignal,
+  scrambleStepMs = SCRAMBLE_STEP_MS,
+  scrambleRevealStep = SCRAMBLE_REVEAL_STEP,
   accentLettersEnabled = true,
   className = '',
   tag: Tag = 'span',
@@ -201,8 +205,8 @@ const GlitchText: React.FC<GlitchTextProps> = ({
         queueNextLoop(nextIndex);
       }
 
-      iteration += SCRAMBLE_REVEAL_STEP;
-    }, SCRAMBLE_STEP_MS);
+      iteration += scrambleRevealStep;
+    }, scrambleStepMs);
   };
 
   useEffect(() => {
@@ -295,7 +299,7 @@ const GlitchText: React.FC<GlitchTextProps> = ({
     return () => {
       clearTimers();
     };
-  }, [activeIndex, autoLoop, loopIntervalMs, loopIntervalOverridesMs, playbackSequenceKey, accentLettersEnabled, scrambleOnMount]);
+  }, [activeIndex, autoLoop, loopIntervalMs, loopIntervalOverridesMs, playbackSequenceKey, accentLettersEnabled, scrambleOnMount, scrambleRevealStep, scrambleStepMs]);
 
   useEffect(() => {
     if (scrambleSignal === undefined) {
@@ -317,7 +321,7 @@ const GlitchText: React.FC<GlitchTextProps> = ({
     const nextText = playbackSequence[resolvedIndex] ?? '';
     setAccentIndex(pickAccentIndex(nextText));
     startScramble(nextText, resolvedIndex);
-  }, [activeIndex, accentLettersEnabled, playbackSequence, scrambleSignal]);
+  }, [activeIndex, accentLettersEnabled, playbackSequence, scrambleRevealStep, scrambleSignal, scrambleStepMs]);
 
   return (
     <Tag
