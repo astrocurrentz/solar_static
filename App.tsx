@@ -790,25 +790,9 @@ const App: React.FC = () => {
           <div className="absolute inset-0 opacity-75" style={HERO_GLOW} />
           <div className="absolute inset-0 opacity-70" style={WARM_OVERLAY} />
 
-          <div className="relative z-10 flex h-full items-center justify-center px-4 md:px-24" style={THANKS_CONTENT_STYLE}>
-            <div className="flex w-full max-w-[min(52rem,calc(100vw-2rem))] flex-col items-center gap-2 text-center md:gap-3">
-              <button
-                type="button"
-                onClick={() => navigate('/')}
-                className="transition-transform duration-300 hover:scale-110"
-                aria-label="Return home"
-              >
-                <img
-                  src="/assets/brand/sss-mark-favicon.png"
-                  alt="Solar Static logo"
-                  className="h-[11.25rem] w-[11.25rem] md:h-[15.75rem] md:w-[15.75rem]"
-                  style={{ imageRendering: 'pixelated' }}
-                />
-              </button>
-              <p className="font-mono text-[0.74rem] uppercase tracking-[0.3em] text-[var(--text-secondary)] md:text-[0.8rem]">
-                Solar Static Creative Studio
-              </p>
-              <div className="mt-5 w-full max-w-[44rem] min-h-[4.7rem] px-1 text-center md:mt-6 md:min-h-[5.2rem]">
+          <div className="relative z-10 h-full" style={THANKS_CONTENT_STYLE}>
+            <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 px-4 md:px-24">
+              <div className="mx-auto w-full max-w-[44rem] min-h-[4.4rem] text-center md:min-h-[4.8rem]">
                 <GlitchText
                   texts={THANKS_MESSAGE_SENTENCES}
                   autoLoop
@@ -817,8 +801,37 @@ const App: React.FC = () => {
                   loopIntervalMs={THANKS_MESSAGE_LOOP_INTERVAL_MS}
                   scrambleStepMs={22}
                   scrambleRevealStep={1.8}
-                  className="block font-mono text-[clamp(0.84rem,3.1vw,1.28rem)] leading-[1.45] tracking-[0.05em] text-[var(--text-secondary)] md:text-[clamp(0.9rem,1.6vw,1.35rem)]"
+                  className="block font-mono text-[clamp(0.82rem,2.9vw,1.2rem)] leading-[1.45] tracking-[0.05em] text-[var(--text-secondary)] md:text-[clamp(0.88rem,1.45vw,1.2rem)]"
                 />
+              </div>
+            </div>
+
+            <div className="thanks-bottom-group absolute inset-x-0 bottom-0 px-4 md:px-24">
+              <div className="mx-auto flex w-full max-w-[34rem] flex-col items-center gap-2 text-center">
+                <button
+                  type="button"
+                  onClick={() => navigate('/')}
+                  className="transition-transform duration-300 hover:scale-110"
+                  aria-label="Return home"
+                >
+                  <div
+                    className="h-[8.25rem] w-[8.25rem] md:h-[10.5rem] md:w-[10.5rem]"
+                    style={{
+                      backgroundColor: 'var(--accent-secondary)',
+                      WebkitMaskImage: 'url(/assets/brand/sss-mark-favicon.png)',
+                      maskImage: 'url(/assets/brand/sss-mark-favicon.png)',
+                      WebkitMaskRepeat: 'no-repeat',
+                      maskRepeat: 'no-repeat',
+                      WebkitMaskPosition: 'center',
+                      maskPosition: 'center',
+                      WebkitMaskSize: 'contain',
+                      maskSize: 'contain',
+                    }}
+                  />
+                </button>
+                <p className="font-mono text-[0.69rem] uppercase tracking-[0.3em] text-[var(--accent-secondary)] md:text-[0.75rem]">
+                  Solar Static Creative Studio
+                </p>
               </div>
             </div>
           </div>
@@ -898,10 +911,16 @@ const App: React.FC = () => {
           padding-top: calc(1rem + env(safe-area-inset-top, 0px));
           padding-bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
         }
+        .thanks-bottom-group {
+          padding-bottom: calc(2.75rem + env(safe-area-inset-bottom, 0px));
+        }
         @media (min-width: 768px) {
           .request-shell {
             padding-top: calc(4.75rem + env(safe-area-inset-top, 0px));
             padding-bottom: calc(4.75rem + env(safe-area-inset-bottom, 0px));
+          }
+          .thanks-bottom-group {
+            padding-bottom: calc(3.25rem + env(safe-area-inset-bottom, 0px));
           }
         }
         .animate-noise {
