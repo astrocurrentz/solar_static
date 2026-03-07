@@ -559,7 +559,7 @@ const App: React.FC = () => {
                       landingNavigationTimeoutRef.current = null;
                     }, BUTTON_GLITCH_NAV_DELAY_MS);
                   }}
-                  className="group relative z-20 flex self-start items-center gap-4 text-lg font-bold text-[var(--text-primary)] transition-colors hover:text-[var(--accent-secondary)] md:absolute md:bottom-0 md:right-0 md:self-auto"
+                  className="group relative z-20 flex self-start items-center gap-4 text-lg font-bold text-[var(--text-primary)] transition-colors hover:text-[var(--accent-secondary)] md:fixed md:bottom-[calc(3.45rem+env(safe-area-inset-bottom,0px))] md:right-[6vw] md:self-auto"
                 >
                   <div className="flex h-12 w-12 items-center justify-center border border-[var(--border-strong)] bg-[var(--surface-tint)] transition-all group-hover:border-[var(--accent-primary)] group-hover:bg-[var(--accent-primary)] group-hover:text-[var(--text-primary)]">
                     <ArrowUpRight size={20} />
@@ -695,7 +695,7 @@ const App: React.FC = () => {
                   <span className="shrink-0 text-[var(--text-secondary)]">NODE // REQUEST</span>
                 </div>
 
-                <div className="grid min-h-0 flex-1 gap-4 p-4 md:gap-6 md:p-7">
+                <div className="grid min-h-0 flex-1 gap-4 p-4 md:gap-5 md:px-0 md:py-5">
                   <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_12rem] md:items-start">
                     <div className={`border bg-[rgba(8,8,8,0.12)] transition-colors ${validationErrors.email ? 'border-[var(--accent-secondary)]' : 'border-[var(--border-soft)]'}`}>
                       <div className={`flex items-center justify-between border-b px-4 py-2 font-mono text-[10px] uppercase tracking-[0.26em] transition-colors ${validationErrors.email ? 'border-[var(--accent-secondary)] text-[var(--accent-secondary)]' : 'border-[var(--border-soft)] text-[var(--text-secondary)]'}`}>
