@@ -1,10 +1,15 @@
 import React, { FormEvent, KeyboardEvent, startTransition, useEffect, useRef, useState } from 'react';
-import { ArrowUpRight } from 'lucide-react';
+import { ArrowLeft, ArrowUpRight } from 'lucide-react';
 import CustomCursor from './components/CustomCursor';
 import GlitchText from './components/GlitchText';
 import NoiseOverlay from './components/NoiseOverlay';
+import {
+  BaziSelectedWorkPage,
+  LatentSelectedWorkPage,
+  SelectedWorksIndexPage,
+} from './components/SelectedWorksPages';
 
-type RoutePath = '/' | '/request' | '/thanks';
+type RoutePath = '/' | '/request' | '/thanks' | '/selected-works' | '/selected-works/bazi' | '/selected-works/latent-27';
 type SubmitState = 'idle' | 'sending' | 'error';
 type RequestValidationErrors = {
   email?: string;
@@ -40,8 +45,9 @@ const GLITCH_LOOP_INTERVAL_OVERRIDES_MS = {
 };
 
 const ETHOS_PARAGRAPHS = [
-  'As living beings in the universe, we constantly receive countless signals - light, radiation, sound, and invisible transmissions. What we see, hear, and feel are fragments of these signals, absorbed and interpreted through our own perception.',
-  'As inhabitants orbiting the sun, we exist within a unique field of energy, noise, and static. Solar Static is born from this condition. Our work captures, transforms, and reshapes these signals into creative forms - design, sound, visuals, and software.',
+  'As living beings in the universe, we constantly receive countless signals — light, radiation, sound, and invisible transmissions. What we see, hear, and feel are fragments of these signals, absorbed and interpreted through our own perception.',
+  'As inhabitants orbiting the sun, we exist within a unique field of energy, noise, and static. Solar Static emerges from this condition. Our work captures, transforms, and reshapes these signals into creative forms — design, sound, visuals, and software.',
+  'Through this process, the ordinary becomes something else. Familiar objects and everyday interactions are reimagined as playful encounters with the signals surrounding us — small moments of curiosity, discovery, and quiet reflection.',
   'Everything we create is a reflection of the signals we receive from the universe.',
 ];
 const ETHOS_FULL_TEXT = ETHOS_PARAGRAPHS.join('\n\n');
@@ -110,6 +116,9 @@ const THANKS_CONTENT_STYLE = {
   paddingTop: 'calc(2rem + env(safe-area-inset-top, 0px))',
   paddingBottom: 'calc(2rem + env(safe-area-inset-bottom, 0px))',
 };
+const TOP_LEFT_BACK_BUTTON_STYLE = {
+  top: 'calc(1rem + env(safe-area-inset-top, 0px))',
+};
 
 const buildRequestTelemetryLine = (variant: 'primary' | 'secondary'): RequestTelemetryLine => {
   const segmentCount = variant === 'primary' ? randomInt(2, 4) : randomInt(1, 3);
@@ -140,6 +149,12 @@ const normalizeRoute = (pathname: string): RoutePath => {
   const cleanPath = pathname !== '/' ? pathname.replace(/\/+$/, '') : pathname;
 
   switch (cleanPath) {
+    case '/selected-works':
+      return '/selected-works';
+    case '/selected-works/bazi':
+      return '/selected-works/bazi';
+    case '/selected-works/latent-27':
+      return '/selected-works/latent-27';
     case '/request':
       return '/request';
     case '/thanks':
@@ -160,6 +175,7 @@ const App: React.FC = () => {
   const [isEthosInFront, setIsEthosInFront] = useState(false);
   const [ethosDisplayText, setEthosDisplayText] = useState('');
   const [landingButtonScrambleSignal, setLandingButtonScrambleSignal] = useState(0);
+  const [selectedWorksButtonScrambleSignal, setSelectedWorksButtonScrambleSignal] = useState(0);
   const [requestButtonScrambleSignal, setRequestButtonScrambleSignal] = useState(0);
   const ethosIdleTimeoutRef = useRef<number | null>(null);
   const ethosScrambleIntervalRef = useRef<number | null>(null);
@@ -187,6 +203,9 @@ const App: React.FC = () => {
   useEffect(() => {
     const pageTitles: Record<RoutePath, string> = {
       '/': 'SOLAR STATIC // CALCULATING DESTINY',
+      '/selected-works': 'SOLAR STATIC // SELECTED WORKS',
+      '/selected-works/bazi': 'SOLAR STATIC // 八字·BĀZÌ',
+      '/selected-works/latent-27': 'SOLAR STATIC // LATENT 27',
       '/request': 'SOLAR STATIC // TRANSMIT REQUEST',
       '/thanks': 'SOLAR STATIC // SIGNAL RECEIVED',
     };
@@ -480,7 +499,15 @@ const App: React.FC = () => {
             >
               <div className="absolute left-0 top-0 flex items-center gap-4 font-mono text-xs font-bold tracking-[0.2em] text-[var(--accent-secondary)]">
                 <div className="h-2 w-2 animate-pulse rounded-none bg-[var(--accent-secondary)]" />
-                <span>SYSTEM_ONLINE // V.2026</span>
+                <span
+                  className={`inline-block origin-left transition-[opacity,transform] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+                    isEthosInFront
+                      ? 'scale-[0.88] opacity-40 md:scale-100 md:opacity-100'
+                      : 'scale-100 opacity-100'
+                  }`}
+                >
+                  SYSTEM_ONLINE // V.2026
+                </span>
               </div>
 
               <div
@@ -500,7 +527,6 @@ const App: React.FC = () => {
                       texts={LOOPING_WORDS}
                       autoLoop
                       wrapToWidth
-                      wrapToWidthDesktopOnly
                       loopIntervalMs={GLITCH_LOOP_INTERVAL_MS}
                       loopIntervalOverridesMs={GLITCH_LOOP_INTERVAL_OVERRIDES_MS}
                       accentLettersEnabled={!isEthosInFront}
@@ -510,6 +536,72 @@ const App: React.FC = () => {
                 </h1>
               </div>
 
+              <div
+                className={`absolute right-0 top-14 z-20 flex origin-top-right flex-col gap-3 transition-[opacity,transform] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] md:fixed md:bottom-[calc(3.45rem+env(safe-area-inset-bottom,0px))] md:right-[6vw] md:top-auto ${
+                  isEthosInFront
+                    ? 'translate-y-2 scale-[0.86] opacity-35 md:translate-y-0 md:scale-100 md:opacity-100'
+                    : 'translate-y-0 scale-100 opacity-100'
+                }`}
+              >
+                <button
+                  type="button"
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    setSelectedWorksButtonScrambleSignal((currentSignal) => currentSignal + 1);
+
+                    if (landingNavigationTimeoutRef.current !== null) {
+                      window.clearTimeout(landingNavigationTimeoutRef.current);
+                    }
+
+                    landingNavigationTimeoutRef.current = window.setTimeout(() => {
+                      navigate('/selected-works');
+                      landingNavigationTimeoutRef.current = null;
+                    }, BUTTON_GLITCH_NAV_DELAY_MS);
+                  }}
+                  className="group flex items-center gap-4 text-lg font-bold text-[var(--text-primary)] transition-colors hover:text-[var(--accent-secondary)]"
+                >
+                  <div className="flex h-12 w-12 items-center justify-center border border-[var(--border-strong)] bg-[var(--surface-tint)] transition-all group-hover:border-[var(--accent-primary)] group-hover:bg-[var(--accent-primary)] group-hover:text-[var(--text-primary)]">
+                    <ArrowUpRight size={20} />
+                  </div>
+                  <GlitchText
+                    text="SELECTED WORKS"
+                    wrapToWidth={false}
+                    scrambleOnMount={false}
+                    scrambleSignal={selectedWorksButtonScrambleSignal}
+                    className="font-mono text-sm tracking-widest"
+                  />
+                </button>
+
+                <button
+                  type="button"
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    setLandingButtonScrambleSignal((currentSignal) => currentSignal + 1);
+
+                    if (landingNavigationTimeoutRef.current !== null) {
+                      window.clearTimeout(landingNavigationTimeoutRef.current);
+                    }
+
+                    landingNavigationTimeoutRef.current = window.setTimeout(() => {
+                      navigate('/request');
+                      landingNavigationTimeoutRef.current = null;
+                    }, BUTTON_GLITCH_NAV_DELAY_MS);
+                  }}
+                  className="group flex items-center gap-4 text-lg font-bold text-[var(--text-primary)] transition-colors hover:text-[var(--accent-secondary)]"
+                >
+                  <div className="flex h-12 w-12 items-center justify-center border border-[var(--border-strong)] bg-[var(--surface-tint)] transition-all group-hover:border-[var(--accent-primary)] group-hover:bg-[var(--accent-primary)] group-hover:text-[var(--text-primary)]">
+                    <ArrowUpRight size={20} />
+                  </div>
+                  <GlitchText
+                    text="TRANSMIT REQUEST"
+                    wrapToWidth={false}
+                    scrambleOnMount={false}
+                    scrambleSignal={landingButtonScrambleSignal}
+                    className="font-mono text-sm tracking-widest"
+                  />
+                </button>
+              </div>
+
               <div className="absolute bottom-0 left-0 right-0 flex flex-col gap-10 md:flex-row md:items-end md:justify-between">
                 <div
                   role="button"
@@ -517,6 +609,11 @@ const App: React.FC = () => {
                   aria-pressed={isEthosInFront}
                   onClick={(event) => {
                     event.stopPropagation();
+                    if (isEthosInFront) {
+                      restoreEthosBackground();
+                      return;
+                    }
+
                     activateEthosForeground();
                   }}
                   onKeyDown={handleEthosKeyDown}
@@ -537,35 +634,6 @@ const App: React.FC = () => {
                     )}
                   </p>
                 </div>
-
-                <button
-                  type="button"
-                  onClick={(event) => {
-                    event.stopPropagation();
-                    setLandingButtonScrambleSignal((currentSignal) => currentSignal + 1);
-
-                    if (landingNavigationTimeoutRef.current !== null) {
-                      window.clearTimeout(landingNavigationTimeoutRef.current);
-                    }
-
-                    landingNavigationTimeoutRef.current = window.setTimeout(() => {
-                      navigate('/request');
-                      landingNavigationTimeoutRef.current = null;
-                    }, BUTTON_GLITCH_NAV_DELAY_MS);
-                  }}
-                  className="group relative z-20 flex self-start items-center gap-4 text-lg font-bold text-[var(--text-primary)] transition-colors hover:text-[var(--accent-secondary)] md:fixed md:bottom-[calc(3.45rem+env(safe-area-inset-bottom,0px))] md:right-[6vw] md:self-auto"
-                >
-                  <div className="flex h-12 w-12 items-center justify-center border border-[var(--border-strong)] bg-[var(--surface-tint)] transition-all group-hover:border-[var(--accent-primary)] group-hover:bg-[var(--accent-primary)] group-hover:text-[var(--text-primary)]">
-                    <ArrowUpRight size={20} />
-                  </div>
-                  <GlitchText
-                    text="TRANSMIT REQUEST"
-                    wrapToWidth={false}
-                    scrambleOnMount={false}
-                    scrambleSignal={landingButtonScrambleSignal}
-                    className="font-mono text-sm tracking-widest"
-                  />
-                </button>
               </div>
             </div>
           </div>
@@ -575,10 +643,58 @@ const App: React.FC = () => {
         </main>
       )}
 
+      {route === '/selected-works' && (
+        <div className="relative h-[100dvh] min-h-[100dvh]">
+          <SelectedWorksIndexPage onNavigate={(nextRoute) => navigate(nextRoute)} />
+          <div className="absolute left-3 z-20 md:left-8" style={TOP_LEFT_BACK_BUTTON_STYLE}>
+            <button
+              type="button"
+              onClick={() => navigate('/')}
+              className="group flex items-center gap-4 text-lg font-bold text-[var(--text-primary)] transition-colors hover:text-[var(--accent-secondary)]"
+              aria-label="Back to Solar Static home"
+            >
+              <div className="flex h-12 w-12 items-center justify-center border border-[var(--border-strong)] bg-[var(--surface-tint)] transition-all group-hover:border-[var(--accent-primary)] group-hover:bg-[var(--accent-primary)] group-hover:text-[var(--text-primary)]">
+                <ArrowLeft size={18} aria-hidden="true" />
+              </div>
+              <GlitchText
+                text="SS"
+                wrapToWidth={false}
+                className="font-mono text-sm tracking-widest"
+              />
+            </button>
+          </div>
+        </div>
+      )}
+
+      {route === '/selected-works/bazi' && (
+        <BaziSelectedWorkPage />
+      )}
+
+      {route === '/selected-works/latent-27' && (
+        <LatentSelectedWorkPage />
+      )}
+
       {route === '/request' && (
         <main className="relative h-[100dvh] min-h-[100dvh] overflow-hidden" style={{ ...HERO_BACKGROUND, ...ROUTE_VIEWPORT_STYLE }}>
           <div className="absolute inset-0 opacity-75" style={HERO_GLOW} />
           <div className="absolute inset-0 opacity-70" style={WARM_OVERLAY} />
+          <div className="absolute left-3 z-20 md:left-8" style={TOP_LEFT_BACK_BUTTON_STYLE}>
+            <button
+              type="button"
+              onClick={() => navigate('/')}
+              className="group flex items-center gap-4 text-lg font-bold text-[var(--text-primary)] transition-colors hover:text-[var(--accent-secondary)]"
+              aria-label="Back to Solar Static home"
+            >
+              <div className="flex h-12 w-12 items-center justify-center border border-[var(--border-strong)] bg-[var(--surface-tint)] transition-all group-hover:border-[var(--accent-primary)] group-hover:bg-[var(--accent-primary)] group-hover:text-[var(--text-primary)]">
+                <ArrowLeft size={18} aria-hidden="true" />
+              </div>
+              <GlitchText
+                text="SS"
+                wrapToWidth={false}
+                className="font-mono text-sm tracking-widest"
+              />
+            </button>
+          </div>
 
           <div className="request-shell relative z-10 flex h-full items-center justify-center px-3 sm:px-6 md:px-24">
             <form

@@ -1,10 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 const CustomCursor: React.FC = () => {
   const [isEnabled, setIsEnabled] = useState(true);
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isPointer, setIsPointer] = useState(false);
   const [isHoveringText, setIsHoveringText] = useState(false);
+  const [isSuppressed, setIsSuppressed] = useState(false);
+  const isSuppressedRef = useRef(false);
 
   useEffect(() => {
     const coarsePointerMedia = window.matchMedia('(pointer: coarse)');
@@ -35,9 +37,26 @@ const CustomCursor: React.FC = () => {
     }
 
     const handleMouseMove = (e: MouseEvent) => {
-      setPosition({ x: e.clientX, y: e.clientY });
-      
       const target = e.target as HTMLElement;
+      const suppressCursor = Boolean(target.closest('[data-disable-custom-cursor="true"]'));
+
+      if (suppressCursor) {
+        if (!isSuppressedRef.current) {
+          isSuppressedRef.current = true;
+          setIsSuppressed(true);
+          setIsPointer(false);
+          setIsHoveringText(false);
+        }
+        return;
+      }
+
+      if (isSuppressedRef.current) {
+        isSuppressedRef.current = false;
+        setIsSuppressed(false);
+      }
+
+      setPosition({ x: e.clientX, y: e.clientY });
+
       const computedStyle = window.getComputedStyle(target);
       
       setIsPointer(
@@ -55,7 +74,7 @@ const CustomCursor: React.FC = () => {
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, [isEnabled]);
 
-  if (!isEnabled) {
+  if (!isEnabled || isSuppressed) {
     return null;
   }
 
