@@ -537,7 +537,7 @@ const App: React.FC = () => {
               </div>
 
               <div
-                className={`absolute right-0 top-14 z-20 flex origin-top-right flex-col gap-3 transition-[opacity,transform] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] md:fixed md:bottom-[calc(3.45rem+env(safe-area-inset-bottom,0px))] md:right-[6vw] md:top-auto ${
+                className={`absolute right-0 bottom-[calc(8rem+env(safe-area-inset-bottom,0px))] z-20 flex origin-top-right flex-col gap-3 transition-[opacity,transform] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] md:fixed md:bottom-[calc(3.45rem+env(safe-area-inset-bottom,0px))] md:right-[6vw] md:top-auto ${
                   isEthosInFront
                     ? 'translate-y-2 scale-[0.86] opacity-35 md:translate-y-0 md:scale-100 md:opacity-100'
                     : 'translate-y-0 scale-100 opacity-100'
