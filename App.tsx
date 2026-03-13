@@ -8,8 +8,12 @@ import {
   LatentSelectedWorkPage,
   SelectedWorksIndexPage,
 } from './components/SelectedWorksPages';
+import {
+  TextToImagePostToolPage,
+  ToolsLauncherCard,
+} from './components/ToolsPages';
 
-type RoutePath = '/' | '/request' | '/thanks' | '/selected-works' | '/selected-works/bazi' | '/selected-works/latent-27';
+type RoutePath = '/' | '/tools' | '/tools/__text2imgp' | '/request' | '/thanks' | '/selected-works' | '/selected-works/bazi' | '/selected-works/latent-27';
 type SubmitState = 'idle' | 'sending' | 'error';
 type RequestValidationErrors = {
   email?: string;
@@ -66,6 +70,20 @@ const WARM_OVERLAY = {
 const HERO_GLOW = {
   background:
     'radial-gradient(circle at 76% 24%, rgba(201, 115, 56, 0.2) 0%, rgba(165, 77, 39, 0.06) 34%, rgba(40, 33, 25, 0) 72%)',
+};
+const TOOLS_MESH_STYLE_PRIMARY = {
+  backgroundImage: [
+    'linear-gradient(to right, rgba(229, 216, 189, 0.12) 1px, transparent 1px)',
+    'linear-gradient(to bottom, rgba(229, 216, 189, 0.12) 1px, transparent 1px)',
+  ].join(','),
+  backgroundSize: '68px 68px, 68px 68px',
+};
+const TOOLS_MESH_STYLE_SECONDARY = {
+  backgroundImage: [
+    'linear-gradient(to right, rgba(201, 115, 56, 0.16) 1px, transparent 1px)',
+    'linear-gradient(to bottom, rgba(201, 115, 56, 0.16) 1px, transparent 1px)',
+  ].join(','),
+  backgroundSize: '18px 18px, 18px 18px',
 };
 
 const PANEL_SHADOW = {
@@ -155,6 +173,10 @@ const normalizeRoute = (pathname: string): RoutePath => {
       return '/selected-works/bazi';
     case '/selected-works/latent-27':
       return '/selected-works/latent-27';
+    case '/tools':
+      return '/tools';
+    case '/tools/__text2imgp':
+      return '/tools/__text2imgp';
     case '/request':
       return '/request';
     case '/thanks':
@@ -174,6 +196,7 @@ const App: React.FC = () => {
   const [secondaryTelemetryLines, setSecondaryTelemetryLines] = useState<RequestTelemetryLine[]>(() => buildRequestTelemetryBatch(7, 'secondary'));
   const [isEthosInFront, setIsEthosInFront] = useState(false);
   const [ethosDisplayText, setEthosDisplayText] = useState('');
+  const [toolsButtonScrambleSignal, setToolsButtonScrambleSignal] = useState(0);
   const [landingButtonScrambleSignal, setLandingButtonScrambleSignal] = useState(0);
   const [selectedWorksButtonScrambleSignal, setSelectedWorksButtonScrambleSignal] = useState(0);
   const [requestButtonScrambleSignal, setRequestButtonScrambleSignal] = useState(0);
@@ -202,7 +225,9 @@ const App: React.FC = () => {
 
   useEffect(() => {
     const pageTitles: Record<RoutePath, string> = {
-      '/': 'SOLAR STATIC // CALCULATING DESTINY',
+      '/': '// SOLAT STATIC // /',
+      '/tools': 'TOOLS',
+      '/tools/__text2imgp': 'SOLAR STATIC // TEXT_TO_IMG_POST',
       '/selected-works': 'SOLAR STATIC // SELECTED WORKS',
       '/selected-works/bazi': 'SOLAR STATIC // 八字·BĀZÌ',
       '/selected-works/latent-27': 'SOLAR STATIC // LATENT 27',
@@ -488,7 +513,7 @@ const App: React.FC = () => {
 
           <div className="relative z-10 h-full px-4 md:px-12 xl:px-14" style={LANDING_CONTENT_STYLE}>
             <div
-              className="relative h-full w-full max-w-[92rem]"
+              className="relative h-full w-full"
               onClick={() => {
                 if (!isEthosInFront) {
                   return;
@@ -506,7 +531,7 @@ const App: React.FC = () => {
                       : 'scale-100 opacity-100'
                   }`}
                 >
-                  SYSTEM_ONLINE // V.2026
+                  CREATIVE_STUDIO // V.2026
                 </span>
               </div>
 
@@ -519,7 +544,9 @@ const App: React.FC = () => {
               >
                 <h1
                   className={`w-full select-none font-display font-black leading-[0.86] tracking-tight text-[var(--text-primary)] transition-[font-size] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${
-                    isEthosInFront ? 'text-[clamp(2.8rem,12vw,5rem)] md:text-[12vw]' : 'text-[clamp(3rem,12.8vw,5.4rem)] md:text-[14vw]'
+                    isEthosInFront
+                      ? 'text-[clamp(2.8rem,12vw,5rem)] md:text-[clamp(4.9rem,8vw,11.5rem)]'
+                      : 'text-[clamp(3rem,12.8vw,5.4rem)] md:text-[clamp(5.2rem,9vw,12.5rem)]'
                   }`}
                 >
                   <span className="relative z-10 block max-w-full pl-[2.5vw] pr-[1.5vw] md:pl-[3vw] md:pr-[1.2vw]">
@@ -543,6 +570,35 @@ const App: React.FC = () => {
                     : 'translate-y-0 scale-100 opacity-100'
                 }`}
               >
+                <button
+                  type="button"
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    setToolsButtonScrambleSignal((currentSignal) => currentSignal + 1);
+
+                    if (landingNavigationTimeoutRef.current !== null) {
+                      window.clearTimeout(landingNavigationTimeoutRef.current);
+                    }
+
+                    landingNavigationTimeoutRef.current = window.setTimeout(() => {
+                      navigate('/tools');
+                      landingNavigationTimeoutRef.current = null;
+                    }, BUTTON_GLITCH_NAV_DELAY_MS);
+                  }}
+                  className="group flex items-center gap-4 text-lg font-bold text-[var(--text-primary)] transition-colors hover:text-[var(--accent-secondary)]"
+                >
+                  <div className="flex h-12 w-12 items-center justify-center border border-[var(--border-strong)] bg-[var(--surface-tint)] transition-all group-hover:border-[var(--accent-primary)] group-hover:bg-[var(--accent-primary)] group-hover:text-[var(--text-primary)]">
+                    <ArrowUpRight size={20} />
+                  </div>
+                  <GlitchText
+                    text="TOOLS"
+                    wrapToWidth={false}
+                    scrambleOnMount={false}
+                    scrambleSignal={toolsButtonScrambleSignal}
+                    className="font-mono text-sm tracking-widest"
+                  />
+                </button>
+
                 <button
                   type="button"
                   onClick={(event) => {
@@ -638,8 +694,74 @@ const App: React.FC = () => {
             </div>
           </div>
 
-          <div className="pointer-events-none absolute top-0 right-0 hidden h-full w-1/4 border-l border-[var(--border-soft)] opacity-50 lg:block" />
+          <div className="pointer-events-none absolute top-0 right-0 hidden h-full w-[clamp(12rem,18vw,24rem)] border-l border-[var(--border-soft)] opacity-50 lg:block" />
           <div className="pointer-events-none absolute left-0 h-[1px] w-full bg-[var(--border-soft)]" style={BOTTOM_RAIL_STYLE} />
+        </main>
+      )}
+
+      {route === '/tools' && (
+        <main className="relative h-[100dvh] min-h-[100dvh] overflow-hidden" style={{ ...HERO_BACKGROUND, ...ROUTE_VIEWPORT_STYLE }}>
+          <div className="absolute inset-0 opacity-80" style={HERO_GLOW} />
+          <div className="absolute inset-0 opacity-70" style={WARM_OVERLAY} />
+          <div className="animate-tools-mesh-drift pointer-events-none absolute inset-0 opacity-34" style={TOOLS_MESH_STYLE_PRIMARY} />
+          <div className="pointer-events-none absolute inset-0 opacity-24" style={TOOLS_MESH_STYLE_SECONDARY} />
+
+          <div className="absolute left-3 z-20 md:left-8" style={TOP_LEFT_BACK_BUTTON_STYLE}>
+            <button
+              type="button"
+              onClick={() => navigate('/')}
+              className="group flex items-center gap-4 text-lg font-bold text-[var(--text-primary)] transition-colors hover:text-[var(--accent-secondary)]"
+              aria-label="Back to Solar Static home"
+            >
+              <div className="flex h-12 w-12 items-center justify-center border border-[var(--border-strong)] bg-[var(--surface-tint)] transition-all group-hover:border-[var(--accent-primary)] group-hover:bg-[var(--accent-primary)] group-hover:text-[var(--text-primary)]">
+                <ArrowLeft size={18} aria-hidden="true" />
+              </div>
+              <GlitchText
+                text="SS"
+                wrapToWidth={false}
+                className="font-mono text-sm tracking-widest"
+              />
+            </button>
+          </div>
+
+          <ToolsLauncherCard
+            onOpenTextToImagePost={() => navigate('/tools/__text2imgp')}
+          />
+
+          <div className="pointer-events-none absolute top-0 right-0 hidden h-full w-[clamp(12rem,18vw,24rem)] border-l border-[var(--border-soft)] opacity-50 lg:block" />
+          <div className="pointer-events-none absolute left-0 h-[1px] w-full bg-[var(--border-soft)]" style={BOTTOM_RAIL_STYLE} />
+        </main>
+      )}
+
+      {route === '/tools/__text2imgp' && (
+        <main className="relative h-[100dvh] min-h-[100dvh] overflow-x-hidden overflow-y-auto" style={{ ...HERO_BACKGROUND, ...ROUTE_VIEWPORT_STYLE }}>
+          <div className="absolute inset-0 opacity-80" style={HERO_GLOW} />
+          <div className="absolute inset-0 opacity-70" style={WARM_OVERLAY} />
+          <div className="animate-tools-mesh-drift pointer-events-none absolute inset-0 opacity-34" style={TOOLS_MESH_STYLE_PRIMARY} />
+          <div className="pointer-events-none absolute inset-0 opacity-24" style={TOOLS_MESH_STYLE_SECONDARY} />
+
+          <div className="absolute left-3 z-20 md:left-8" style={TOP_LEFT_BACK_BUTTON_STYLE}>
+            <button
+              type="button"
+              onClick={() => navigate('/tools')}
+              className="group flex items-center gap-4 text-lg font-bold text-[var(--text-primary)] transition-colors hover:text-[var(--accent-secondary)]"
+              aria-label="Back to tools"
+            >
+              <div className="flex h-12 w-12 items-center justify-center border border-[var(--border-strong)] bg-[var(--surface-tint)] transition-all group-hover:border-[var(--accent-primary)] group-hover:bg-[var(--accent-primary)] group-hover:text-[var(--text-primary)]">
+                <ArrowLeft size={18} aria-hidden="true" />
+              </div>
+              <GlitchText
+                text="TOOLS"
+                wrapToWidth={false}
+                className="hidden font-mono text-sm tracking-widest md:block"
+              />
+            </button>
+          </div>
+
+          <TextToImagePostToolPage />
+
+          <div className="pointer-events-none absolute top-0 right-0 hidden h-full w-[clamp(12rem,18vw,24rem)] border-l border-[var(--border-soft)] opacity-50 lg:block" />
+          <div className="pointer-events-none absolute left-0 hidden h-[1px] w-full bg-[var(--border-soft)] md:block" style={BOTTOM_RAIL_STYLE} />
         </main>
       )}
 
@@ -1023,6 +1145,14 @@ const App: React.FC = () => {
             border-right-color: transparent;
           }
         }
+        @keyframes tools-mesh-drift {
+          0% {
+            transform: translate3d(0, 0, 0);
+          }
+          100% {
+            transform: translate3d(68px, 68px, 0);
+          }
+        }
         .request-shell {
           padding-top: calc(1rem + env(safe-area-inset-top, 0px));
           padding-bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
@@ -1075,6 +1205,9 @@ const App: React.FC = () => {
         .animate-request-typing {
           width: var(--request-typing-width);
           animation: request-typing var(--request-typing-duration) steps(var(--request-typing-steps), end) 1;
+        }
+        .animate-tools-mesh-drift {
+          animation: tools-mesh-drift 24s linear infinite;
         }
         input:-webkit-autofill,
         input:-webkit-autofill:hover,

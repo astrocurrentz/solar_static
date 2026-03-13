@@ -3,6 +3,21 @@
   functions = "netlify/functions"
 
 [[redirects]]
+  from = "/tools"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/tools/__text2imgp"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/api/tools/text-to-img-post/render"
+  to = "/.netlify/functions/text-to-img-post-render"
+  status = 200
+
+[[redirects]]
   from = "/request"
   to = "/index.html"
   status = 200

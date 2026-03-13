@@ -2556,6 +2556,7 @@ export function SelectedWorksIndexPage({
 }) {
   const meshSignalA = useOccasionalGlitchSignal(3900, 7600);
   const meshSignalB = useOccasionalGlitchSignal(4300, 8000);
+  const meshSignalC = useOccasionalGlitchSignal(4700, 8400);
 
   return (
     <main
@@ -2601,6 +2602,25 @@ export function SelectedWorksIndexPage({
             className="font-display text-[clamp(2rem,8vw,5rem)] font-black tracking-wide"
           />
         </button>
+
+        <a
+          href="https://www.fuzzchorus.org/"
+          target="_blank"
+          rel="noreferrer noopener"
+          aria-label="Open FCMS project website"
+          className="group text-[var(--text-primary)] transition-colors duration-300 hover:text-[var(--accent-secondary)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--accent-secondary)]"
+        >
+          <GlitchText
+            text="FCMS"
+            tag="span"
+            wrapToWidth={false}
+            scrambleOnMount={false}
+            scrambleSignal={meshSignalC}
+            scrambleStepMs={22}
+            scrambleRevealStep={1.2}
+            className="font-display text-[clamp(2rem,8vw,5rem)] font-black tracking-wide"
+          />
+        </a>
       </div>
     </main>
   );
