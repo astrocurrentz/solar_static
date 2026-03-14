@@ -28,6 +28,21 @@
   status = 200
 
 [[redirects]]
+  from = "/selected-works"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/selected-works/bazi"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/selected-works/latent-27"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
   from = "/api/*"
   to = "/.netlify/functions/:splat"
   status = 200

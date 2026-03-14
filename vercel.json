@@ -16,6 +16,18 @@
     {
       "source": "/thanks",
       "destination": "/index.html"
+    },
+    {
+      "source": "/selected-works",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/selected-works/bazi",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/selected-works/latent-27",
+      "destination": "/index.html"
     }
   ]
 }
