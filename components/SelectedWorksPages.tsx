@@ -2077,6 +2077,7 @@ function ElementsDistributionCard({ captionGlitchSignal }: { captionGlitchSignal
   };
 
   const onPointerDown = (event: React.PointerEvent) => {
+    event.preventDefault();
     const rect = donutRef.current?.getBoundingClientRect();
     if (!rect) return;
 
@@ -2115,11 +2116,13 @@ function ElementsDistributionCard({ captionGlitchSignal }: { captionGlitchSignal
     setDonutRotation(drag.startRotation + delta);
   };
 
-  const finishPointer = (event: React.PointerEvent) => {
+  const finishPointerByClientPosition = useCallback((pointerId: number, clientX: number, clientY: number) => {
     const drag = spinStateRef.current;
-    if (!drag || drag.pointerId !== event.pointerId) return;
+    if (!drag || drag.pointerId !== pointerId) return;
 
-    donutRef.current?.releasePointerCapture(event.pointerId);
+    if (donutRef.current?.hasPointerCapture(pointerId)) {
+      donutRef.current.releasePointerCapture(pointerId);
+    }
     spinStateRef.current = null;
 
     if (drag.moved) {
@@ -2136,9 +2139,12 @@ function ElementsDistributionCard({ captionGlitchSignal }: { captionGlitchSignal
 
     setDonutInteraction('idle');
     const rect = donutRef.current?.getBoundingClientRect();
-    if (!rect) return;
+    if (!rect) {
+      setPressedElementKey(null);
+      return;
+    }
 
-    const angle = angleFromPointer(event.clientX, event.clientY, rect);
+    const angle = angleFromPointer(clientX, clientY, rect);
     const finalRotation = drag.startRotation + normalizeAngle(angle - drag.startAngle);
     const sectorIndex = angleToSectorIndex(angle - finalRotation);
     const target = chartData[sectorIndex];
@@ -2148,7 +2154,25 @@ function ElementsDistributionCard({ captionGlitchSignal }: { captionGlitchSignal
     }
 
     setPressedElementKey(null);
+  }, [angleToSectorIndex, chartData, clearSettleTimeout, normalizeAngle]);
+
+  const finishPointer = (event: React.PointerEvent) => {
+    finishPointerByClientPosition(event.pointerId, event.clientX, event.clientY);
   };
+
+  useEffect(() => {
+    const handleGlobalPointerRelease = (event: PointerEvent) => {
+      finishPointerByClientPosition(event.pointerId, event.clientX, event.clientY);
+    };
+
+    window.addEventListener('pointerup', handleGlobalPointerRelease);
+    window.addEventListener('pointercancel', handleGlobalPointerRelease);
+
+    return () => {
+      window.removeEventListener('pointerup', handleGlobalPointerRelease);
+      window.removeEventListener('pointercancel', handleGlobalPointerRelease);
+    };
+  }, [finishPointerByClientPosition]);
 
   return (
     <article className="bazi-card bazi-section-card bazi-elements-card">

@@ -36,9 +36,12 @@ const CustomCursor: React.FC = () => {
       return;
     }
 
-    const handleMouseMove = (e: MouseEvent) => {
-      const target = e.target as HTMLElement;
-      const suppressCursor = Boolean(target.closest('[data-disable-custom-cursor="true"]'));
+    const handlePointerMove = (event: MouseEvent | PointerEvent) => {
+      const targetElement = event.target instanceof Element ? (event.target as HTMLElement) : null;
+
+      setPosition({ x: event.clientX, y: event.clientY });
+
+      const suppressCursor = Boolean(targetElement?.closest('[data-disable-custom-cursor="true"]'));
 
       if (suppressCursor) {
         if (!isSuppressedRef.current) {
@@ -55,23 +58,31 @@ const CustomCursor: React.FC = () => {
         setIsSuppressed(false);
       }
 
-      setPosition({ x: e.clientX, y: e.clientY });
+      if (!targetElement) {
+        setIsPointer(false);
+        setIsHoveringText(false);
+        return;
+      }
 
-      const computedStyle = window.getComputedStyle(target);
+      const computedStyle = window.getComputedStyle(targetElement);
       
       setIsPointer(
         computedStyle.cursor === 'pointer' || 
-        target.tagName.toLowerCase() === 'button' || 
-        target.tagName.toLowerCase() === 'a'
+        targetElement.tagName.toLowerCase() === 'button' || 
+        targetElement.tagName.toLowerCase() === 'a'
       );
 
       setIsHoveringText(
-        ['p', 'h1', 'h2', 'h3', 'span'].includes(target.tagName.toLowerCase())
+        ['p', 'h1', 'h2', 'h3', 'span'].includes(targetElement.tagName.toLowerCase())
       );
     };
 
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
+    window.addEventListener('pointermove', handlePointerMove, { passive: true });
+    window.addEventListener('mousemove', handlePointerMove, { passive: true });
+    return () => {
+      window.removeEventListener('pointermove', handlePointerMove);
+      window.removeEventListener('mousemove', handlePointerMove);
+    };
   }, [isEnabled]);
 
   if (!isEnabled || isSuppressed) {

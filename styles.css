@@ -890,6 +890,12 @@ body {
   height: 100%;
 }
 
+.bazi-elements-donut-wrap :focus,
+.bazi-elements-donut-wrap :focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
 .bazi-elements-note {
   margin: 0;
   text-align: center;
