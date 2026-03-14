@@ -1236,12 +1236,49 @@ function NativeSelect({
   placeholder: string;
   onChange: (value: string) => void;
 }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const rootRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (!isOpen) {
+      return undefined;
+    }
+
+    const handlePointerDown = (event: PointerEvent) => {
+      const target = event.target as Node | null;
+      if (!target || !rootRef.current || rootRef.current.contains(target)) {
+        return;
+      }
+      setIsOpen(false);
+    };
+
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setIsOpen(false);
+      }
+    };
+
+    window.addEventListener('pointerdown', handlePointerDown);
+    window.addEventListener('keydown', handleEscape);
+    return () => {
+      window.removeEventListener('pointerdown', handlePointerDown);
+      window.removeEventListener('keydown', handleEscape);
+    };
+  }, [isOpen]);
+
+  const handleSelect = (selectedValue: string) => {
+    onChange(selectedValue);
+    setIsOpen(false);
+  };
+
+  const triggerLabel = value || placeholder;
+
   return (
     <div className="bazi-native-select-wrap">
       <select
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        className="bazi-input-field bazi-input-select bazi-native-select"
+        className="bazi-input-field bazi-input-select bazi-native-select bazi-native-select-mobile"
       >
         <option value="">{placeholder}</option>
         {options.map((optionValue) => (
@@ -1250,7 +1287,37 @@ function NativeSelect({
           </option>
         ))}
       </select>
-      <ChevronDown className="bazi-select-chevron" size={20} />
+      <ChevronDown className="bazi-select-chevron bazi-select-chevron-mobile" size={20} />
+
+      <div ref={rootRef} className="bazi-custom-select-desktop">
+        <button
+          type="button"
+          className={`bazi-input-field bazi-input-select bazi-custom-select-trigger ${value ? 'has-value' : 'is-placeholder'} ${isOpen ? 'is-open' : ''}`}
+          aria-haspopup="listbox"
+          aria-expanded={isOpen}
+          onClick={() => setIsOpen((open) => !open)}
+        >
+          <span>{triggerLabel}</span>
+          <ChevronDown className="bazi-select-chevron bazi-select-chevron-desktop" size={20} />
+        </button>
+
+        {isOpen && (
+          <div className="bazi-custom-select-menu" role="listbox" aria-label={placeholder}>
+            {options.map((optionValue) => (
+              <button
+                key={`custom-select-option-${optionValue}`}
+                type="button"
+                role="option"
+                aria-selected={optionValue === value}
+                className={`bazi-custom-select-option ${optionValue === value ? 'is-selected' : ''}`}
+                onClick={() => handleSelect(optionValue)}
+              >
+                {optionValue}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

@@ -550,6 +550,72 @@ body {
   pointer-events: none;
 }
 
+.bazi-custom-select-desktop {
+  display: none;
+  position: relative;
+}
+
+.bazi-custom-select-trigger {
+  position: relative;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  text-align: left;
+  padding-right: 2.75rem;
+}
+
+.bazi-custom-select-trigger.is-placeholder {
+  color: var(--bazi-muted-foreground);
+}
+
+.bazi-custom-select-trigger.has-value {
+  color: var(--bazi-foreground);
+}
+
+.bazi-custom-select-trigger.is-open {
+  transform: translate(var(--bazi-press-x), var(--bazi-press-y));
+  box-shadow: none;
+}
+
+.bazi-custom-select-menu {
+  position: absolute;
+  top: calc(100% + 0.38rem);
+  left: 0;
+  right: 0;
+  z-index: 50;
+  border: 2px solid var(--bazi-border);
+  border-radius: var(--bazi-radius-md);
+  background: var(--bazi-secondary-background);
+  box-shadow: var(--bazi-shadow);
+  max-height: 14rem;
+  overflow-y: auto;
+  padding: 0.25rem;
+}
+
+.bazi-custom-select-option {
+  width: 100%;
+  min-height: 2.2rem;
+  border: 2px solid transparent;
+  border-radius: calc(var(--bazi-radius-md) - 0.2rem);
+  background: transparent;
+  color: var(--bazi-foreground);
+  text-align: left;
+  padding: 0.24rem 0.52rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.bazi-custom-select-option:hover,
+.bazi-custom-select-option:focus-visible,
+.bazi-custom-select-option.is-selected {
+  border-color: var(--bazi-border);
+  background: var(--bazi-main);
+  color: var(--bazi-main-foreground);
+  outline: none;
+}
+
 .bazi-muted-text {
   margin: 0;
   color: var(--bazi-muted-foreground);
@@ -1186,6 +1252,15 @@ body {
 }
 
 @media (min-width: 1025px) {
+  .bazi-native-select-mobile,
+  .bazi-select-chevron-mobile {
+    display: none;
+  }
+
+  .bazi-custom-select-desktop {
+    display: block;
+  }
+
   .bazi-section-s2 .bazi-section-inner,
   .bazi-section-s3 .bazi-section-inner,
   .bazi-section-s4 .bazi-section-inner,
@@ -1460,6 +1535,27 @@ body {
   .bazi-input-section .bazi-input-stack {
     margin-top: 0.95rem;
     align-content: center;
+  }
+}
+
+@media (min-width: 1025px) {
+  .bazi-section-s2 .bazi-input-section-inner {
+    align-items: stretch;
+  }
+
+  .bazi-section-s2 .bazi-input-shell {
+    height: 100%;
+    min-height: 0;
+    grid-template-rows: auto minmax(0, 1fr);
+  }
+
+  .bazi-section-s2 .bazi-input-stack {
+    margin-top: 0;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.95rem;
   }
 }
 
