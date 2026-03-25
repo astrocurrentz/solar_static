@@ -196,7 +196,6 @@ const App: React.FC = () => {
   const [secondaryTelemetryLines, setSecondaryTelemetryLines] = useState<RequestTelemetryLine[]>(() => buildRequestTelemetryBatch(7, 'secondary'));
   const [isEthosInFront, setIsEthosInFront] = useState(false);
   const [ethosDisplayText, setEthosDisplayText] = useState('');
-  const [toolsButtonScrambleSignal, setToolsButtonScrambleSignal] = useState(0);
   const [landingButtonScrambleSignal, setLandingButtonScrambleSignal] = useState(0);
   const [selectedWorksButtonScrambleSignal, setSelectedWorksButtonScrambleSignal] = useState(0);
   const [requestButtonScrambleSignal, setRequestButtonScrambleSignal] = useState(0);
@@ -570,35 +569,6 @@ const App: React.FC = () => {
                     : 'translate-y-0 scale-100 opacity-100'
                 }`}
               >
-                <button
-                  type="button"
-                  onClick={(event) => {
-                    event.stopPropagation();
-                    setToolsButtonScrambleSignal((currentSignal) => currentSignal + 1);
-
-                    if (landingNavigationTimeoutRef.current !== null) {
-                      window.clearTimeout(landingNavigationTimeoutRef.current);
-                    }
-
-                    landingNavigationTimeoutRef.current = window.setTimeout(() => {
-                      navigate('/tools');
-                      landingNavigationTimeoutRef.current = null;
-                    }, BUTTON_GLITCH_NAV_DELAY_MS);
-                  }}
-                  className="group flex items-center gap-4 text-lg font-bold text-[var(--text-primary)] transition-colors hover:text-[var(--accent-secondary)]"
-                >
-                  <div className="flex h-12 w-12 items-center justify-center border border-[var(--border-strong)] bg-[var(--surface-tint)] transition-all group-hover:border-[var(--accent-primary)] group-hover:bg-[var(--accent-primary)] group-hover:text-[var(--text-primary)]">
-                    <ArrowUpRight size={20} />
-                  </div>
-                  <GlitchText
-                    text="TOOLS"
-                    wrapToWidth={false}
-                    scrambleOnMount={false}
-                    scrambleSignal={toolsButtonScrambleSignal}
-                    className="font-mono text-sm tracking-widest"
-                  />
-                </button>
-
                 <button
                   type="button"
                   onClick={(event) => {
