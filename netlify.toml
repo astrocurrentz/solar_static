@@ -3,6 +3,26 @@
   functions = "netlify/functions"
 
 [[redirects]]
+  from = "/exteral/bazi"
+  to = "/external/bazi/privacy"
+  status = 301
+
+[[redirects]]
+  from = "/privacy"
+  to = "/external/bazi/privacy"
+  status = 301
+
+[[redirects]]
+  from = "/privacy/bazi"
+  to = "/external/bazi/privacy"
+  status = 301
+
+[[redirects]]
+  from = "/exteral/*"
+  to = "/external/:splat"
+  status = 301
+
+[[redirects]]
   from = "/tools"
   to = "/index.html"
   status = 200

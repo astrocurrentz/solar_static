@@ -14,6 +14,7 @@ import {
 } from './components/ToolsPages';
 
 type RoutePath = '/' | '/tools' | '/tools/__text2imgp' | '/request' | '/thanks' | '/selected-works' | '/selected-works/bazi' | '/selected-works/latent-27';
+type AppRoute = RoutePath | 'not-found';
 type SubmitState = 'idle' | 'sending' | 'error';
 type RequestValidationErrors = {
   email?: string;
@@ -114,6 +115,7 @@ const NOISE_ANIMATION_DURATION_MS = 450;
 const NOISE_ANIMATION_STEP_COUNT = 5;
 const ETHOS_FOREGROUND_IDLE_MS = 60_000;
 const BUTTON_GLITCH_NAV_DELAY_MS = 180;
+const NOT_FOUND_GLITCH_INTERVAL_MS = 3600;
 const isValidEmailAddress = (value: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 const REQUEST_TELEMETRY_ACTIONS = ['build', 'route', 'trace', 'sync', 'cache', 'link', 'queue', 'emit', 'compile', 'index', 'relay', 'signal'];
 const REQUEST_TELEMETRY_SUBJECTS = ['mesh', 'uplink', 'node', 'buffer', 'stack', 'graph', 'asset', 'signal', 'frame', 'kernel', 'vector', 'field'];
@@ -163,10 +165,12 @@ const buildRequestTelemetryBatch = (count: number, variant: 'primary' | 'seconda
   Array.from({ length: count }, () => buildRequestTelemetryLine(variant))
 );
 
-const normalizeRoute = (pathname: string): RoutePath => {
+const normalizeRoute = (pathname: string): RoutePath | null => {
   const cleanPath = pathname !== '/' ? pathname.replace(/\/+$/, '') : pathname;
 
   switch (cleanPath) {
+    case '/':
+      return '/';
     case '/selected-works':
       return '/selected-works';
     case '/selected-works/bazi':
@@ -182,12 +186,40 @@ const normalizeRoute = (pathname: string): RoutePath => {
     case '/thanks':
       return '/thanks';
     default:
-      return '/';
+      return null;
   }
 };
 
+const resolveRoute = (pathname: string): AppRoute => normalizeRoute(pathname) ?? 'not-found';
+
+const NotFoundPage: React.FC = () => {
+  const [scrambleSignal, setScrambleSignal] = useState(0);
+
+  useEffect(() => {
+    const intervalId = window.setInterval(() => {
+      setScrambleSignal((currentSignal) => currentSignal + 1);
+    }, NOT_FOUND_GLITCH_INTERVAL_MS);
+
+    return () => window.clearInterval(intervalId);
+  }, []);
+
+  return (
+    <main className="grid min-h-[100dvh] place-items-center overflow-hidden bg-white px-4 text-black">
+      <div className="mx-auto w-fit max-w-[min(32rem,calc(100vw-3rem))] text-center">
+        <GlitchText
+          text="404 NOT FOUND"
+          scrambleSignal={scrambleSignal}
+          accentLettersEnabled={false}
+          className="font-display text-[clamp(2.4rem,7vw,5rem)] font-black uppercase leading-[0.92] tracking-[0.12em]"
+          tag="h1"
+        />
+      </div>
+    </main>
+  );
+};
+
 const App: React.FC = () => {
-  const [route, setRoute] = useState<RoutePath>(() => normalizeRoute(window.location.pathname));
+  const [route, setRoute] = useState<AppRoute>(() => resolveRoute(window.location.pathname));
   const [email, setEmail] = useState('');
   const [requestBody, setRequestBody] = useState('');
   const [submitState, setSubmitState] = useState<SubmitState>('idle');
@@ -207,14 +239,15 @@ const App: React.FC = () => {
 
   useEffect(() => {
     const normalizedRoute = normalizeRoute(window.location.pathname);
-    if (normalizedRoute !== window.location.pathname) {
+    if (normalizedRoute && normalizedRoute !== window.location.pathname) {
       window.history.replaceState({}, '', normalizedRoute);
-      setRoute(normalizedRoute);
     }
+
+    setRoute(resolveRoute(window.location.pathname));
 
     const handlePopState = () => {
       startTransition(() => {
-        setRoute(normalizeRoute(window.location.pathname));
+        setRoute(resolveRoute(window.location.pathname));
       });
     };
 
@@ -223,6 +256,11 @@ const App: React.FC = () => {
   }, []);
 
   useEffect(() => {
+    if (route === 'not-found') {
+      document.title = '404 NOT FOUND';
+      return;
+    }
+
     const pageTitles: Record<RoutePath, string> = {
       '/': '// SOLAT STATIC // /',
       '/tools': 'TOOLS',
@@ -499,6 +537,10 @@ const App: React.FC = () => {
       : submitState === 'error'
         ? 'retry_required'
         : 'ready';
+
+  if (route === 'not-found') {
+    return <NotFoundPage />;
+  }
 
   return (
     <div className="relative h-[100dvh] min-h-[100dvh] overflow-hidden cursor-none bg-[var(--bg-primary)] text-[var(--text-primary)]">

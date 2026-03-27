@@ -1,5 +1,27 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "redirects": [
+    {
+      "source": "/exteral/bazi",
+      "destination": "/external/bazi/privacy",
+      "permanent": true
+    },
+    {
+      "source": "/privacy",
+      "destination": "/external/bazi/privacy",
+      "permanent": true
+    },
+    {
+      "source": "/privacy/bazi",
+      "destination": "/external/bazi/privacy",
+      "permanent": true
+    },
+    {
+      "source": "/exteral/:path*",
+      "destination": "/external/:path*",
+      "permanent": true
+    }
+  ],
   "rewrites": [
     {
       "source": "/tools",
