@@ -1,4 +1,4 @@
-import React, {
+import {
   CSSProperties,
   useCallback,
   useEffect,
@@ -6,6 +6,8 @@ import React, {
   useRef,
   useState,
 } from 'react';
+import { useSpring } from '@react-spring/web';
+import { useDrag } from '@use-gesture/react';
 import { ArrowLeft } from 'lucide-react';
 import GlitchText from '../GlitchText';
 import { clamp, positiveModulo, useViewportSize } from './shared';
@@ -19,7 +21,6 @@ import {
   FREEWILL_INITIAL_PAN,
   FREEWILL_SIGNAL_POP_DURATION_MS,
   FREEWILL_TILE_BUFFER_STEPS,
-  type FreewillDragState,
   type FreewillPan,
   type FreewillTile,
   type FreewillWipPopup,
@@ -27,15 +28,31 @@ import {
 
 export function FreewillSelectedWorkPage() {
   const shellRef = useRef<HTMLElement | null>(null);
-  const dragRef = useRef<FreewillDragState | null>(null);
   const animationTimeoutsRef = useRef<Map<string, number>>(new Map());
   const suppressNextTileClickRef = useRef(false);
   const viewport = useViewportSize();
   const viewportRef = useRef(viewport);
+  const panRef = useRef<FreewillPan>(FREEWILL_INITIAL_PAN);
   const [pan, setPan] = useState<FreewillPan>(FREEWILL_INITIAL_PAN);
   const [isDragging, setIsDragging] = useState(false);
   const [activeTileAnimations, setActiveTileAnimations] = useState<Record<string, number>>({});
   const [wipPopup, setWipPopup] = useState<FreewillWipPopup | null>(null);
+
+  const syncPanSnapshot = useCallback((nextPan: FreewillPan) => {
+    panRef.current = nextPan;
+    setPan(nextPan);
+  }, []);
+
+  const [, panApi] = useSpring<FreewillPan>(() => ({
+    x: FREEWILL_INITIAL_PAN.x,
+    y: FREEWILL_INITIAL_PAN.y,
+    onChange: ({ value }) => {
+      syncPanSnapshot({
+        x: value.x,
+        y: value.y,
+      });
+    },
+  }), [syncPanSnapshot]);
 
   useEffect(() => {
     viewportRef.current = viewport;
@@ -104,6 +121,7 @@ export function FreewillSelectedWorkPage() {
     const handleWheel = (event: WheelEvent) => {
       event.preventDefault();
       event.stopPropagation();
+      panApi.stop();
 
       const deltaScale = event.deltaMode === 1
         ? 16
@@ -111,10 +129,17 @@ export function FreewillSelectedWorkPage() {
           ? Math.max(viewportRef.current.width, viewportRef.current.height)
           : 1;
 
-      setPan((currentPan) => ({
-        x: currentPan.x + event.deltaX * deltaScale,
-        y: currentPan.y + event.deltaY * deltaScale,
-      }));
+      const nextPan = {
+        x: panRef.current.x + event.deltaX * deltaScale,
+        y: panRef.current.y + event.deltaY * deltaScale,
+      };
+
+      syncPanSnapshot(nextPan);
+      panApi.start({
+        x: nextPan.x,
+        y: nextPan.y,
+        immediate: true,
+      });
     };
 
     shell.addEventListener('wheel', handleWheel, { passive: false });
@@ -122,7 +147,7 @@ export function FreewillSelectedWorkPage() {
     return () => {
       shell.removeEventListener('wheel', handleWheel);
     };
-  }, []);
+  }, [panApi, syncPanSnapshot]);
 
   useEffect(() => {
     const htmlStyle = document.documentElement.style;
@@ -185,108 +210,87 @@ export function FreewillSelectedWorkPage() {
     animationTimeoutsRef.current.set(tileKey, timeoutId);
   }, []);
 
-  const handlePointerDown = useCallback((event: React.PointerEvent<HTMLElement>) => {
+  useDrag(({
+    cancel,
+    delta: [deltaX, deltaY],
+    direction: [directionX, directionY],
+    event,
+    first,
+    last,
+    movement: [movementX, movementY],
+    velocity: [velocityX, velocityY],
+  }) => {
     const targetElement = event.target instanceof Element ? event.target : null;
-    const tileElement = targetElement?.closest('[data-freewill-tile-key]') as HTMLElement | null;
 
     if (targetElement?.closest('[data-freewill-control="true"]')) {
+      cancel();
+      setIsDragging(false);
       return;
     }
 
-    if (event.pointerType === 'mouse' && event.button !== 0) {
+    if (Math.hypot(movementX, movementY) > FREEWILL_CLICK_MOVE_THRESHOLD_PX && event.cancelable) {
+      event.preventDefault();
+    }
+
+    if (first) {
+      suppressNextTileClickRef.current = false;
+      panApi.stop();
+      setIsDragging(true);
+    }
+
+    if (deltaX !== 0 || deltaY !== 0) {
+      const nextPan = {
+        x: panRef.current.x - deltaX,
+        y: panRef.current.y - deltaY,
+      };
+
+      syncPanSnapshot(nextPan);
+      panApi.start({
+        x: nextPan.x,
+        y: nextPan.y,
+        immediate: true,
+      });
+    }
+
+    if (!last) {
       return;
     }
 
-    suppressNextTileClickRef.current = false;
-    event.currentTarget.setPointerCapture(event.pointerId);
-    dragRef.current = {
-      pointerId: event.pointerId,
-      startX: event.clientX,
-      startY: event.clientY,
-      lastX: event.clientX,
-      lastY: event.clientY,
-      startTileKey: tileElement?.dataset.freewillTileKey ?? null,
-      startTileHref: tileElement?.dataset.freewillHref ?? null,
-      startTileWipTitle: tileElement?.dataset.freewillWipTitle ?? null,
-      startTileWipSrc: tileElement?.dataset.freewillWipSrc ?? null,
-      hasExceededClickThreshold: false,
-    };
-    setIsDragging(true);
-  }, []);
-
-  const handlePointerMove = useCallback((event: React.PointerEvent<HTMLElement>) => {
-    const dragState = dragRef.current;
-
-    if (!dragState || dragState.pointerId !== event.pointerId) {
-      return;
-    }
-
-    event.preventDefault();
-    const deltaX = event.clientX - dragState.lastX;
-    const deltaY = event.clientY - dragState.lastY;
-    const totalMovement = Math.hypot(event.clientX - dragState.startX, event.clientY - dragState.startY);
-
-    dragRef.current = {
-      ...dragState,
-      lastX: event.clientX,
-      lastY: event.clientY,
-      hasExceededClickThreshold: dragState.hasExceededClickThreshold || totalMovement > FREEWILL_CLICK_MOVE_THRESHOLD_PX,
-    };
-
-    if (deltaX === 0 && deltaY === 0) {
-      return;
-    }
-
-    setPan((currentPan) => ({
-      x: currentPan.x - deltaX,
-      y: currentPan.y - deltaY,
-    }));
-  }, []);
-
-  const finishPointerDrag = useCallback((event: React.PointerEvent<HTMLElement>, shouldActivateTile: boolean) => {
-    const dragState = dragRef.current;
-
-    if (!dragState || dragState.pointerId !== event.pointerId) {
-      return;
-    }
-
-    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
-      event.currentTarget.releasePointerCapture(event.pointerId);
-    }
-
-    dragRef.current = null;
     setIsDragging(false);
 
-    const totalMovement = Math.hypot(event.clientX - dragState.startX, event.clientY - dragState.startY);
-    const didDrag = (
-      dragState.hasExceededClickThreshold ||
-      totalMovement > FREEWILL_CLICK_MOVE_THRESHOLD_PX
-    );
+    const didDrag = Math.hypot(movementX, movementY) > FREEWILL_CLICK_MOVE_THRESHOLD_PX;
+    suppressNextTileClickRef.current = didDrag;
 
-    const shouldTriggerTile = Boolean(
-      shouldActivateTile &&
-      !didDrag &&
-      dragState.startTileKey,
-    );
-
-    suppressNextTileClickRef.current = shouldTriggerTile || !shouldActivateTile || didDrag;
-
-    if (shouldTriggerTile) {
-      triggerTileActivation(
-        dragState.startTileKey,
-        dragState.startTileHref,
-        dragState.startTileWipTitle && dragState.startTileWipSrc
-          ? { title: dragState.startTileWipTitle, src: dragState.startTileWipSrc }
-          : null,
-      );
-    }
-
-    if (suppressNextTileClickRef.current) {
+    if (didDrag) {
       window.setTimeout(() => {
         suppressNextTileClickRef.current = false;
       }, 80);
     }
-  }, [triggerTileActivation]);
+
+    const panVelocityX = -velocityX * directionX;
+    const panVelocityY = -velocityY * directionY;
+
+    if (!didDrag || Math.hypot(panVelocityX, panVelocityY) <= 0.01) {
+      return;
+    }
+
+    panApi.start({
+      x: panRef.current.x,
+      y: panRef.current.y,
+      immediate: false,
+      config: (key) => ({
+        decay: true,
+        velocity: key === 'x' ? panVelocityX : panVelocityY,
+      }),
+    });
+  }, {
+    target: shellRef,
+    eventOptions: { passive: false },
+    pointer: {
+      buttons: 1,
+      keys: false,
+    },
+  });
 
   return (
     <main
@@ -303,11 +307,6 @@ export function FreewillSelectedWorkPage() {
         userSelect: 'none',
         WebkitUserSelect: 'none',
       } as CSSProperties}
-      onPointerDown={handlePointerDown}
-      onPointerMove={handlePointerMove}
-      onPointerUp={(event) => finishPointerDrag(event, true)}
-      onPointerCancel={(event) => finishPointerDrag(event, false)}
-      onLostPointerCapture={(event) => finishPointerDrag(event, false)}
       onDragStart={(event) => event.preventDefault()}
     >
       <div className="absolute inset-0 overflow-hidden" aria-hidden="true">

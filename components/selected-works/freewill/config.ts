@@ -33,19 +33,6 @@ export interface FreewillPan {
   y: number;
 }
 
-export interface FreewillDragState {
-  pointerId: number;
-  startX: number;
-  startY: number;
-  lastX: number;
-  lastY: number;
-  startTileKey: string | null;
-  startTileHref: string | null;
-  startTileWipTitle: string | null;
-  startTileWipSrc: string | null;
-  hasExceededClickThreshold: boolean;
-}
-
 export interface FreewillWipPopup {
   title: string;
   src: string;
