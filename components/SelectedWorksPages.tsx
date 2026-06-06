@@ -40,6 +40,25 @@ const SECTION_MIN_HEIGHT_STYLE = { minHeight: '100dvh' };
 const SECTION_CONTENT_MIN_HEIGHT_STYLE = {
   minHeight: 'calc(100dvh - var(--bazi-top-safe) - var(--bazi-bottom-safe))',
 };
+const FREEWILL_BACKGROUND = '#4F0000';
+const FREEWILL_ASSETS = [
+  { src: '/assets/freewill/angle.svg', label: 'Angle' },
+  { src: '/assets/freewill/eye.svg', label: 'Eye' },
+  { src: '/assets/freewill/freewill.svg', label: 'Freewill' },
+  { src: '/assets/freewill/hand.svg', label: 'Hand' },
+  { src: '/assets/freewill/head-and-dot.svg', label: 'Head and dot' },
+  { src: '/assets/freewill/head.svg', label: 'Head' },
+  { src: '/assets/freewill/jar.svg', label: 'Jar' },
+  { src: '/assets/freewill/lightning.svg', label: 'Lightning' },
+  { src: '/assets/freewill/ring.svg', label: 'Ring' },
+  { src: '/assets/freewill/scent.svg', label: 'Scent' },
+  { src: '/assets/freewill/upload.svg', label: 'Upload' },
+  { src: '/assets/freewill/water.svg', label: 'Water' },
+  { src: '/assets/freewill/wuxing.svg', label: 'Wuxing' },
+] as const;
+const FREEWILL_TILE_BUFFER_STEPS = 2;
+const FREEWILL_ASSET_STRIDE_X = 5;
+const FREEWILL_ASSET_STRIDE_Y = 7;
 
 type InputMode = 'birthProfile' | 'directBaZi';
 type DirectPickerState = { slot: PillarSlot; kind: 'stem' | 'branch' } | null;
@@ -71,6 +90,29 @@ interface Point {
 interface Velocity {
   dx: number;
   dy: number;
+}
+
+interface ViewportSize {
+  width: number;
+  height: number;
+}
+
+interface FreewillPan {
+  x: number;
+  y: number;
+}
+
+interface FreewillDragState {
+  pointerId: number;
+  lastX: number;
+  lastY: number;
+}
+
+interface FreewillTile {
+  key: string;
+  x: number;
+  y: number;
+  asset: (typeof FREEWILL_ASSETS)[number];
 }
 
 const DAY_MASTER_NODE_ID = 'day-master';
@@ -344,6 +386,42 @@ function useOccasionalGlitchSignal(minDelayMs = 4200, maxDelayMs = 9200) {
   }, [maxDelayMs, minDelayMs]);
 
   return signal;
+}
+
+function positiveModulo(value: number, divisor: number): number {
+  return ((value % divisor) + divisor) % divisor;
+}
+
+function useViewportSize(): ViewportSize {
+  const getViewportSize = useCallback(() => ({
+    width: window.visualViewport?.width ?? window.innerWidth,
+    height: window.visualViewport?.height ?? window.innerHeight,
+  }), []);
+
+  const [viewportSize, setViewportSize] = useState<ViewportSize>(() => {
+    if (typeof window === 'undefined') {
+      return { width: 1280, height: 720 };
+    }
+
+    return getViewportSize();
+  });
+
+  useEffect(() => {
+    const updateViewportSize = () => {
+      setViewportSize(getViewportSize());
+    };
+
+    updateViewportSize();
+    window.addEventListener('resize', updateViewportSize);
+    window.visualViewport?.addEventListener('resize', updateViewportSize);
+
+    return () => {
+      window.removeEventListener('resize', updateViewportSize);
+      window.visualViewport?.removeEventListener('resize', updateViewportSize);
+    };
+  }, [getViewportSize]);
+
+  return viewportSize;
 }
 
 function OccasionalGlitchText({
@@ -2643,11 +2721,12 @@ function BaziIntroParagraph() {
 export function SelectedWorksIndexPage({
   onNavigate,
 }: {
-  onNavigate: (nextRoute: '/selected-works/bazi' | '/selected-works/latent-27') => void;
+  onNavigate: (nextRoute: '/selected-works/bazi' | '/selected-works/latent-27' | '/freewill') => void;
 }) {
   const meshSignalA = useOccasionalGlitchSignal(3900, 7600);
   const meshSignalB = useOccasionalGlitchSignal(4300, 8000);
   const meshSignalC = useOccasionalGlitchSignal(4700, 8400);
+  const meshSignalD = useOccasionalGlitchSignal(5100, 8800);
 
   return (
     <main
@@ -2712,6 +2791,274 @@ export function SelectedWorksIndexPage({
             className="font-display text-[clamp(2rem,8vw,5rem)] font-black tracking-wide"
           />
         </a>
+
+        <button
+          type="button"
+          aria-label="Open The Freewill project"
+          onClick={() => onNavigate('/freewill')}
+          className="group text-[var(--text-primary)] transition-colors duration-300 hover:text-[var(--accent-secondary)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--accent-secondary)]"
+        >
+          <GlitchText
+            text="The Freewill"
+            tag="span"
+            wrapToWidth={false}
+            scrambleOnMount={false}
+            scrambleSignal={meshSignalD}
+            scrambleStepMs={22}
+            scrambleRevealStep={1.2}
+            className="font-display text-[clamp(2rem,8vw,5rem)] font-black tracking-wide"
+          />
+        </button>
+      </div>
+    </main>
+  );
+}
+
+export function FreewillSelectedWorkPage() {
+  const shellRef = useRef<HTMLElement | null>(null);
+  const dragRef = useRef<FreewillDragState | null>(null);
+  const viewport = useViewportSize();
+  const viewportRef = useRef(viewport);
+  const [pan, setPan] = useState<FreewillPan>({ x: 0, y: 0 });
+  const [isDragging, setIsDragging] = useState(false);
+
+  useEffect(() => {
+    viewportRef.current = viewport;
+  }, [viewport]);
+
+  const tileMetrics = useMemo(() => {
+    const shortestSide = Math.min(viewport.width, viewport.height);
+    const tileSize = viewport.width < 640
+      ? clamp(viewport.width * 0.34, 116, 152)
+      : clamp(shortestSide * 0.28, 156, 236);
+    const gap = clamp(tileSize * 0.38, 42, 92);
+
+    return {
+      tileSize: Math.round(tileSize),
+      step: Math.round(tileSize + gap),
+    };
+  }, [viewport.height, viewport.width]);
+
+  const tiles = useMemo<FreewillTile[]>(() => {
+    const { step } = tileMetrics;
+    const halfWidth = viewport.width / 2;
+    const halfHeight = viewport.height / 2;
+    const buffer = step * FREEWILL_TILE_BUFFER_STEPS;
+    const minCol = Math.floor((pan.x - halfWidth - buffer) / step);
+    const maxCol = Math.ceil((pan.x + halfWidth + buffer) / step);
+    const minRow = Math.floor((pan.y - halfHeight - buffer) / step);
+    const maxRow = Math.ceil((pan.y + halfHeight + buffer) / step);
+    const nextTiles: FreewillTile[] = [];
+
+    for (let row = minRow; row <= maxRow; row += 1) {
+      for (let col = minCol; col <= maxCol; col += 1) {
+        const assetIndex = positiveModulo(
+          col * FREEWILL_ASSET_STRIDE_X + row * FREEWILL_ASSET_STRIDE_Y,
+          FREEWILL_ASSETS.length,
+        );
+        const asset = FREEWILL_ASSETS[assetIndex];
+
+        if (!asset) {
+          continue;
+        }
+
+        nextTiles.push({
+          key: `${col}:${row}`,
+          x: halfWidth + col * step - pan.x,
+          y: halfHeight + row * step - pan.y,
+          asset,
+        });
+      }
+    }
+
+    return nextTiles;
+  }, [pan.x, pan.y, tileMetrics, viewport.height, viewport.width]);
+
+  useEffect(() => {
+    const shell = shellRef.current;
+
+    if (!shell) {
+      return;
+    }
+
+    const handleWheel = (event: WheelEvent) => {
+      event.preventDefault();
+      event.stopPropagation();
+
+      const deltaScale = event.deltaMode === 1
+        ? 16
+        : event.deltaMode === 2
+          ? Math.max(viewportRef.current.width, viewportRef.current.height)
+          : 1;
+
+      setPan((currentPan) => ({
+        x: currentPan.x + event.deltaX * deltaScale,
+        y: currentPan.y + event.deltaY * deltaScale,
+      }));
+    };
+
+    shell.addEventListener('wheel', handleWheel, { passive: false });
+
+    return () => {
+      shell.removeEventListener('wheel', handleWheel);
+    };
+  }, []);
+
+  useEffect(() => {
+    const htmlStyle = document.documentElement.style;
+    const bodyStyle = document.body.style;
+    const previousHtmlOverscroll = htmlStyle.overscrollBehavior;
+    const previousBodyOverscroll = bodyStyle.overscrollBehavior;
+
+    htmlStyle.overscrollBehavior = 'none';
+    bodyStyle.overscrollBehavior = 'none';
+
+    return () => {
+      htmlStyle.overscrollBehavior = previousHtmlOverscroll;
+      bodyStyle.overscrollBehavior = previousBodyOverscroll;
+    };
+  }, []);
+
+  const navigateToSelectedWorks = useCallback(() => {
+    if (window.location.pathname === '/selected-works') {
+      return;
+    }
+
+    window.history.pushState({}, '', '/selected-works');
+    window.dispatchEvent(new PopStateEvent('popstate'));
+  }, []);
+
+  const handlePointerDown = useCallback((event: React.PointerEvent<HTMLElement>) => {
+    const targetElement = event.target instanceof Element ? event.target : null;
+
+    if (targetElement?.closest('[data-freewill-control="true"]')) {
+      return;
+    }
+
+    if (event.pointerType === 'mouse' && event.button !== 0) {
+      return;
+    }
+
+    event.preventDefault();
+    event.currentTarget.setPointerCapture(event.pointerId);
+    dragRef.current = {
+      pointerId: event.pointerId,
+      lastX: event.clientX,
+      lastY: event.clientY,
+    };
+    setIsDragging(true);
+  }, []);
+
+  const handlePointerMove = useCallback((event: React.PointerEvent<HTMLElement>) => {
+    const dragState = dragRef.current;
+
+    if (!dragState || dragState.pointerId !== event.pointerId) {
+      return;
+    }
+
+    event.preventDefault();
+    const deltaX = event.clientX - dragState.lastX;
+    const deltaY = event.clientY - dragState.lastY;
+
+    dragRef.current = {
+      ...dragState,
+      lastX: event.clientX,
+      lastY: event.clientY,
+    };
+
+    if (deltaX === 0 && deltaY === 0) {
+      return;
+    }
+
+    setPan((currentPan) => ({
+      x: currentPan.x - deltaX,
+      y: currentPan.y - deltaY,
+    }));
+  }, []);
+
+  const finishPointerDrag = useCallback((event: React.PointerEvent<HTMLElement>) => {
+    const dragState = dragRef.current;
+
+    if (!dragState || dragState.pointerId !== event.pointerId) {
+      return;
+    }
+
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+
+    dragRef.current = null;
+    setIsDragging(false);
+  }, []);
+
+  return (
+    <main
+      ref={shellRef}
+      role="application"
+      aria-label="The Freewill infinite artwork grid"
+      data-disable-custom-cursor="true"
+      className="fixed inset-0 h-[100dvh] min-h-[100dvh] overflow-hidden text-white"
+      style={{
+        background: FREEWILL_BACKGROUND,
+        cursor: isDragging ? 'grabbing' : 'grab',
+        overscrollBehavior: 'none',
+        touchAction: 'none',
+        userSelect: 'none',
+        WebkitUserSelect: 'none',
+      } as CSSProperties}
+      onPointerDown={handlePointerDown}
+      onPointerMove={handlePointerMove}
+      onPointerUp={finishPointerDrag}
+      onPointerCancel={finishPointerDrag}
+      onLostPointerCapture={finishPointerDrag}
+      onDragStart={(event) => event.preventDefault()}
+    >
+      <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
+        {tiles.map((tile) => (
+          <div
+            key={tile.key}
+            className="absolute flex items-center justify-center"
+            style={{
+              height: tileMetrics.tileSize,
+              left: 0,
+              top: 0,
+              transform: `translate3d(${(tile.x - tileMetrics.tileSize / 2).toFixed(2)}px, ${(tile.y - tileMetrics.tileSize / 2).toFixed(2)}px, 0)`,
+              width: tileMetrics.tileSize,
+              willChange: 'transform',
+            }}
+          >
+            <img
+              src={tile.asset.src}
+              alt=""
+              draggable={false}
+              className="block h-full w-full object-contain"
+              style={{ pointerEvents: 'none' }}
+            />
+          </div>
+        ))}
+      </div>
+
+      <div
+        className="absolute left-3 z-30 md:left-8"
+        style={{ top: 'calc(1rem + env(safe-area-inset-top, 0px))' }}
+        data-freewill-control="true"
+      >
+        <button
+          type="button"
+          onClick={navigateToSelectedWorks}
+          className="group flex items-center gap-4 text-lg font-bold text-white transition-colors hover:text-white/70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
+          aria-label="Back to Selected Works"
+          data-freewill-control="true"
+        >
+          <div className="flex h-12 w-12 items-center justify-center border border-white/60 bg-[#4F0000] shadow-[0_0_0_1px_rgba(79,0,0,0.9)] transition-all group-hover:border-white group-hover:bg-white group-hover:text-[#4F0000]">
+            <ArrowLeft size={18} aria-hidden="true" />
+          </div>
+          <GlitchText
+            text="SW"
+            wrapToWidth={false}
+            className="font-mono text-sm tracking-widest"
+          />
+        </button>
       </div>
     </main>
   );

@@ -16,6 +16,7 @@ export default defineConfig(({ mode }) => {
           '/selected-works',
           '/selected-works/bazi',
           '/selected-works/latent-27',
+          '/freewill',
         ]);
 
         server.middlewares.use(async (request: any, response: any, next: any) => {

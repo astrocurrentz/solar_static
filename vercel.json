@@ -50,6 +50,10 @@
     {
       "source": "/selected-works/latent-27",
       "destination": "/index.html"
+    },
+    {
+      "source": "/freewill",
+      "destination": "/index.html"
     }
   ]
 }

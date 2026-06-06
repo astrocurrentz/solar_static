@@ -5,6 +5,7 @@ import GlitchText from './components/GlitchText';
 import NoiseOverlay from './components/NoiseOverlay';
 import {
   BaziSelectedWorkPage,
+  FreewillSelectedWorkPage,
   LatentSelectedWorkPage,
   SelectedWorksIndexPage,
 } from './components/SelectedWorksPages';
@@ -13,7 +14,7 @@ import {
   ToolsLauncherCard,
 } from './components/ToolsPages';
 
-type RoutePath = '/' | '/tools' | '/tools/__text2imgp' | '/request' | '/thanks' | '/selected-works' | '/selected-works/bazi' | '/selected-works/latent-27';
+type RoutePath = '/' | '/tools' | '/tools/__text2imgp' | '/request' | '/thanks' | '/selected-works' | '/selected-works/bazi' | '/selected-works/latent-27' | '/freewill';
 type AppRoute = RoutePath | 'not-found';
 type SubmitState = 'idle' | 'sending' | 'error';
 type RequestValidationErrors = {
@@ -177,6 +178,8 @@ const normalizeRoute = (pathname: string): RoutePath | null => {
       return '/selected-works/bazi';
     case '/selected-works/latent-27':
       return '/selected-works/latent-27';
+    case '/freewill':
+      return '/freewill';
     case '/tools':
       return '/tools';
     case '/tools/__text2imgp':
@@ -268,6 +271,7 @@ const App: React.FC = () => {
       '/selected-works': 'SOLAR STATIC // SELECTED WORKS',
       '/selected-works/bazi': 'SOLAR STATIC // 八字·BĀZÌ',
       '/selected-works/latent-27': 'SOLAR STATIC // LATENT 27',
+      '/freewill': 'SOLAR STATIC // THE FREEWILL',
       '/request': 'SOLAR STATIC // TRANSMIT REQUEST',
       '/thanks': 'SOLAR STATIC // SIGNAL RECEIVED',
     };
@@ -806,6 +810,10 @@ const App: React.FC = () => {
 
       {route === '/selected-works/latent-27' && (
         <LatentSelectedWorkPage />
+      )}
+
+      {route === '/freewill' && (
+        <FreewillSelectedWorkPage />
       )}
 
       {route === '/request' && (
