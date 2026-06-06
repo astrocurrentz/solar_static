@@ -59,6 +59,7 @@ const FREEWILL_ASSETS = [
 const FREEWILL_TILE_BUFFER_STEPS = 2;
 const FREEWILL_ASSET_STRIDE_X = 5;
 const FREEWILL_ASSET_STRIDE_Y = 7;
+const FREEWILL_SVG_SCALE = 0.54;
 
 type InputMode = 'birthProfile' | 'directBaZi';
 type DirectPickerState = { slot: PillarSlot; kind: 'stem' | 'branch' } | null;
@@ -3031,8 +3032,12 @@ export function FreewillSelectedWorkPage() {
               src={tile.asset.src}
               alt=""
               draggable={false}
-              className="block h-full w-full object-contain"
-              style={{ pointerEvents: 'none' }}
+              className="block object-contain"
+              style={{
+                height: `${FREEWILL_SVG_SCALE * 100}%`,
+                pointerEvents: 'none',
+                width: `${FREEWILL_SVG_SCALE * 100}%`,
+              }}
             />
           </div>
         ))}
