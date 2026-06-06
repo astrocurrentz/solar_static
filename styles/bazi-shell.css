@@ -1,0 +1,308 @@
+.bazi-demo {
+  --bazi-background: var(--bazi-background-light);
+  --bazi-secondary-background: var(--bazi-background-light);
+  --bazi-foreground: var(--bazi-foreground-light);
+  --bazi-muted-foreground: var(--bazi-muted-foreground-light);
+  --bazi-border: var(--bazi-border-light);
+  --bazi-main: var(--bazi-main-light);
+  --bazi-main-foreground: var(--bazi-main-foreground-light);
+  --bazi-shadow: 4px 4px 0 0 var(--bazi-border);
+  --bazi-press-x: 4px;
+  --bazi-press-y: 4px;
+  --bazi-radius-xs: 5px;
+  --bazi-radius-sm: 8px;
+  --bazi-radius-md: 10px;
+  --bazi-radius-lg: 12px;
+  --bazi-radius-xl: 14px;
+  --bazi-top-safe: calc(env(safe-area-inset-top, 0px) + 4.4rem);
+  --bazi-bottom-safe: calc(env(safe-area-inset-bottom, 0px) + 2rem);
+  background: var(--bazi-background);
+  color: var(--bazi-foreground);
+  font-family: var(--font-body);
+}
+
+.bazi-demo h1,
+.bazi-demo h2,
+.bazi-demo h3,
+.bazi-demo h4,
+.bazi-demo .bazi-card-title,
+.bazi-demo .bazi-subcard-title,
+.bazi-demo .bazi-row-label,
+.bazi-demo .bazi-transit-header h3 {
+  font-family: var(--font-display);
+}
+
+.bazi-demo.dark {
+  --bazi-background: var(--bazi-background-dark);
+  --bazi-secondary-background: var(--bazi-background-dark);
+  --bazi-foreground: var(--bazi-foreground-dark);
+  --bazi-muted-foreground: var(--bazi-muted-foreground-dark);
+}
+
+.bazi-page-shell {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+.bazi-demo * {
+  box-sizing: border-box;
+}
+
+.bazi-demo button {
+  font-family: inherit;
+}
+
+.bazi-demo input,
+.bazi-demo select {
+  font: inherit;
+}
+
+.bazi-foreground {
+  color: var(--bazi-foreground);
+}
+
+.bazi-main-foreground {
+  color: var(--bazi-main-foreground);
+}
+
+.bazi-border {
+  border-color: var(--bazi-border);
+}
+
+.bazi-element-fire {
+  color: var(--bazi-element-fire);
+}
+
+.bazi-demo-grid {
+  background-image:
+    linear-gradient(to right, var(--bazi-grid-light-line) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--bazi-grid-light-line) 1px, transparent 1px);
+  background-size: 64px 64px;
+}
+
+.bazi-demo.dark .bazi-demo-grid {
+  background-image:
+    linear-gradient(to right, var(--bazi-grid-dark-line) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--bazi-grid-dark-line) 1px, transparent 1px);
+}
+
+.bazi-pressable {
+  transition: transform 90ms linear, box-shadow 90ms linear, background-color 200ms ease, color 200ms ease, border-color 200ms ease;
+}
+
+.bazi-pressable:active {
+  transform: translate(var(--bazi-press-x), var(--bazi-press-y));
+  box-shadow: none;
+}
+
+.bazi-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  min-height: 2.25rem;
+  border: 2px solid var(--bazi-border);
+  border-radius: var(--bazi-radius-md);
+  background: var(--bazi-secondary-background);
+  color: var(--bazi-foreground);
+  box-shadow: var(--bazi-shadow);
+  padding: 0 0.82rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.bazi-chip-small {
+  min-height: 2rem;
+  border-radius: var(--bazi-radius-sm);
+  padding: 0 0.62rem;
+  font-size: 0.78rem;
+  letter-spacing: 0.01em;
+}
+
+.bazi-theme-chip {
+  min-width: 6.85rem;
+}
+
+.bazi-theme-icon-chip {
+  width: 2.25rem;
+  min-height: 2.25rem;
+  border-radius: var(--bazi-radius-md);
+  padding: 0;
+  background: var(--bazi-secondary-background);
+  color: var(--bazi-foreground);
+}
+
+.bazi-back-chip {
+  min-width: auto;
+  justify-content: center;
+  padding: 0 0.68rem;
+  gap: 0.36rem;
+}
+
+.bazi-back-chip-icon {
+  flex-shrink: 0;
+}
+
+.bazi-scroll-hidden {
+  scrollbar-width: none;
+  overflow-x: hidden;
+  overscroll-behavior-x: none;
+}
+
+.bazi-scroll-hidden::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
+.bazi-section {
+  padding-top: var(--bazi-top-safe);
+  padding-bottom: var(--bazi-bottom-safe);
+}
+
+.bazi-fixed-chip.bazi-fixed-left {
+  left: 1rem;
+  top: calc(env(safe-area-inset-top, 0px) + 12px);
+}
+
+.bazi-fixed-chip.bazi-fixed-right {
+  right: 1rem;
+  top: calc(env(safe-area-inset-top, 0px) + 12px);
+}
+
+.bazi-section-shell {
+  padding-inline: 2rem;
+  max-width: 100%;
+}
+
+.bazi-section-inner {
+  width: 100%;
+  min-width: 0;
+}
+
+.bazi-input-section-inner {
+  grid-template-rows: minmax(0, 1fr) auto;
+}
+
+.bazi-disclaimer-section {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  align-items: stretch;
+}
+
+.bazi-disclaimer-main {
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.bazi-disclaimer-main > * {
+  width: 100%;
+}
+
+.bazi-section-label {
+  opacity: 0.95;
+  text-transform: none;
+}
+
+.bazi-card {
+  border: 2px solid var(--bazi-border);
+  border-radius: var(--bazi-radius-xl);
+  background: var(--bazi-secondary-background);
+  color: var(--bazi-foreground);
+  box-shadow: var(--bazi-shadow);
+}
+
+.bazi-section-card {
+  width: 100%;
+  min-width: 0;
+  padding: 1.15rem;
+}
+
+.bazi-card-title {
+  margin: 0;
+  text-align: center;
+  font-size: clamp(1.9rem, 4vw, 2.15rem);
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.bazi-card-title-left {
+  text-align: left;
+}
+
+.bazi-card-caption {
+  margin: -0.3rem 0 0;
+  text-align: center;
+  font-size: clamp(0.95rem, 1.45vw, 1.05rem);
+  font-weight: 600;
+  color: var(--bazi-muted-foreground);
+}
+
+.bazi-home-button {
+  width: 11rem;
+  height: 11rem;
+  border: 2px solid var(--bazi-border);
+  border-radius: var(--bazi-radius-xl);
+  box-shadow: var(--bazi-shadow);
+  line-height: 1;
+  letter-spacing: -0.01em;
+  text-align: center;
+}
+
+.bazi-home-button-stack {
+  display: flex;
+  height: 100%;
+  width: 100%;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.1rem;
+}
+
+.bazi-home-button-line {
+  display: block;
+  font-size: clamp(3.4rem, 12vw, 5.6rem);
+  font-weight: 900;
+  line-height: 0.86;
+  letter-spacing: -0.03em;
+}
+
+.bazi-color-transition {
+  transition: background-color 200ms ease, color 200ms ease, border-color 200ms ease, transform 90ms linear, box-shadow 90ms linear;
+}
+
+.bazi-intro-text {
+  width: min(56rem, 100%);
+  margin: 0;
+  text-align: center;
+  font-size: clamp(0.94rem, 1.7vw, 1.1rem);
+  line-height: 1.78;
+  color: var(--bazi-foreground);
+}
+
+.bazi-demo-disclaimer {
+  margin: 0;
+  text-align: center;
+  font-size: clamp(0.88rem, 1.45vw, 1.02rem);
+  line-height: 1.52;
+  color: color-mix(in srgb, var(--bazi-foreground) 74%, transparent);
+}
+
+.bazi-store-text {
+  font-size: clamp(1rem, 5.6vmin, 3.35rem);
+  line-height: 1.15;
+  padding-inline: 0.5rem;
+}
+
+.bazi-section-s8 .bazi-store-text {
+  width: min(100%, 70rem);
+  margin: 0 auto;
+  padding-top: max(0.75rem, env(safe-area-inset-top, 0px));
+  padding-bottom: max(0.75rem, env(safe-area-inset-bottom, 0px));
+  padding-left: max(1rem, env(safe-area-inset-left, 0px));
+  padding-right: max(1rem, env(safe-area-inset-right, 0px));
+  text-wrap: balance;
+}

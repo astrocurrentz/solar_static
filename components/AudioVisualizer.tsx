@@ -1,8 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
 import GlitchText from './GlitchText';
+import { APP_CSS_VARIABLES } from '../shared/design/tokens.mjs';
+import { SITE_COPY } from '../shared/copy/site-copy.mjs';
 
-const ACTIVE_WAVE = '#C97338';
-const IDLE_WAVE = 'rgba(229, 216, 189, 0.32)';
+const ACTIVE_WAVE = APP_CSS_VARIABLES['--accent-secondary'];
+const IDLE_WAVE = APP_CSS_VARIABLES['--audio-idle-wave'];
 
 const AudioVisualizer: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -66,7 +68,7 @@ const AudioVisualizer: React.FC = () => {
       style={{ boxShadow: '0 20px 40px var(--shadow-deep)' }}
     >
       <div className="absolute top-2 left-2 text-[10px] font-bold tracking-widest uppercase text-[var(--accent-secondary)]">
-        Audio Processor Unit
+        {SITE_COPY.audioVisualizer.title}
       </div>
       
       <canvas 
@@ -78,17 +80,17 @@ const AudioVisualizer: React.FC = () => {
       <div className="mt-4 flex items-end justify-between border-t border-[var(--border-soft)] pt-4">
         <div>
            <h3 className="text-xl font-bold font-display uppercase text-[var(--text-primary)]">
-             {isPlaying ? <GlitchText text="SYSTEM_ACTIVE" /> : "SYSTEM_IDLE"}
+             {isPlaying ? <GlitchText text={SITE_COPY.audioVisualizer.active} /> : SITE_COPY.audioVisualizer.idle}
            </h3>
            <p className="mt-1 max-w-[200px] text-xs text-[var(--text-secondary)]">
-             Click visualizations to toggle audio simulation processing.
+             {SITE_COPY.audioVisualizer.description}
            </p>
         </div>
         <button 
           onClick={() => setIsPlaying(!isPlaying)}
           className="bg-[var(--accent-primary)] px-6 py-2 text-sm font-bold uppercase tracking-wider text-[var(--text-primary)] transition-colors hover:bg-[var(--accent-secondary)]"
         >
-          {isPlaying ? 'PAUSE' : 'INITIATE'}
+          {isPlaying ? SITE_COPY.audioVisualizer.pause : SITE_COPY.audioVisualizer.initiate}
         </button>
       </div>
 

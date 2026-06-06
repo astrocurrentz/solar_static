@@ -2,26 +2,19 @@ import fs from 'fs';
 import path from 'path';
 import { defineConfig, loadEnv } from 'vite';
 import react from '@vitejs/plugin-react';
+import { parseJsonPayload } from './shared/http/adapter-utils.mjs';
+import { SPA_ROUTE_PATHS } from './shared/routes.mjs';
+import { TEXT_TO_IMG_POST_CONFIG } from './shared/text-to-img-post-config.mjs';
 
 export default defineConfig(({ mode }) => {
     const localTextToImgRenderPlugin = {
       name: 'local-text-to-img-render-endpoint',
       configureServer(server: any) {
-        const spaRoutes = new Set([
-          '/',
-          '/tools',
-          '/tools/__text2imgp',
-          '/request',
-          '/thanks',
-          '/selected-works',
-          '/selected-works/bazi',
-          '/selected-works/latent-27',
-          '/freewill',
-        ]);
+        const spaRoutes = new Set(SPA_ROUTE_PATHS);
 
         server.middlewares.use(async (request: any, response: any, next: any) => {
           const requestPath = (request.url ?? '').split('?')[0];
-          if (request.method !== 'POST' || requestPath !== '/api/tools/text-to-img-post/render') {
+          if (request.method !== 'POST' || requestPath !== TEXT_TO_IMG_POST_CONFIG.endpoint) {
             next();
             return;
           }
@@ -37,7 +30,7 @@ export default defineConfig(({ mode }) => {
 
           try {
             const body = await readRequestBody();
-            const payload = body ? JSON.parse(body) : {};
+            const payload = parseJsonPayload(body);
             const rendererModule = await import('./server/text-to-img-post-renderer.mjs');
             const pngBytes = await rendererModule.renderTextToImagePost(payload);
             response.statusCode = 200;
@@ -128,6 +121,27 @@ export default defineConfig(({ mode }) => {
         alias: {
           '@': path.resolve(__dirname, '.'),
         }
+      },
+      build: {
+        rollupOptions: {
+          output: {
+            manualChunks(id: string) {
+              if (!id.includes('node_modules')) {
+                return undefined;
+              }
+
+              if (id.includes('/recharts') || id.includes('/d3-')) {
+                return 'vendor-charts';
+              }
+
+              if (id.includes('/lucide-react')) {
+                return 'vendor-icons';
+              }
+
+              return 'vendor';
+            },
+          },
+        },
       }
     };
 });

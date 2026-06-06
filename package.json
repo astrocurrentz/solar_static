@@ -5,6 +5,10 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "generate:static": "node scripts/generate-static.mjs",
+    "check:ground-rules": "node scripts/check-ground-rules.mjs",
+    "typecheck": "tsc --noEmit",
+    "verify": "npm run generate:static && npm run check:ground-rules && npm run typecheck && npm run build",
     "build": "vite build",
     "preview": "vite preview"
   },

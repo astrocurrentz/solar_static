@@ -5,6 +5,7 @@ module.exports = {
     './App.tsx',
     './index.tsx',
     './components/**/*.{ts,tsx}',
+    './shared/**/*.{js,mjs,ts,tsx}',
     './api/**/*.{ts,tsx}',
   ],
   theme: {

@@ -1,8 +1,10 @@
+/* GENERATED FILE: edit shared/copy/site-copy.mjs instead. */
 const STORAGE_KEYS = {
   script: 'solarstatic.bazi.reference.script.v1',
 };
 
 const DEFAULT_SCRIPT = 'hans';
+const EXTERNAL_COPY = {"loadingHans":"载入中…","loadingHant":"載入中…","loadFailedHans":"内容载入失败。","loadFailedHant":"內容載入失敗。","switchToHans":"Switch to Simplified Chinese","switchToHant":"Switch to Traditional Chinese","scriptHansButton":"简","scriptHantButton":"繁"};
 
 const root = document.documentElement;
 const langToggle = document.querySelector('[data-lang-toggle]');
@@ -32,14 +34,11 @@ const setStoredValue = (key, value) => {
 };
 
 const renderLangButton = (script) => {
-  if (!langToggle) {
-    return;
-  }
-
-  langToggle.textContent = script === 'hans' ? '简' : '繁';
+  if (!langToggle) return;
+  langToggle.textContent = script === 'hans' ? EXTERNAL_COPY.scriptHansButton : EXTERNAL_COPY.scriptHantButton;
   langToggle.setAttribute(
     'aria-label',
-    script === 'hans' ? 'Switch to Traditional Chinese' : 'Switch to Simplified Chinese',
+    script === 'hans' ? EXTERNAL_COPY.switchToHant : EXTERNAL_COPY.switchToHans,
   );
 };
 
@@ -53,7 +52,7 @@ const escapeHtml = (value) =>
 
 const renderInlineMarkdown = (value) => {
   const codeSpans = [];
-  const escaped = escapeHtml(value).replace(/`([^`]+)`/g, (_, code) => {
+  const escaped = escapeHtml(value).replace(/\`([^\`]+)\`/g, (_, code) => {
     const token = `__CODE_SPAN_${codeSpans.length}__`;
     codeSpans.push(`<code>${escapeHtml(code)}</code>`);
     return token;
@@ -74,26 +73,19 @@ const renderMarkdownToHtml = (markdown) => {
   const lines = markdown.replace(/\r\n?/g, '\n').split('\n');
   const html = [];
   let index = 0;
-
   const isHeading = (line) => /^#{1,6}\s+/.test(line);
   const isHr = (line) => /^([-*_])\1{2,}\s*$/.test(line.trim());
   const isUnorderedList = (line) => /^\s*[-*+]\s+/.test(line);
   const isOrderedList = (line) => /^\s*\d+\.\s+/.test(line);
   const isBlockquote = (line) => /^\s*>\s?/.test(line);
-  const isFence = (line) => /^\s*```/.test(line);
+  const isFence = (line) => /^\s*\`\`\`/.test(line);
   const startsNewBlock = (line) =>
-    !line.trim() ||
-    isHeading(line) ||
-    isHr(line) ||
-    isUnorderedList(line) ||
-    isOrderedList(line) ||
-    isBlockquote(line) ||
-    isFence(line);
+    !line.trim() || isHeading(line) || isHr(line) || isUnorderedList(line) ||
+    isOrderedList(line) || isBlockquote(line) || isFence(line);
 
   while (index < lines.length) {
     const line = lines[index];
     const trimmed = line.trim();
-
     if (!trimmed) {
       index += 1;
       continue;
@@ -108,14 +100,8 @@ const renderMarkdownToHtml = (markdown) => {
         codeLines.push(lines[index]);
         index += 1;
       }
-      if (index < lines.length) {
-        index += 1;
-      }
-      html.push(
-        `<pre><code${language ? ` class="language-${escapeHtml(language)}"` : ''}>${escapeHtml(
-          codeLines.join('\n'),
-        )}</code></pre>`,
-      );
+      if (index < lines.length) index += 1;
+      html.push(`<pre><code${language ? ` class="language-${escapeHtml(language)}"` : ''}>${escapeHtml(codeLines.join('\n'))}</code></pre>`);
       continue;
     }
 
@@ -165,64 +151,42 @@ const renderMarkdownToHtml = (markdown) => {
     }
     html.push(`<p>${paragraphLines.map(renderInlineMarkdown).join('<br />')}</p>`);
   }
-
   return html.join('\n');
 };
 
 const getContentPathForScript = (script) => {
-  if (!contentHost) {
-    return null;
-  }
-
+  if (!contentHost) return null;
   return script === 'hant' ? contentHost.dataset.contentHant ?? null : contentHost.dataset.contentHans ?? null;
 };
 
 const renderContentStatus = (text) => {
-  if (!markdownStatus) {
-    return;
-  }
-
+  if (!markdownStatus) return;
   markdownStatus.hidden = false;
   markdownStatus.textContent = text;
 };
 
 const renderMarkdownContent = async (script) => {
   const contentPath = getContentPathForScript(script);
-  if (!markdownContent || !contentPath) {
-    return;
-  }
-
+  if (!markdownContent || !contentPath) return;
   const renderId = ++activeRenderId;
-  renderContentStatus(script === 'hant' ? '載入中…' : '载入中…');
-
+  renderContentStatus(script === 'hant' ? EXTERNAL_COPY.loadingHant : EXTERNAL_COPY.loadingHans);
   try {
     let html = htmlCache.get(contentPath);
     if (!html) {
       const response = await fetch(contentPath);
-      if (!response.ok) {
-        throw new Error(`Failed to load ${contentPath}`);
-      }
+      if (!response.ok) throw new Error(`Failed to load ${contentPath}`);
       const markdown = await response.text();
       html = renderMarkdownToHtml(markdown);
       htmlCache.set(contentPath, html);
     }
-
-    if (renderId !== activeRenderId) {
-      return;
-    }
-
+    if (renderId !== activeRenderId) return;
     markdownContent.innerHTML = html;
-    if (markdownStatus) {
-      markdownStatus.hidden = true;
-    }
+    if (markdownStatus) markdownStatus.hidden = true;
   } catch (error) {
-    if (renderId !== activeRenderId) {
-      return;
-    }
-
+    if (renderId !== activeRenderId) return;
     console.error(error);
     markdownContent.innerHTML = '';
-    renderContentStatus(script === 'hant' ? '內容載入失敗。' : '内容载入失败。');
+    renderContentStatus(script === 'hant' ? EXTERNAL_COPY.loadFailedHant : EXTERNAL_COPY.loadFailedHans);
   }
 };
 
@@ -230,19 +194,16 @@ const applyScript = (script) => {
   const resolvedScript = script === 'hant' ? 'hant' : 'hans';
   root.dataset.script = resolvedScript;
   root.lang = resolvedScript === 'hant' ? 'zh-Hant' : 'zh-Hans';
-
   const textKey = resolvedScript === 'hant' ? 'hant' : 'hans';
   for (const node of translatableNodes) {
     node.textContent = node.dataset[textKey] ?? node.textContent;
   }
-
   if (pageTitleHost) {
     document.title =
       resolvedScript === 'hant'
         ? pageTitleHost.dataset.pageTitleHant ?? document.title
         : pageTitleHost.dataset.pageTitleHans ?? document.title;
   }
-
   renderLangButton(resolvedScript);
   setStoredValue(STORAGE_KEYS.script, resolvedScript);
   void renderMarkdownContent(resolvedScript);

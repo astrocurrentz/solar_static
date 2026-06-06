@@ -1,0 +1,155 @@
+html {
+  scroll-behavior: smooth;
+  background: var(--bg-primary);
+}
+
+body {
+  cursor: none;
+  font-family: var(--font-body);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  overflow: hidden;
+}
+
+@media (pointer: coarse) {
+  body {
+    cursor: auto;
+  }
+}
+
+.font-display {
+  font-family: var(--font-display);
+}
+
+@font-face {
+  font-family: 'Shamblers';
+  src: url('/assets/freewill/shamblers.otf') format('opentype');
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'ShamblersRegular';
+  src: url('/assets/freewill/shamblers.otf') format('opentype');
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'LeagueGothic-Regular';
+  src: url('/assets/freewill/league-gothic-regular.otf') format('opentype');
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'League Gothic';
+  src: url('/assets/freewill/league-gothic-regular.otf') format('opentype');
+  font-display: swap;
+}
+
+::selection {
+  background: var(--accent-secondary);
+  color: var(--bg-primary);
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+  border-radius: 9999px;
+}
+
+@keyframes neo-rise {
+  0% {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.neo-rise {
+  animation: neo-rise 380ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.neo-delay-1 {
+  animation-delay: 90ms;
+}
+
+.neo-delay-2 {
+  animation-delay: 160ms;
+}
+
+@keyframes freewill-signal-pop {
+  0% {
+    transform: scale(0.76);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+.freewill-svg-image {
+  cursor: inherit;
+  transform-origin: center;
+  transition: transform 160ms ease;
+}
+
+.freewill-svg-hit-target {
+  -webkit-tap-highlight-color: transparent;
+  cursor: inherit;
+  display: block;
+  line-height: 0;
+  pointer-events: auto;
+  touch-action: none;
+}
+
+.freewill-svg-hit-target .freewill-svg-image {
+  pointer-events: none;
+}
+
+.freewill-signal-pop-active .freewill-svg-image {
+  animation: freewill-signal-pop 420ms cubic-bezier(0.16, 1.55, 0.32, 1) both;
+}
+
+.freewill-wip-popup-overlay {
+  -webkit-tap-highlight-color: transparent;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  padding: 0;
+  pointer-events: auto;
+}
+
+.freewill-wip-popup-image {
+  display: block;
+  max-height: 86dvh;
+  max-width: 92vw;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+.selected-works-index {
+  padding: 1rem;
+}
+
+.selected-works-grid {
+  gap: 1.25rem;
+}
+
+.selected-works-tile {
+  min-height: 16rem;
+  height: 42vh;
+}
+
+.selected-works-title {
+  font-size: clamp(1.5rem, 4vw, 2.5rem);
+}

@@ -1,4 +1,5 @@
 import { createNetlifyJsonResponse, submitRequest } from '../../server/request-handler.mjs';
+import { parseJsonPayload } from '../../shared/http/adapter-utils.mjs';
 
 export const handler = async (event) => {
   if (event.httpMethod !== 'POST') {
@@ -7,7 +8,7 @@ export const handler = async (event) => {
 
   let payload;
   try {
-    payload = JSON.parse(event.body ?? '{}');
+    payload = parseJsonPayload(event.body);
   } catch {
     return createNetlifyJsonResponse(400, { error: 'invalid_json' });
   }

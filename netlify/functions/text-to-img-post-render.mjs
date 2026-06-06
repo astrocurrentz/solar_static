@@ -2,27 +2,21 @@ import {
   TextToImageValidationError,
   renderTextToImagePost,
 } from '../../server/text-to-img-post-renderer.mjs';
-
-const JSON_HEADERS = {
-  'Content-Type': 'application/json',
-};
-
-const createJsonResponse = (statusCode, body) => ({
-  statusCode,
-  headers: JSON_HEADERS,
-  body: JSON.stringify(body),
-});
+import {
+  createNetlifyJsonResponse,
+  parseJsonPayload,
+} from '../../shared/http/adapter-utils.mjs';
 
 export const handler = async (event) => {
   if (event.httpMethod !== 'POST') {
-    return createJsonResponse(405, { error: 'method_not_allowed' });
+    return createNetlifyJsonResponse(405, { error: 'method_not_allowed' });
   }
 
   let payload;
   try {
-    payload = JSON.parse(event.body ?? '{}');
+    payload = parseJsonPayload(event.body);
   } catch {
-    return createJsonResponse(400, {
+    return createNetlifyJsonResponse(400, {
       error: 'invalid_json',
       message: 'Request body must be valid JSON.',
     });
@@ -41,17 +35,16 @@ export const handler = async (event) => {
     };
   } catch (error) {
     if (error instanceof TextToImageValidationError) {
-      return createJsonResponse(error.statusCode, {
+      return createNetlifyJsonResponse(error.statusCode, {
         error: error.code,
         message: error.message,
       });
     }
 
     console.error(error);
-    return createJsonResponse(500, {
+    return createNetlifyJsonResponse(500, {
       error: 'render_failed',
       message: 'Unable to render image.',
     });
   }
 };
-

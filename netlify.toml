@@ -1,73 +1,73 @@
 [build]
-  publish = "dist"
-  functions = "netlify/functions"
+publish = "dist"
+functions = "netlify/functions"
 
 [[redirects]]
-  from = "/exteral/bazi"
-  to = "/external/bazi/privacy"
-  status = 301
+from = "/exteral/bazi"
+to = "/external/bazi/privacy"
+status = 301
 
 [[redirects]]
-  from = "/privacy"
-  to = "/external/bazi/privacy"
-  status = 301
+from = "/privacy"
+to = "/external/bazi/privacy"
+status = 301
 
 [[redirects]]
-  from = "/privacy/bazi"
-  to = "/external/bazi/privacy"
-  status = 301
+from = "/privacy/bazi"
+to = "/external/bazi/privacy"
+status = 301
 
 [[redirects]]
-  from = "/exteral/*"
-  to = "/external/:splat"
-  status = 301
+from = "/exteral/*"
+to = "/external/:splat"
+status = 301
 
 [[redirects]]
-  from = "/tools"
-  to = "/index.html"
-  status = 200
+from = "/tools"
+to = "/index.html"
+status = 200
 
 [[redirects]]
-  from = "/tools/__text2imgp"
-  to = "/index.html"
-  status = 200
+from = "/tools/__text2imgp"
+to = "/index.html"
+status = 200
 
 [[redirects]]
-  from = "/api/tools/text-to-img-post/render"
-  to = "/.netlify/functions/text-to-img-post-render"
-  status = 200
+from = "/request"
+to = "/index.html"
+status = 200
 
 [[redirects]]
-  from = "/request"
-  to = "/index.html"
-  status = 200
+from = "/thanks"
+to = "/index.html"
+status = 200
 
 [[redirects]]
-  from = "/thanks"
-  to = "/index.html"
-  status = 200
+from = "/selected-works"
+to = "/index.html"
+status = 200
 
 [[redirects]]
-  from = "/selected-works"
-  to = "/index.html"
-  status = 200
+from = "/selected-works/bazi"
+to = "/index.html"
+status = 200
 
 [[redirects]]
-  from = "/selected-works/bazi"
-  to = "/index.html"
-  status = 200
+from = "/selected-works/latent-27"
+to = "/index.html"
+status = 200
 
 [[redirects]]
-  from = "/selected-works/latent-27"
-  to = "/index.html"
-  status = 200
+from = "/freewill"
+to = "/index.html"
+status = 200
 
 [[redirects]]
-  from = "/freewill"
-  to = "/index.html"
-  status = 200
+from = "/api/tools/text-to-img-post/render"
+to = "/.netlify/functions/text-to-img-post-render"
+status = 200
 
 [[redirects]]
-  from = "/api/*"
-  to = "/.netlify/functions/:splat"
-  status = 200
+from = "/api/*"
+to = "/.netlify/functions/:splat"
+status = 200

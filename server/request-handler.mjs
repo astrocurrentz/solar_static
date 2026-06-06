@@ -1,6 +1,9 @@
-const JSON_HEADERS = {
-  'Content-Type': 'application/json',
-};
+import {
+  JSON_HEADERS,
+  createJsonBody,
+  createNetlifyJsonResponse,
+  createWebJsonResponse,
+} from '../shared/http/adapter-utils.mjs';
 
 const isValidEmail = (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 const hasSupabaseConfig = (env) => Boolean(env.SUPABASE_URL && env.SUPABASE_SERVICE_ROLE_KEY);
@@ -24,18 +27,12 @@ const updateSubmissionStatus = async (submissionId, emailStatus, env, fetchImpl)
   });
 };
 
-export const createJsonBody = (body) => JSON.stringify(body);
-
-export const createWebJsonResponse = (statusCode, body) => new Response(createJsonBody(body), {
-  status: statusCode,
-  headers: JSON_HEADERS,
-});
-
-export const createNetlifyJsonResponse = (statusCode, body) => ({
-  statusCode,
-  headers: JSON_HEADERS,
-  body: createJsonBody(body),
-});
+export {
+  JSON_HEADERS,
+  createJsonBody,
+  createNetlifyJsonResponse,
+  createWebJsonResponse,
+};
 
 export const submitRequest = async ({ payload, env, fetchImpl = fetch }) => {
   const email = typeof payload?.email === 'string' ? payload.email.trim() : '';

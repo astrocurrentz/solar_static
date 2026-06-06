@@ -36,7 +36,7 @@ const DistortionImage: React.FC<DistortionImageProps> = ({ src, alt, className =
       />
 
       {/* Scanline Overlay */}
-      <div className="absolute inset-0 bg-[linear-gradient(rgba(40,33,25,0)_50%,rgba(40,33,25,0.18)_50%),linear-gradient(90deg,rgba(201,115,56,0.08),rgba(229,216,189,0.03),rgba(165,77,39,0.08))] bg-[length:100%_4px,3px_100%] pointer-events-none z-10 opacity-30" />
+      <div className="absolute inset-0 bg-[linear-gradient(var(--distortion-scanline-a)_50%,var(--distortion-scanline-b)_50%),linear-gradient(90deg,var(--distortion-scanline-c),var(--distortion-scanline-d),var(--distortion-scanline-e))] bg-[length:100%_4px,3px_100%] pointer-events-none z-10 opacity-30" />
     </div>
   );
 };

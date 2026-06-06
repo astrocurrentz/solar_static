@@ -2,18 +2,7 @@ import {
   TextToImageValidationError,
   renderTextToImagePost,
 } from '../../../server/text-to-img-post-renderer.mjs';
-
-const parsePayload = (body) => {
-  if (!body) {
-    return {};
-  }
-
-  if (typeof body === 'string') {
-    return JSON.parse(body);
-  }
-
-  return body;
-};
+import { parseJsonPayload } from '../../../shared/http/adapter-utils.mjs';
 
 export default async function handler(request, response) {
   if (request.method !== 'POST') {
@@ -23,7 +12,7 @@ export default async function handler(request, response) {
 
   let payload;
   try {
-    payload = parsePayload(request.body);
+    payload = parseJsonPayload(request.body);
   } catch {
     response.status(400).json({ error: 'invalid_json', message: 'Request body must be valid JSON.' });
     return;
@@ -44,4 +33,3 @@ export default async function handler(request, response) {
     response.status(500).json({ error: 'render_failed', message: 'Unable to render image.' });
   }
 }
-

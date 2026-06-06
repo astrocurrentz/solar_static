@@ -1,0 +1,362 @@
+@media (max-width: 768px) {
+  .selected-works-index {
+    padding: 0.75rem;
+  }
+
+  .selected-works-grid {
+    gap: 0.75rem;
+  }
+
+  .selected-works-tile {
+    min-height: 11rem;
+    height: min(34vh, 14rem);
+  }
+
+  .selected-works-title {
+    font-size: clamp(1rem, 5.4vw, 1.5rem);
+  }
+
+  .bazi-fixed-chip.bazi-fixed-left {
+    left: 0.75rem;
+    top: calc(env(safe-area-inset-top, 0px) + 10px);
+  }
+
+  .bazi-fixed-chip.bazi-fixed-right {
+    right: 0.75rem;
+    top: calc(env(safe-area-inset-top, 0px) + 10px);
+  }
+
+  .bazi-section-shell {
+    padding-inline: 0.75rem;
+  }
+
+  .bazi-input-section .bazi-section-inner {
+    padding-top: 0.35rem;
+    padding-bottom: 0.9rem;
+  }
+
+  .bazi-input-section .bazi-tabs-wrap {
+    gap: 0.42rem;
+    padding: 0.34rem;
+  }
+
+  .bazi-input-section .bazi-tab {
+    min-height: 2.8rem;
+    font-size: clamp(0.84rem, 3.5vw, 1rem);
+  }
+
+  .bazi-input-section .bazi-input-stack {
+    margin-top: 0.78rem;
+    gap: 0.72rem;
+  }
+
+  .bazi-input-section .bazi-subcard {
+    padding: 0.88rem;
+    gap: 0.72rem;
+  }
+
+  .bazi-input-section .bazi-subcard-title {
+    font-size: clamp(1.05rem, 6.2vw, 1.4rem);
+  }
+
+  .bazi-input-section .bazi-grid-3 {
+    gap: 0.45rem;
+  }
+
+  .bazi-input-section .bazi-input-field {
+    min-height: 3.05rem;
+    padding: 0.36rem 0.74rem;
+    font-size: clamp(1rem, 4vw, 1.24rem);
+  }
+
+  .bazi-input-section .bazi-direct-grid-header {
+    font-size: clamp(0.72rem, 2.8vw, 0.9rem);
+  }
+
+  .bazi-input-section .bazi-glyph-text {
+    font-size: clamp(1.45rem, 7vw, 2.2rem);
+  }
+
+  .bazi-input-section .bazi-pinyin-text {
+    font-size: clamp(0.68rem, 2.7vw, 0.86rem);
+  }
+
+  .bazi-input-section .bazi-direct-birth-year {
+    min-height: 2.9rem;
+    font-size: clamp(0.95rem, 3.9vw, 1.12rem);
+  }
+
+  .bazi-input-section .bazi-clear-button {
+    min-height: 2.8rem;
+    padding: 0 1.1rem;
+    font-size: clamp(0.9rem, 3.6vw, 1.05rem);
+  }
+
+  .bazi-home-button {
+    width: 9.5rem;
+    height: 9.5rem;
+  }
+
+  .bazi-home-button-line {
+    font-size: clamp(2.8rem, 11vw, 4.5rem);
+  }
+
+  .bazi-tab {
+    min-height: 3.45rem;
+  }
+
+  .bazi-grid-3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.58rem;
+  }
+
+  .bazi-direct-grid,
+  .bazi-direct-grid-header,
+  .bazi-glyph-grid-4 {
+    gap: 0.58rem;
+  }
+
+  .bazi-pinyin-text {
+    font-size: clamp(0.84rem, 2vw, 1.04rem);
+  }
+
+  .bazi-glyph-text {
+    font-size: clamp(2.15rem, 9vw, 3.05rem);
+  }
+
+  .bazi-network-stage {
+    min-height: clamp(16rem, 52vh, 25rem);
+  }
+
+  .bazi-elements-donut-wrap {
+    min-height: clamp(14rem, 72vw, 20rem);
+    padding-inline: 0.2rem;
+  }
+
+  .bazi-elements-donut-inner {
+    width: min(100%, 22rem);
+  }
+
+  .bazi-transit-grid {
+    gap: 0.42rem;
+  }
+
+  .bazi-transit-field {
+    min-height: 4.85rem;
+    font-size: 0.95rem;
+  }
+
+  .bazi-almanac-two-col {
+    grid-template-columns: 1fr;
+  }
+
+  .bazi-six-glyphs-layout {
+    grid-template-columns: auto 1fr auto;
+    grid-template-rows: auto;
+  }
+
+  .bazi-six-glyphs-layout > .bazi-nav-icon:first-child,
+  .bazi-six-glyphs-layout > .bazi-nav-icon:last-child {
+    grid-row: 1;
+  }
+
+  .bazi-six-glyphs-layout > .bazi-nav-icon:first-child {
+    grid-column: 1;
+  }
+
+  .bazi-six-glyphs-layout > .bazi-nav-icon:last-child {
+    grid-column: 3;
+  }
+
+  .bazi-six-glyph-grid {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .bazi-yiji-list p {
+    font-size: 0.94rem;
+  }
+
+  .bazi-section-s8 .bazi-store-text {
+    font-size: clamp(0.96rem, 5.2vw, 1.42rem);
+    line-height: 1.25;
+    padding-top: max(0.9rem, env(safe-area-inset-top, 0px));
+    padding-bottom: max(1rem, env(safe-area-inset-bottom, 0px));
+    padding-left: max(1rem, env(safe-area-inset-left, 0px));
+    padding-right: max(1rem, env(safe-area-inset-right, 0px));
+  }
+
+  .bazi-section-s2 .bazi-subcard-title,
+  .bazi-section-s3 .bazi-card-title,
+  .bazi-section-s4 .bazi-card-title,
+  .bazi-section-s5 .bazi-card-title,
+  .bazi-section-s6 .bazi-transit-header h3,
+  .bazi-section-s7 .bazi-almanac-inner-card h4 {
+    font-size: clamp(0.96rem, 4.5vw, 1.26rem);
+    line-height: 1.1;
+    white-space: nowrap;
+  }
+
+  .bazi-section-s7 .bazi-almanac-date {
+    font-size: clamp(1rem, 4.9vw, 1.25rem);
+    white-space: nowrap;
+  }
+
+  .bazi-section-s6 .bazi-transit-header {
+    gap: 0.45rem;
+  }
+
+  .bazi-section-s6 .bazi-now-chip {
+    min-height: 2rem;
+    padding-inline: 0.52rem;
+    font-size: 0.9rem;
+  }
+
+  .bazi-section-s4 .bazi-card-caption,
+  .bazi-section-s5 .bazi-card-caption {
+    order: 3;
+    margin-top: 0.32rem;
+    font-size: clamp(0.74rem, 2.8vw, 0.9rem);
+  }
+
+  .bazi-section-s6 .bazi-transit-grid {
+    gap: 0.35rem;
+  }
+
+  .bazi-section-s6 .bazi-transit-grid .bazi-glyph-square,
+  .bazi-section-s7 .bazi-six-glyph-grid .bazi-glyph-square {
+    min-height: 0;
+    padding: 0.2rem;
+  }
+
+  .bazi-section-s6 .bazi-transit-grid .bazi-glyph-text,
+  .bazi-section-s7 .bazi-six-glyph-grid .bazi-glyph-text {
+    font-size: clamp(1.6rem, 6.4vw, 2.18rem);
+  }
+
+  .bazi-section-s6 .bazi-transit-grid .bazi-pinyin-text,
+  .bazi-section-s7 .bazi-six-glyph-grid .bazi-pinyin-text {
+    font-size: clamp(0.52rem, 2.1vw, 0.66rem);
+    line-height: 0.95;
+  }
+
+  .bazi-section-s7 .bazi-section-card {
+    padding: 0.72rem;
+    gap: 0.72rem;
+  }
+
+  .bazi-section-s7 .bazi-almanac-top-row {
+    gap: 0.52rem;
+  }
+
+  .bazi-section-s7 .bazi-almanac-date {
+    font-size: clamp(0.92rem, 4.1vw, 1.08rem);
+    white-space: nowrap;
+  }
+
+  .bazi-section-s7 .bazi-save-chip {
+    width: 2.18rem;
+    min-height: 2.18rem;
+    border-radius: 0.7rem;
+  }
+
+  .bazi-section-s7 .bazi-save-chip svg {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  .bazi-section-s7 .bazi-almanac-two-col {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.58rem;
+  }
+
+  .bazi-section-s7 .bazi-almanac-inner-card {
+    padding: 0.66rem;
+  }
+
+  .bazi-section-s7 .bazi-almanac-inner-card h4 {
+    margin-bottom: 0.48rem;
+    font-size: clamp(0.88rem, 3.5vw, 1.02rem);
+  }
+
+  .bazi-section-s7 .bazi-lucky-grid {
+    gap: 0.46rem;
+  }
+
+  .bazi-section-s7 .bazi-lucky-cell {
+    min-height: 4.55rem;
+    font-size: clamp(1.5rem, 7vw, 2.12rem);
+  }
+
+  .bazi-section-s7 .bazi-lucky-glyph {
+    font-size: clamp(2rem, 8vw, 2.65rem);
+  }
+
+  .bazi-section-s7 .bazi-lucky-arrow {
+    right: 0.44rem;
+    top: 0.34rem;
+    font-size: 1.35rem;
+  }
+
+  .bazi-section-s7 .bazi-lucky-cell.time {
+    gap: 0;
+    justify-content: center;
+  }
+
+  .bazi-section-s7 .bazi-lucky-cell.time svg {
+    width: 1.9rem;
+    height: 1.9rem;
+  }
+
+  .bazi-section-s7 .bazi-lucky-cell.time span {
+    display: none;
+  }
+
+  .bazi-section-s7 .bazi-energy-bars {
+    gap: 0.42rem;
+  }
+
+  .bazi-section-s7 .bazi-energy-row {
+    gap: 0.34rem;
+  }
+
+  .bazi-section-s7 .bazi-energy-row-head {
+    font-size: clamp(0.72rem, 3vw, 0.9rem);
+  }
+
+  .bazi-section-s7 .bazi-energy-track {
+    height: 0.6rem;
+  }
+
+  .bazi-section-s7 .bazi-six-glyphs-card {
+    gap: 0.45rem;
+  }
+
+  .bazi-section-s7 .bazi-six-glyphs-layout {
+    gap: 0.34rem;
+  }
+
+  .bazi-section-s7 .bazi-six-glyphs-layout > .bazi-nav-icon:first-child,
+  .bazi-section-s7 .bazi-six-glyphs-layout > .bazi-nav-icon:last-child {
+    width: 2.22rem;
+    min-height: 2.22rem;
+  }
+
+  .bazi-section-s7 .bazi-six-glyph-grid {
+    gap: 0.34rem;
+  }
+
+  .bazi-section-s7 .bazi-six-glyph-grid .bazi-glyph-square {
+    min-height: 0;
+    padding: 0.14rem;
+  }
+
+  .bazi-section-s7 .bazi-six-glyph-grid .bazi-glyph-text {
+    font-size: clamp(1.38rem, 5.9vw, 1.88rem);
+  }
+
+  .bazi-section-s7 .bazi-six-glyph-grid .bazi-pinyin-text {
+    font-size: clamp(0.44rem, 1.85vw, 0.6rem);
+    line-height: 0.9;
+  }
+}

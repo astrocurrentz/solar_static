@@ -4,45 +4,38 @@ import { fileURLToPath } from 'node:url';
 import React from 'react';
 import satori from 'satori';
 import { Resvg } from '@resvg/resvg-js';
+import { RAW_COLORS, RGB, FONT_NAMES, FONT_STACKS, alpha } from '../shared/design/tokens.mjs';
+import {
+  TEXT_TO_IMG_POST_CONFIG,
+  getTextToImageContentPageCount,
+} from '../shared/text-to-img-post-config.mjs';
 
-const OUTPUT_WIDTH = 1440;
-const OUTPUT_HEIGHT = 2400;
-const MAX_TOTAL_TEXT_LENGTH = 2500;
-const MAX_TOTAL_PAGE_COUNT = 15;
-const TITLE_PAGE_COUNT = 1;
-const MAX_IMAGE_COUNT = MAX_TOTAL_PAGE_COUNT - TITLE_PAGE_COUNT;
-
-const TEXT_COLOR = '#e5d8bd';
-const ACCENT_COLOR = '#c97338';
-
-const BODY_PADDING = {
-  top: 224,
-  right: 108,
-  bottom: 168,
-  left: 108,
-};
-const HEADER_MIN_HEIGHT_TITLE = 396;
-const HEADER_MIN_HEIGHT_CONTINUATION = 110;
-const HEADER_PADDING_TOP_TITLE = 168;
-const HEADER_PADDING_BOTTOM_TITLE = 52;
-const HEADER_PADDING_BOTTOM_CONTINUATION = 34;
-const PARAGRAPH_MARGIN_TOP_TITLE = 52;
-const PARAGRAPH_MARGIN_TOP_CONTINUATION = 40;
-const PARAGRAPH_BOX_PADDING = 72;
-const PARAGRAPH_TEXT_RIGHT_GUARD = 14;
-const FOOTER_MARGIN_TOP = 42;
-const FOOTER_PADDING_TOP = 28;
+const OUTPUT_WIDTH = TEXT_TO_IMG_POST_CONFIG.outputWidth;
+const OUTPUT_HEIGHT = TEXT_TO_IMG_POST_CONFIG.outputHeight;
+const MAX_TOTAL_TEXT_LENGTH = TEXT_TO_IMG_POST_CONFIG.maxTotalTextLength;
+const MAX_TOTAL_PAGE_COUNT = TEXT_TO_IMG_POST_CONFIG.maxTotalPageCount;
+const TITLE_PAGE_COUNT = TEXT_TO_IMG_POST_CONFIG.titlePageCount;
+const MAX_IMAGE_COUNT = getTextToImageContentPageCount();
+const TEXT_COLOR = RAW_COLORS.appCream;
+const ACCENT_COLOR = RAW_COLORS.appCopper;
+const BODY_PADDING = TEXT_TO_IMG_POST_CONFIG.bodyPadding;
+const HEADER_MIN_HEIGHT_TITLE = TEXT_TO_IMG_POST_CONFIG.header.minHeightTitle;
+const HEADER_MIN_HEIGHT_CONTINUATION = TEXT_TO_IMG_POST_CONFIG.header.minHeightContinuation;
+const HEADER_PADDING_TOP_TITLE = TEXT_TO_IMG_POST_CONFIG.header.paddingTopTitle;
+const HEADER_PADDING_BOTTOM_TITLE = TEXT_TO_IMG_POST_CONFIG.header.paddingBottomTitle;
+const HEADER_PADDING_BOTTOM_CONTINUATION = TEXT_TO_IMG_POST_CONFIG.header.paddingBottomContinuation;
+const PARAGRAPH_MARGIN_TOP_TITLE = TEXT_TO_IMG_POST_CONFIG.paragraph.marginTopTitle;
+const PARAGRAPH_MARGIN_TOP_CONTINUATION = TEXT_TO_IMG_POST_CONFIG.paragraph.marginTopContinuation;
+const PARAGRAPH_BOX_PADDING = TEXT_TO_IMG_POST_CONFIG.paragraph.padding;
+const PARAGRAPH_TEXT_RIGHT_GUARD = TEXT_TO_IMG_POST_CONFIG.paragraph.textRightGuard;
+const FOOTER_MARGIN_TOP = TEXT_TO_IMG_POST_CONFIG.footer.marginTop;
+const FOOTER_PADDING_TOP = TEXT_TO_IMG_POST_CONFIG.footer.paddingTop;
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const projectRoot = path.resolve(__dirname, '..');
 
-const FONT_FILES = {
-  syneBold: 'node_modules/@fontsource/syne/files/syne-latin-800-normal.woff',
-  spaceMonoRegular: 'node_modules/@fontsource/space-mono/files/space-mono-latin-400-normal.woff',
-  notoSansScRegular: 'node_modules/@fontsource/noto-sans-sc/files/noto-sans-sc-chinese-simplified-400-normal.woff',
-  notoSansScBold: 'node_modules/@fontsource/noto-sans-sc/files/noto-sans-sc-chinese-simplified-700-normal.woff',
-};
+const FONT_FILES = TEXT_TO_IMG_POST_CONFIG.fontFiles;
 
 const h = React.createElement;
 
@@ -65,25 +58,25 @@ const loadFonts = async () => {
       fs.readFile(path.resolve(projectRoot, FONT_FILES.notoSansScBold)),
     ]).then(([syneBold, spaceMonoRegular, notoSansScRegular, notoSansScBold]) => ([
       {
-        name: 'Syne',
+        name: FONT_NAMES.syne,
         data: syneBold,
         weight: 800,
         style: 'normal',
       },
       {
-        name: 'Space Mono',
+        name: FONT_NAMES.spaceMono,
         data: spaceMonoRegular,
         weight: 400,
         style: 'normal',
       },
       {
-        name: 'Noto Sans SC',
+        name: FONT_NAMES.notoSansSc,
         data: notoSansScRegular,
         weight: 400,
         style: 'normal',
       },
       {
-        name: 'Noto Sans SC',
+        name: FONT_NAMES.notoSansSc,
         data: notoSansScBold,
         weight: 700,
         style: 'normal',
@@ -143,7 +136,7 @@ const buildSceneTree = ({ title, paragraph, pageIndex, pageCount }) => {
         flexDirection: 'column',
         overflow: 'hidden',
         color: TEXT_COLOR,
-        background: '#282119',
+        background: RAW_COLORS.appBrown,
       },
     },
     h('div', {
@@ -151,7 +144,7 @@ const buildSceneTree = ({ title, paragraph, pageIndex, pageCount }) => {
         position: 'absolute',
         display: 'flex',
         inset: '0',
-        background: 'linear-gradient(135deg, #282119 0%, #282119 52%, #65371f 100%)',
+        background: `linear-gradient(135deg, ${RAW_COLORS.appBrown} 0%, ${RAW_COLORS.appBrown} 52%, ${RAW_COLORS.appBrownSoft} 100%)`,
       },
     }),
     h('div', {
@@ -160,7 +153,7 @@ const buildSceneTree = ({ title, paragraph, pageIndex, pageCount }) => {
         display: 'flex',
         inset: '0',
         opacity: 0.35,
-        backgroundImage: 'linear-gradient(to right, rgba(229,216,189,0.14) 1px, transparent 1px), linear-gradient(to bottom, rgba(229,216,189,0.14) 1px, transparent 1px)',
+        backgroundImage: `linear-gradient(to right, ${alpha(RGB.creamTight, '0.14')} 1px, transparent 1px), linear-gradient(to bottom, ${alpha(RGB.creamTight, '0.14')} 1px, transparent 1px)`,
         backgroundSize: '70px 70px',
       },
     }),
@@ -170,7 +163,7 @@ const buildSceneTree = ({ title, paragraph, pageIndex, pageCount }) => {
         display: 'flex',
         inset: '0',
         opacity: 0.2,
-        backgroundImage: 'linear-gradient(to right, rgba(201,115,56,0.18) 1px, transparent 1px), linear-gradient(to bottom, rgba(201,115,56,0.18) 1px, transparent 1px)',
+        backgroundImage: `linear-gradient(to right, ${alpha(RGB.copperTight, '0.18')} 1px, transparent 1px), linear-gradient(to bottom, ${alpha(RGB.copperTight, '0.18')} 1px, transparent 1px)`,
         backgroundSize: '20px 20px',
       },
     }),
@@ -191,7 +184,7 @@ const buildSceneTree = ({ title, paragraph, pageIndex, pageCount }) => {
         {
           style: {
             display: 'flex',
-            borderBottom: '1px solid rgba(229,216,189,0.2)',
+            borderBottom: `1px solid ${alpha(RGB.creamTight, '0.2')}`,
             paddingTop: isTitlePage ? `${HEADER_PADDING_TOP_TITLE}px` : '0px',
             paddingBottom: isTitlePage ? `${HEADER_PADDING_BOTTOM_TITLE}px` : `${HEADER_PADDING_BOTTOM_CONTINUATION}px`,
             minHeight: isTitlePage ? `${HEADER_MIN_HEIGHT_TITLE}px` : `${HEADER_MIN_HEIGHT_CONTINUATION}px`,
@@ -205,7 +198,7 @@ const buildSceneTree = ({ title, paragraph, pageIndex, pageCount }) => {
                 style: {
                   display: 'block',
                   maxWidth: '970px',
-                  fontFamily: 'Syne',
+                  fontFamily: FONT_STACKS.renderDisplay,
                   fontWeight: 800,
                   fontSize: '114px',
                   lineHeight: 1.24,
@@ -222,8 +215,8 @@ const buildSceneTree = ({ title, paragraph, pageIndex, pageCount }) => {
         {
           style: {
             marginTop: isTitlePage ? `${PARAGRAPH_MARGIN_TOP_TITLE}px` : `${PARAGRAPH_MARGIN_TOP_CONTINUATION}px`,
-            border: '1px solid rgba(229,216,189,0.2)',
-            background: 'rgba(8,8,8,0.2)',
+            border: `1px solid ${alpha(RGB.creamTight, '0.2')}`,
+            background: alpha(RGB.requestBlackTight, '0.2'),
             padding: `${PARAGRAPH_BOX_PADDING}px`,
             display: 'flex',
             flex: '1',
@@ -255,10 +248,10 @@ const buildSceneTree = ({ title, paragraph, pageIndex, pageCount }) => {
                   whiteSpace: 'pre-wrap',
                   wordBreak: 'break-word',
                   overflowWrap: 'anywhere',
-                  fontFamily: 'Space Mono, Noto Sans SC',
-                  fontSize: '50px',
-                  lineHeight: 1.48,
-                letterSpacing: '0.015em',
+                  fontFamily: FONT_STACKS.renderBody,
+                  fontSize: `${TEXT_TO_IMG_POST_CONFIG.paragraph.fontSize}px`,
+                  lineHeight: TEXT_TO_IMG_POST_CONFIG.paragraph.lineHeight,
+                letterSpacing: `${TEXT_TO_IMG_POST_CONFIG.paragraph.letterSpacingRatio}em`,
                 color: TEXT_COLOR,
               },
             },
@@ -274,7 +267,7 @@ const buildSceneTree = ({ title, paragraph, pageIndex, pageCount }) => {
             display: 'flex',
             justifyContent: 'flex-end',
             alignItems: 'center',
-            borderTop: '1px solid rgba(229,216,189,0.2)',
+            borderTop: `1px solid ${alpha(RGB.creamTight, '0.2')}`,
             paddingTop: `${FOOTER_PADDING_TOP}px`,
           },
         },
@@ -282,7 +275,7 @@ const buildSceneTree = ({ title, paragraph, pageIndex, pageCount }) => {
           'span',
           {
             style: {
-              fontFamily: 'Space Mono, Noto Sans SC',
+              fontFamily: FONT_STACKS.renderBody,
               fontSize: '28px',
               letterSpacing: '0.22em',
               color: ACCENT_COLOR,

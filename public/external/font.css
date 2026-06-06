@@ -1,20 +1,11 @@
+/* GENERATED FILE: edit shared/design/tokens.mjs instead. */
 @import url("https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=Noto+Sans+SC:wght@400;500;700;800&display=swap");
-
-:root {
-  --external-display-font:
-    "Syne", "Noto Sans SC", "PingFang SC", "Hiragino Sans GB",
-    "Microsoft YaHei", "Heiti SC", "Source Han Sans SC", "Helvetica Neue",
-    Arial, sans-serif;
-  --external-body-font:
-    "Noto Sans SC", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei",
-    "Heiti SC", "Source Han Sans SC", "Helvetica Neue", Arial, sans-serif;
-}
 
 html,
 body {
   margin: 0;
-  background: #ffffff;
-  color: #000000;
+  background: var(--external-background);
+  color: var(--external-foreground);
   font-family: var(--external-display-font);
 }
 
@@ -166,7 +157,7 @@ body.external-page {
 .external-document hr,
 .reference-content hr {
   border: 0;
-  border-top: 1px solid rgba(0, 0, 0, 0.14);
+  border-top: 1px solid var(--external-rule-soft);
   margin: 1.6rem 0;
 }
 
@@ -186,14 +177,12 @@ body.external-page {
 .reference-content blockquote {
   margin-left: 0;
   padding-left: 1rem;
-  border-left: 1px solid rgba(0, 0, 0, 0.18);
+  border-left: 1px solid var(--external-rule-strong);
 }
 
 .reference-content pre,
 .reference-content code {
-  font-family:
-    "SFMono-Regular", "SF Mono", "Menlo", "Consolas", "Liberation Mono",
-    monospace;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 
 .reference-content pre {
