@@ -41,16 +41,21 @@ const SECTION_CONTENT_MIN_HEIGHT_STYLE = {
   minHeight: 'calc(100dvh - var(--bazi-top-safe) - var(--bazi-bottom-safe))',
 };
 const FREEWILL_BACKGROUND = '#4F0000';
+const FREEWILL_SPOTIFY_ARTIST_URL = 'https://open.spotify.com/artist/3xREYHFthr71ZxpGbbo20n?si=-o78G5STSHqfA4MRNegayw';
+const FREEWILL_SPOTIFY_RING_URL = 'https://open.spotify.com/track/68soMWMZ84dkWc6udaqORQ?si=34ef287da1a142d4';
+const FREEWILL_SVG_SCALE = 0.54;
+const FREEWILL_DEFAULT_DISPLAY_SCALE = { width: FREEWILL_SVG_SCALE, height: FREEWILL_SVG_SCALE } as const;
+const FREEWILL_WORDMARK_DISPLAY_SCALE = { width: 1.18, height: 0.376 } as const;
 const FREEWILL_ASSETS = [
   { src: '/assets/freewill/angle.svg', label: 'Angle' },
   { src: '/assets/freewill/eye.svg', label: 'Eye' },
-  { src: '/assets/freewill/freewill.svg', label: 'Freewill' },
+  { src: '/assets/freewill/freewill.svg', label: 'Freewill', href: FREEWILL_SPOTIFY_ARTIST_URL, displayScale: FREEWILL_WORDMARK_DISPLAY_SCALE },
   { src: '/assets/freewill/hand.svg', label: 'Hand' },
   { src: '/assets/freewill/head-and-dot.svg', label: 'Head and dot' },
   { src: '/assets/freewill/head.svg', label: 'Head' },
   { src: '/assets/freewill/jar.svg', label: 'Jar' },
   { src: '/assets/freewill/lightning.svg', label: 'Lightning' },
-  { src: '/assets/freewill/ring.svg', label: 'Ring' },
+  { src: '/assets/freewill/ring.svg', label: 'Ring', href: FREEWILL_SPOTIFY_RING_URL },
   { src: '/assets/freewill/scent.svg', label: 'Scent' },
   { src: '/assets/freewill/upload.svg', label: 'Upload' },
   { src: '/assets/freewill/water.svg', label: 'Water' },
@@ -59,7 +64,9 @@ const FREEWILL_ASSETS = [
 const FREEWILL_TILE_BUFFER_STEPS = 2;
 const FREEWILL_ASSET_STRIDE_X = 5;
 const FREEWILL_ASSET_STRIDE_Y = 7;
-const FREEWILL_SVG_SCALE = 0.54;
+const FREEWILL_CLICK_MOVE_THRESHOLD_PX = 8;
+const FREEWILL_SIGNAL_POP_DURATION_MS = 540;
+const FREEWILL_INITIAL_PAN = { x: -76, y: 0 } as const;
 
 type InputMode = 'birthProfile' | 'directBaZi';
 type DirectPickerState = { slot: PillarSlot; kind: 'stem' | 'branch' } | null;
@@ -105,8 +112,13 @@ interface FreewillPan {
 
 interface FreewillDragState {
   pointerId: number;
+  startX: number;
+  startY: number;
   lastX: number;
   lastY: number;
+  startTileKey: string | null;
+  startTileHref: string | null;
+  hasExceededClickThreshold: boolean;
 }
 
 interface FreewillTile {
@@ -2818,14 +2830,21 @@ export function SelectedWorksIndexPage({
 export function FreewillSelectedWorkPage() {
   const shellRef = useRef<HTMLElement | null>(null);
   const dragRef = useRef<FreewillDragState | null>(null);
+  const animationTimeoutsRef = useRef<Map<string, number>>(new Map());
   const viewport = useViewportSize();
   const viewportRef = useRef(viewport);
-  const [pan, setPan] = useState<FreewillPan>({ x: 0, y: 0 });
+  const [pan, setPan] = useState<FreewillPan>(FREEWILL_INITIAL_PAN);
   const [isDragging, setIsDragging] = useState(false);
+  const [activeTileAnimations, setActiveTileAnimations] = useState<Record<string, number>>({});
 
   useEffect(() => {
     viewportRef.current = viewport;
   }, [viewport]);
+
+  useEffect(() => () => {
+    animationTimeoutsRef.current.forEach((timeoutId) => window.clearTimeout(timeoutId));
+    animationTimeoutsRef.current.clear();
+  }, []);
 
   const tileMetrics = useMemo(() => {
     const shortestSide = Math.min(viewport.width, viewport.height);
@@ -2929,8 +2948,49 @@ export function FreewillSelectedWorkPage() {
     window.dispatchEvent(new PopStateEvent('popstate'));
   }, []);
 
+  const triggerTileActivation = useCallback((tileKey: string, href: string | null) => {
+    const animationId = Date.now();
+    const existingTimeoutId = animationTimeoutsRef.current.get(tileKey);
+
+    if (existingTimeoutId !== undefined) {
+      window.clearTimeout(existingTimeoutId);
+    }
+
+    setActiveTileAnimations((currentAnimations) => ({
+      ...currentAnimations,
+      [tileKey]: animationId,
+    }));
+
+    if (href) {
+      const linkElement = document.createElement('a');
+      linkElement.href = href;
+      linkElement.target = '_blank';
+      linkElement.rel = 'noopener noreferrer';
+      linkElement.referrerPolicy = 'no-referrer';
+      document.body.appendChild(linkElement);
+      linkElement.click();
+      linkElement.remove();
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      animationTimeoutsRef.current.delete(tileKey);
+      setActiveTileAnimations((currentAnimations) => {
+        if (currentAnimations[tileKey] !== animationId) {
+          return currentAnimations;
+        }
+
+        const nextAnimations = { ...currentAnimations };
+        delete nextAnimations[tileKey];
+        return nextAnimations;
+      });
+    }, FREEWILL_SIGNAL_POP_DURATION_MS);
+
+    animationTimeoutsRef.current.set(tileKey, timeoutId);
+  }, []);
+
   const handlePointerDown = useCallback((event: React.PointerEvent<HTMLElement>) => {
     const targetElement = event.target instanceof Element ? event.target : null;
+    const tileElement = targetElement?.closest('[data-freewill-tile-key]') as HTMLElement | null;
 
     if (targetElement?.closest('[data-freewill-control="true"]')) {
       return;
@@ -2944,8 +3004,13 @@ export function FreewillSelectedWorkPage() {
     event.currentTarget.setPointerCapture(event.pointerId);
     dragRef.current = {
       pointerId: event.pointerId,
+      startX: event.clientX,
+      startY: event.clientY,
       lastX: event.clientX,
       lastY: event.clientY,
+      startTileKey: tileElement?.dataset.freewillTileKey ?? null,
+      startTileHref: tileElement?.dataset.freewillHref ?? null,
+      hasExceededClickThreshold: false,
     };
     setIsDragging(true);
   }, []);
@@ -2960,11 +3025,13 @@ export function FreewillSelectedWorkPage() {
     event.preventDefault();
     const deltaX = event.clientX - dragState.lastX;
     const deltaY = event.clientY - dragState.lastY;
+    const totalMovement = Math.hypot(event.clientX - dragState.startX, event.clientY - dragState.startY);
 
     dragRef.current = {
       ...dragState,
       lastX: event.clientX,
       lastY: event.clientY,
+      hasExceededClickThreshold: dragState.hasExceededClickThreshold || totalMovement > FREEWILL_CLICK_MOVE_THRESHOLD_PX,
     };
 
     if (deltaX === 0 && deltaY === 0) {
@@ -2977,7 +3044,7 @@ export function FreewillSelectedWorkPage() {
     }));
   }, []);
 
-  const finishPointerDrag = useCallback((event: React.PointerEvent<HTMLElement>) => {
+  const finishPointerDrag = useCallback((event: React.PointerEvent<HTMLElement>, shouldActivateTile: boolean) => {
     const dragState = dragRef.current;
 
     if (!dragState || dragState.pointerId !== event.pointerId) {
@@ -2990,7 +3057,18 @@ export function FreewillSelectedWorkPage() {
 
     dragRef.current = null;
     setIsDragging(false);
-  }, []);
+
+    const totalMovement = Math.hypot(event.clientX - dragState.startX, event.clientY - dragState.startY);
+
+    if (
+      shouldActivateTile &&
+      dragState.startTileKey &&
+      !dragState.hasExceededClickThreshold &&
+      totalMovement <= FREEWILL_CLICK_MOVE_THRESHOLD_PX
+    ) {
+      triggerTileActivation(dragState.startTileKey, dragState.startTileHref);
+    }
+  }, [triggerTileActivation]);
 
   return (
     <main
@@ -3009,38 +3087,47 @@ export function FreewillSelectedWorkPage() {
       } as CSSProperties}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
-      onPointerUp={finishPointerDrag}
-      onPointerCancel={finishPointerDrag}
-      onLostPointerCapture={finishPointerDrag}
+      onPointerUp={(event) => finishPointerDrag(event, true)}
+      onPointerCancel={(event) => finishPointerDrag(event, false)}
+      onLostPointerCapture={(event) => finishPointerDrag(event, false)}
       onDragStart={(event) => event.preventDefault()}
     >
       <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
-        {tiles.map((tile) => (
-          <div
-            key={tile.key}
-            className="absolute flex items-center justify-center"
-            style={{
-              height: tileMetrics.tileSize,
-              left: 0,
-              top: 0,
-              transform: `translate3d(${(tile.x - tileMetrics.tileSize / 2).toFixed(2)}px, ${(tile.y - tileMetrics.tileSize / 2).toFixed(2)}px, 0)`,
-              width: tileMetrics.tileSize,
-              willChange: 'transform',
-            }}
-          >
-            <img
-              src={tile.asset.src}
-              alt=""
-              draggable={false}
-              className="block object-contain"
+        {tiles.map((tile) => {
+          const displayScale = 'displayScale' in tile.asset
+            ? tile.asset.displayScale
+            : FREEWILL_DEFAULT_DISPLAY_SCALE;
+          const tileHref = 'href' in tile.asset ? tile.asset.href : undefined;
+
+          return (
+            <div
+              key={tile.key}
+              className={`freewill-svg-tile pointer-events-none absolute flex items-center justify-center ${activeTileAnimations[tile.key] !== undefined ? 'freewill-signal-pop-active' : ''}`}
               style={{
-                height: `${FREEWILL_SVG_SCALE * 100}%`,
-                pointerEvents: 'none',
-                width: `${FREEWILL_SVG_SCALE * 100}%`,
+                height: tileMetrics.tileSize,
+                left: 0,
+                top: 0,
+                transform: `translate3d(${(tile.x - tileMetrics.tileSize / 2).toFixed(2)}px, ${(tile.y - tileMetrics.tileSize / 2).toFixed(2)}px, 0)`,
+                width: tileMetrics.tileSize,
+                willChange: 'transform',
               }}
-            />
-          </div>
-        ))}
+            >
+              <img
+                key={`${tile.key}-${activeTileAnimations[tile.key] ?? 'idle'}`}
+                src={tile.asset.src}
+                alt=""
+                data-freewill-href={tileHref}
+                data-freewill-tile-key={tile.key}
+                draggable={false}
+                className="freewill-svg-image pointer-events-auto block object-contain"
+                style={{
+                  height: `${displayScale.height * 100}%`,
+                  width: `${displayScale.width * 100}%`,
+                }}
+              />
+            </div>
+          );
+        })}
       </div>
 
       <div
