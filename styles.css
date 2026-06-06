@@ -53,6 +53,30 @@ body {
   font-family: 'Syne', sans-serif;
 }
 
+@font-face {
+  font-family: 'Shamblers';
+  src: url('/assets/freewill/shamblers.otf') format('opentype');
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'ShamblersRegular';
+  src: url('/assets/freewill/shamblers.otf') format('opentype');
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'LeagueGothic-Regular';
+  src: url('/assets/freewill/league-gothic-regular.otf') format('opentype');
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'League Gothic';
+  src: url('/assets/freewill/league-gothic-regular.otf') format('opentype');
+  font-display: swap;
+}
+
 ::selection {
   background: var(--accent-secondary);
   color: var(--bg-primary);
@@ -111,8 +135,38 @@ body {
   transition: transform 160ms ease;
 }
 
+.freewill-svg-hit-target {
+  -webkit-tap-highlight-color: transparent;
+  cursor: inherit;
+  display: block;
+  line-height: 0;
+  pointer-events: auto;
+  touch-action: none;
+}
+
+.freewill-svg-hit-target .freewill-svg-image {
+  pointer-events: none;
+}
+
 .freewill-signal-pop-active .freewill-svg-image {
   animation: freewill-signal-pop 420ms cubic-bezier(0.16, 1.55, 0.32, 1) both;
+}
+
+.freewill-wip-popup-overlay {
+  -webkit-tap-highlight-color: transparent;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  padding: 0;
+  pointer-events: auto;
+}
+
+.freewill-wip-popup-image {
+  display: block;
+  max-height: 86dvh;
+  max-width: 92vw;
+  object-fit: contain;
+  pointer-events: none;
 }
 
 .selected-works-index {

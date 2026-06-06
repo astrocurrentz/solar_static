@@ -47,23 +47,24 @@ const FREEWILL_SVG_SCALE = 0.54;
 const FREEWILL_DEFAULT_DISPLAY_SCALE = { width: FREEWILL_SVG_SCALE, height: FREEWILL_SVG_SCALE } as const;
 const FREEWILL_WORDMARK_DISPLAY_SCALE = { width: 1.18, height: 0.376 } as const;
 const FREEWILL_ASSETS = [
-  { src: '/assets/freewill/angle.svg', label: 'Angle' },
-  { src: '/assets/freewill/eye.svg', label: 'Eye' },
+  { src: '/assets/freewill/angle.svg', label: 'Angle', wipTitle: 'Angels Are Alien Drones', wipSrc: '/assets/freewill/angle_.svg' },
+  { src: '/assets/freewill/eye.svg', label: 'Eye', wipTitle: 'xxx protocol', wipSrc: '/assets/freewill/eye_.svg' },
   { src: '/assets/freewill/freewill.svg', label: 'Freewill', href: FREEWILL_SPOTIFY_ARTIST_URL, displayScale: FREEWILL_WORDMARK_DISPLAY_SCALE },
-  { src: '/assets/freewill/hand.svg', label: 'Hand' },
-  { src: '/assets/freewill/head-and-dot.svg', label: 'Head and dot' },
+  { src: '/assets/freewill/hand.svg', label: 'Hand', wipTitle: 'Kill Ill Will', wipSrc: '/assets/freewill/hand_.svg' },
+  { src: '/assets/freewill/head-and-dot.svg', label: 'Head and dot', href: FREEWILL_SPOTIFY_ARTIST_URL },
   { src: '/assets/freewill/head.svg', label: 'Head' },
-  { src: '/assets/freewill/jar.svg', label: 'Jar' },
+  { src: '/assets/freewill/jar.svg', label: 'Jar', wipTitle: 'Sunday', wipSrc: '/assets/freewill/jar_.svg' },
   { src: '/assets/freewill/lightning.svg', label: 'Lightning' },
+  { src: '/assets/freewill/one.svg', label: 'One', wipTitle: 'One', wipSrc: '/assets/freewill/one_.svg' },
   { src: '/assets/freewill/ring.svg', label: 'Ring', href: FREEWILL_SPOTIFY_RING_URL },
-  { src: '/assets/freewill/scent.svg', label: 'Scent' },
-  { src: '/assets/freewill/upload.svg', label: 'Upload' },
-  { src: '/assets/freewill/water.svg', label: 'Water' },
-  { src: '/assets/freewill/wuxing.svg', label: 'Wuxing' },
+  { src: '/assets/freewill/scent.svg', label: 'Scent', wipTitle: 'Extraterrestrial Scents', wipSrc: '/assets/freewill/scent_.svg' },
+  { src: '/assets/freewill/upload.svg', label: 'Upload', wipTitle: 'Will U Upload', wipSrc: '/assets/freewill/upload_.svg' },
+  { src: '/assets/freewill/water.svg', label: 'Water', wipTitle: 'Shui', wipSrc: '/assets/freewill/water_.svg' },
+  { src: '/assets/freewill/wuxing.svg', label: 'Wuxing', wipTitle: 'Wuxing', wipSrc: '/assets/freewill/wuxing_.svg' },
 ] as const;
 const FREEWILL_TILE_BUFFER_STEPS = 2;
 const FREEWILL_ASSET_STRIDE_X = 5;
-const FREEWILL_ASSET_STRIDE_Y = 7;
+const FREEWILL_ASSET_STRIDE_Y = 3;
 const FREEWILL_CLICK_MOVE_THRESHOLD_PX = 8;
 const FREEWILL_SIGNAL_POP_DURATION_MS = 540;
 const FREEWILL_INITIAL_PAN = { x: -76, y: 0 } as const;
@@ -118,7 +119,14 @@ interface FreewillDragState {
   lastY: number;
   startTileKey: string | null;
   startTileHref: string | null;
+  startTileWipTitle: string | null;
+  startTileWipSrc: string | null;
   hasExceededClickThreshold: boolean;
+}
+
+interface FreewillWipPopup {
+  title: string;
+  src: string;
 }
 
 interface FreewillTile {
@@ -2831,11 +2839,13 @@ export function FreewillSelectedWorkPage() {
   const shellRef = useRef<HTMLElement | null>(null);
   const dragRef = useRef<FreewillDragState | null>(null);
   const animationTimeoutsRef = useRef<Map<string, number>>(new Map());
+  const suppressNextTileClickRef = useRef(false);
   const viewport = useViewportSize();
   const viewportRef = useRef(viewport);
   const [pan, setPan] = useState<FreewillPan>(FREEWILL_INITIAL_PAN);
   const [isDragging, setIsDragging] = useState(false);
   const [activeTileAnimations, setActiveTileAnimations] = useState<Record<string, number>>({});
+  const [wipPopup, setWipPopup] = useState<FreewillWipPopup | null>(null);
 
   useEffect(() => {
     viewportRef.current = viewport;
@@ -2948,7 +2958,7 @@ export function FreewillSelectedWorkPage() {
     window.dispatchEvent(new PopStateEvent('popstate'));
   }, []);
 
-  const triggerTileActivation = useCallback((tileKey: string, href: string | null) => {
+  const triggerTileActivation = useCallback((tileKey: string, href: string | null, nextWipPopup: FreewillWipPopup | null) => {
     const animationId = Date.now();
     const existingTimeoutId = animationTimeoutsRef.current.get(tileKey);
 
@@ -2962,14 +2972,11 @@ export function FreewillSelectedWorkPage() {
     }));
 
     if (href) {
-      const linkElement = document.createElement('a');
-      linkElement.href = href;
-      linkElement.target = '_blank';
-      linkElement.rel = 'noopener noreferrer';
-      linkElement.referrerPolicy = 'no-referrer';
-      document.body.appendChild(linkElement);
-      linkElement.click();
-      linkElement.remove();
+      window.open(href, '_blank', 'noopener,noreferrer');
+    }
+
+    if (nextWipPopup) {
+      setWipPopup(nextWipPopup);
     }
 
     const timeoutId = window.setTimeout(() => {
@@ -3000,7 +3007,7 @@ export function FreewillSelectedWorkPage() {
       return;
     }
 
-    event.preventDefault();
+    suppressNextTileClickRef.current = false;
     event.currentTarget.setPointerCapture(event.pointerId);
     dragRef.current = {
       pointerId: event.pointerId,
@@ -3010,6 +3017,8 @@ export function FreewillSelectedWorkPage() {
       lastY: event.clientY,
       startTileKey: tileElement?.dataset.freewillTileKey ?? null,
       startTileHref: tileElement?.dataset.freewillHref ?? null,
+      startTileWipTitle: tileElement?.dataset.freewillWipTitle ?? null,
+      startTileWipSrc: tileElement?.dataset.freewillWipSrc ?? null,
       hasExceededClickThreshold: false,
     };
     setIsDragging(true);
@@ -3059,14 +3068,33 @@ export function FreewillSelectedWorkPage() {
     setIsDragging(false);
 
     const totalMovement = Math.hypot(event.clientX - dragState.startX, event.clientY - dragState.startY);
+    const didDrag = (
+      dragState.hasExceededClickThreshold ||
+      totalMovement > FREEWILL_CLICK_MOVE_THRESHOLD_PX
+    );
 
-    if (
+    const shouldTriggerTile = Boolean(
       shouldActivateTile &&
-      dragState.startTileKey &&
-      !dragState.hasExceededClickThreshold &&
-      totalMovement <= FREEWILL_CLICK_MOVE_THRESHOLD_PX
-    ) {
-      triggerTileActivation(dragState.startTileKey, dragState.startTileHref);
+      !didDrag &&
+      dragState.startTileKey,
+    );
+
+    suppressNextTileClickRef.current = shouldTriggerTile || !shouldActivateTile || didDrag;
+
+    if (shouldTriggerTile) {
+      triggerTileActivation(
+        dragState.startTileKey,
+        dragState.startTileHref,
+        dragState.startTileWipTitle && dragState.startTileWipSrc
+          ? { title: dragState.startTileWipTitle, src: dragState.startTileWipSrc }
+          : null,
+      );
+    }
+
+    if (suppressNextTileClickRef.current) {
+      window.setTimeout(() => {
+        suppressNextTileClickRef.current = false;
+      }, 80);
     }
   }, [triggerTileActivation]);
 
@@ -3092,17 +3120,22 @@ export function FreewillSelectedWorkPage() {
       onLostPointerCapture={(event) => finishPointerDrag(event, false)}
       onDragStart={(event) => event.preventDefault()}
     >
-      <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
+      <div className="absolute inset-0 overflow-hidden" aria-hidden="true">
         {tiles.map((tile) => {
           const displayScale = 'displayScale' in tile.asset
             ? tile.asset.displayScale
             : FREEWILL_DEFAULT_DISPLAY_SCALE;
           const tileHref = 'href' in tile.asset ? tile.asset.href : undefined;
+          const tileWipTitle = 'wipTitle' in tile.asset ? tile.asset.wipTitle : undefined;
+          const tileWipSrc = 'wipSrc' in tile.asset ? tile.asset.wipSrc : undefined;
+          const tileWipPopup = tileWipTitle && tileWipSrc
+            ? { title: tileWipTitle, src: tileWipSrc }
+            : null;
 
           return (
             <div
               key={tile.key}
-              className={`freewill-svg-tile pointer-events-none absolute flex items-center justify-center ${activeTileAnimations[tile.key] !== undefined ? 'freewill-signal-pop-active' : ''}`}
+              className={`freewill-svg-tile absolute flex items-center justify-center ${activeTileAnimations[tile.key] !== undefined ? 'freewill-signal-pop-active' : ''}`}
               style={{
                 height: tileMetrics.tileSize,
                 left: 0,
@@ -3112,19 +3145,35 @@ export function FreewillSelectedWorkPage() {
                 willChange: 'transform',
               }}
             >
-              <img
-                key={`${tile.key}-${activeTileAnimations[tile.key] ?? 'idle'}`}
-                src={tile.asset.src}
-                alt=""
+              <span
+                className="freewill-svg-hit-target"
                 data-freewill-href={tileHref}
                 data-freewill-tile-key={tile.key}
-                draggable={false}
-                className="freewill-svg-image pointer-events-auto block object-contain"
+                data-freewill-wip-src={tileWipSrc}
+                data-freewill-wip-title={tileWipTitle}
+                onClick={(event) => {
+                  event.stopPropagation();
+
+                  if (suppressNextTileClickRef.current) {
+                    suppressNextTileClickRef.current = false;
+                    return;
+                  }
+
+                  triggerTileActivation(tile.key, tileHref ?? null, tileWipPopup);
+                }}
                 style={{
                   height: `${displayScale.height * 100}%`,
                   width: `${displayScale.width * 100}%`,
                 }}
-              />
+              >
+                <img
+                  key={`${tile.key}-${activeTileAnimations[tile.key] ?? 'idle'}`}
+                  src={tile.asset.src}
+                  alt=""
+                  draggable={false}
+                  className="freewill-svg-image block h-full w-full object-contain"
+                />
+              </span>
             </div>
           );
         })}
@@ -3152,6 +3201,29 @@ export function FreewillSelectedWorkPage() {
           />
         </button>
       </div>
+
+      {wipPopup && (
+        <button
+          type="button"
+          className="freewill-wip-popup-overlay fixed inset-0 z-50 flex h-[100dvh] min-h-[100dvh] w-full items-center justify-center"
+          onClick={(event) => {
+            event.stopPropagation();
+            setWipPopup(null);
+          }}
+          onPointerDown={(event) => {
+            event.stopPropagation();
+          }}
+          aria-label={`Close ${wipPopup.title} WIP popup`}
+          data-freewill-control="true"
+        >
+          <img
+            src={wipPopup.src}
+            alt={`${wipPopup.title} WIP`}
+            className="freewill-wip-popup-image"
+            draggable={false}
+          />
+        </button>
+      )}
     </main>
   );
 }
