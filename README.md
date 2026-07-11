@@ -1,20 +1,16 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# Solar Static Studio
 
-# Run and deploy your AI Studio app
+This repository is the working home for Solar Static Studio: the active website, company source material, operating system, products, client work, shared assets, and historical archive.
 
-This contains everything you need to run your app locally.
+## Structure
 
-View your app in AI Studio: https://ai.studio/apps/drive/1C70d8ZQQJ9ZweZ-PNEE1Eleybg7itr5-
+- `website/` - Active website application, public files, and editorial content.
+- `company/` - Brand, services, pricing, positioning, and legal material.
+- `operating-system/` - Studio playbooks, decisions, finance, CRM, templates, and Notion sync materials.
+- `products/` - Product workspaces for BandOS, Latent, and experiments.
+- `clients/` - Client-specific workspaces and client archive.
+- `assets/` - Shared logo, typography, photography, illustration, and presentation source assets.
+- `archive/` - Historical projects and deprecated work.
+- `scripts/` - Repository-level automation scripts.
 
-## Run Locally
-
-**Prerequisites:**  Node.js
-
-
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+The previous website root has been preserved at `archive/old-website/`.

@@ -1,0 +1,36 @@
+{
+  "name": "@solar-static-studio/notion-sync",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "notion:list": "tsx src/cli.ts list",
+    "notion:status": "tsx src/cli.ts status",
+    "notion:diff": "tsx src/cli.ts diff",
+    "notion:push": "tsx src/cli.ts push",
+    "notion:pull": "tsx src/cli.ts pull",
+    "notion:push-all": "tsx src/cli.ts push-all",
+    "notion:pull-all": "tsx src/cli.ts pull-all",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "test": "vitest run",
+    "format:check": "prettier --check .",
+    "verify": "npm run typecheck && npm run lint && npm run test && npm run format:check"
+  },
+  "dependencies": {
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.31.0",
+    "@types/node": "^22.16.4",
+    "eslint": "^9.31.0",
+    "prettier": "^3.6.2",
+    "tsx": "^4.20.3",
+    "typescript": "^5.8.3",
+    "typescript-eslint": "^8.36.0",
+    "vitest": "^3.2.4"
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "foundation-july-2026": {
+    "localPath": "operating-system/playbooks/2026-07-foundation-month.md",
+    "notionPageId": "REPLACE_WITH_NOTION_PAGE_ID"
+  },
+  "mission": {
+    "localPath": "company/mission.md",
+    "notionPageId": "REPLACE_WITH_NOTION_PAGE_ID"
+  },
+  "positioning": {
+    "localPath": "company/positioning.md",
+    "notionPageId": "REPLACE_WITH_NOTION_PAGE_ID"
+  },
+  "services": {
+    "localPath": "company/services.md",
+    "notionPageId": "REPLACE_WITH_NOTION_PAGE_ID"
+  },
+  "decision-log": {
+    "localPath": "operating-system/decisions/decision-log.md",
+    "notionPageId": "REPLACE_WITH_NOTION_PAGE_ID"
+  },
+  "heloc-plan": {
+    "localPath": "operating-system/finance/heloc-plan.md",
+    "notionPageId": "REPLACE_WITH_NOTION_PAGE_ID"
+  }
+}

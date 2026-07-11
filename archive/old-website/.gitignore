@@ -7,17 +7,10 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-# Dependencies and builds
 node_modules
 dist
 dist-ssr
 *.local
-
-# Tooling and local state
-.vercel
-operating-system/notion-sync/.env
-operating-system/notion-sync/config/notion-pages.json
-operating-system/notion-sync/.sync/
 
 # Editor directories and files
 .vscode/*
@@ -29,3 +22,4 @@ operating-system/notion-sync/.sync/
 *.njsproj
 *.sln
 *.sw?
+.vercel
