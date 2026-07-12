@@ -128,7 +128,7 @@ export const site = {
         },
       },
       meta: {
-        title: 'Solar Static Studio - Company About',
+        title: 'Solar Static Studio - About',
         description:
           'Solar Static Studio is an independent creative product studio that transforms selected ideas into distinctive visual identities and fully realized digital products.',
       },
