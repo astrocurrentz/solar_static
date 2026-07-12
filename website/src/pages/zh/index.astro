@@ -1,0 +1,23 @@
+---
+import About from '../../components/About.astro';
+import Capabilities from '../../components/Capabilities.astro';
+import Contact from '../../components/Contact.astro';
+import Footer from '../../components/Footer.astro';
+import Header from '../../components/Header.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getLocaleContent } from '../../data/site';
+
+const locale = 'zh';
+const content = getLocaleContent(locale);
+---
+
+<BaseLayout locale={locale}>
+  <Header locale={locale} />
+  <main class="page-shell">
+    <About content={content} part="intro" />
+    <Capabilities content={content} />
+    <About content={content} part="positioning" />
+    <Contact content={content} />
+  </main>
+  <Footer />
+</BaseLayout>

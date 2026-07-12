@@ -1,0 +1,139 @@
+---
+import HeroProximityTitle from './about-motion/hero-proximity-title';
+import { motionMediaQuery } from './about-motion/presets';
+import ProximityNormalString from './about-motion/proximity-normal-string';
+import ScrambleStatement from './about-motion/scramble-statement';
+import BrandText from './BrandText.astro';
+import type { LocaleContent } from '../data/site';
+
+interface Props {
+  content: LocaleContent;
+  part?: 'intro' | 'positioning' | 'all';
+}
+
+const { content, part = 'all' } = Astro.props;
+const showIntro = part === 'intro' || part === 'all';
+const showPositioning = part === 'positioning' || part === 'all';
+const reasonSeparator = content.htmlLang === 'zh-CN' ? '：' : ':';
+const reasonJoiner = content.htmlLang === 'zh-CN' ? '' : ' ';
+const locale = content.htmlLang === 'zh-CN' ? 'zh' : 'en';
+---
+
+{
+  showIntro && (
+    <>
+      <section class="hero" aria-labelledby="page-title">
+        <h1 id="page-title">
+          <HeroProximityTitle
+            client:media={motionMediaQuery}
+            locale={locale}
+            text={content.document.title}
+          />
+        </h1>
+        <p class="hero-subtitle">{content.document.subtitle}</p>
+        <p class="core-line">
+          <ScrambleStatement
+            client:media={motionMediaQuery}
+            locale={locale}
+            text={content.document.coreLine}
+          />
+        </p>
+      </section>
+
+      <section class="section" aria-labelledby="about-heading">
+        <h2 id="about-heading">{content.about.heading}</h2>
+        <div class="copy-flow">
+          {content.about.paragraphs.map((paragraph) => (
+            <p>
+              <ProximityNormalString
+                client:media={motionMediaQuery}
+                locale={locale}
+                text={paragraph}
+              />
+            </p>
+          ))}
+        </div>
+        <aside class="callout">
+          <strong>{content.about.highlight.title}</strong>
+          <span>
+            <ProximityNormalString
+              client:media={motionMediaQuery}
+              locale={locale}
+              text={content.about.highlight.body}
+            />
+          </span>
+        </aside>
+      </section>
+
+      <section class="section" aria-labelledby="audience-heading">
+        <h2 id="audience-heading">{content.audience.heading}</h2>
+        <p>
+          <ProximityNormalString
+            client:media={motionMediaQuery}
+            locale={locale}
+            text={content.audience.intro}
+          />
+        </p>
+        <ul class="plain-list">
+          {content.audience.items.map((item) => (
+            <li>
+              <ProximityNormalString
+                client:media={motionMediaQuery}
+                locale={locale}
+                text={item}
+              />
+            </li>
+          ))}
+        </ul>
+      </section>
+    </>
+  )
+}
+
+{
+  showPositioning && (
+    <>
+      <section class="section" aria-labelledby="reasons-heading">
+        <h2 id="reasons-heading">
+          <BrandText text={content.reasons.heading} />
+        </h2>
+        <ul class="reason-list">
+          {content.reasons.items.map((item) => (
+            <li>
+              <strong>
+                {item.title}
+                {reasonSeparator}
+              </strong>
+              <ProximityNormalString
+                client:media={motionMediaQuery}
+                locale={locale}
+                text={`${reasonJoiner}${item.body}`}
+              />
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <section class="section" aria-labelledby="not-heading">
+        <h2 id="not-heading">{content.not.heading}</h2>
+        <p>
+          <ProximityNormalString
+            client:media={motionMediaQuery}
+            locale={locale}
+            text={content.not.body}
+          />
+        </p>
+        <aside class="callout closing-callout">
+          <strong>{content.closing.title}</strong>
+          <span>
+            <ProximityNormalString
+              client:media={motionMediaQuery}
+              locale={locale}
+              text={content.closing.body}
+            />
+          </span>
+        </aside>
+      </section>
+    </>
+  )
+}

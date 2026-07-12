@@ -1,0 +1,34 @@
+---
+import AnimatedEmailLink from './about-motion/animated-email-link';
+import { motionMediaQuery } from './about-motion/presets';
+import ProximityNormalString from './about-motion/proximity-normal-string';
+import { site, type LocaleContent } from '../data/site';
+
+interface Props {
+  content: LocaleContent;
+}
+
+const { content } = Astro.props;
+const locale = content.htmlLang === 'zh-CN' ? 'zh' : 'en';
+---
+
+<section class="section contact-section" aria-labelledby="contact-heading">
+  <div>
+    <h2 id="contact-heading">{content.contact.heading}</h2>
+    <p>
+      <ProximityNormalString
+        client:media={motionMediaQuery}
+        locale={locale}
+        text={content.contact.body}
+      />
+    </p>
+  </div>
+  <a class="email-link" href={`mailto:${site.contactEmail}`}>
+    <span>{content.contact.label}</span>
+    <AnimatedEmailLink
+      client:media={motionMediaQuery}
+      locale={locale}
+      text={site.contactEmail}
+    />
+  </a>
+</section>

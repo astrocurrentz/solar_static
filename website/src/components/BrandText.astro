@@ -1,0 +1,19 @@
+---
+import { site } from '../data/site';
+
+interface Props {
+  text: string;
+}
+
+const { text } = Astro.props;
+const parts = text.split(site.name);
+---
+
+{
+  parts.map((part, index) => (
+    <>
+      {part}
+      {index < parts.length - 1 && <span class="brand-name">{site.name}</span>}
+    </>
+  ))
+}

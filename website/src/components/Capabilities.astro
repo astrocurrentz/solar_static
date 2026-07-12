@@ -1,0 +1,32 @@
+---
+import { motionMediaQuery } from './about-motion/presets';
+import ProximityNormalString from './about-motion/proximity-normal-string';
+import type { LocaleContent } from '../data/site';
+
+interface Props {
+  content: LocaleContent;
+}
+
+const { content } = Astro.props;
+const locale = content.htmlLang === 'zh-CN' ? 'zh' : 'en';
+---
+
+<section class="section" aria-labelledby="capabilities-heading">
+  <h2 id="capabilities-heading">{content.capabilities.heading}</h2>
+  <div class="capability-grid">
+    {
+      content.capabilities.items.map((capability) => (
+        <article class="capability">
+          <h3>{capability.title}</h3>
+          <p>
+            <ProximityNormalString
+              client:media={motionMediaQuery}
+              locale={locale}
+              text={capability.body}
+            />
+          </p>
+        </article>
+      ))
+    }
+  </div>
+</section>
