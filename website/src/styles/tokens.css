@@ -45,6 +45,11 @@
   --space-hero-start: clamp(3rem, 9vw, 7.5rem);
   --space-hero-end: clamp(2.5rem, 7vw, 5rem);
   --space-hero-mobile-start: 2.25rem;
+  --space-home-hero-y: clamp(2rem, 5vw, 4.5rem);
+  --space-home-hero-gap: clamp(1.75rem, 5vw, 4.5rem);
+  --space-home-hero-support-gap: clamp(1.25rem, 3vw, 2rem);
+  --space-home-hero-action-gap: 0.75rem;
+  --space-home-hero-meta-gap: clamp(0.65rem, 3vw, 2rem);
   --space-section: clamp(3.25rem, 7vw, 6.5rem);
   --space-block: clamp(1.75rem, 4vw, 3rem);
   --space-copy: 1rem;
@@ -76,6 +81,8 @@
   --type-language: 0.88rem;
   --type-hero: clamp(3.1rem, 5.8vw, 7.2rem);
   --type-hero-mobile: clamp(2.6rem, 15vw, 4.4rem);
+  --type-home-hero: clamp(4.4rem, 7vw, 6.5rem);
+  --type-home-hero-mobile: clamp(3.2rem, 14.5vw, 4.6rem);
   --type-heading: clamp(2rem, 4.5vw, 3.5rem);
   --type-subheading: clamp(1.35rem, 2.4vw, 2rem);
   --type-body: clamp(1.04rem, 1.4vw, 1.24rem);
@@ -104,6 +111,14 @@
   --border-callout: 0.3rem;
   --language-min-width: 3.2rem;
   --language-min-height: 2.35rem;
+  --home-hero-copy-max: 36rem;
+  --home-hero-support-min: 18rem;
+  --home-hero-cta-min-height: 2.9rem;
+  --home-hero-cta-x: 1.25rem;
+  --home-hero-min-height: calc(
+    100svh - var(--space-header-y) - var(--space-header-y) -
+      var(--site-mark-max-height)
+  );
   --site-mark-width: clamp(5.4rem, 8vw, 8rem);
   --site-mark-max-height: clamp(3.4rem, 5vw, 5rem);
   --brand-loader-width-sm: 4.5rem;

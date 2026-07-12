@@ -24,6 +24,10 @@ const content = getLocaleContent(locale);
 const pageMeta = meta ?? content.meta;
 const canonical = new URL(canonicalPath ?? content.path, site.url).toString();
 const ogImage = new URL(site.ogImage, site.url).toString();
+const alternateLocales = site.publicLocales.map(
+  (publicLocale) => site.locales[publicLocale],
+);
+const showAlternateLinks = includeAlternateLinks && alternateLocales.length > 1;
 ---
 
 <!doctype html>
@@ -36,8 +40,8 @@ const ogImage = new URL(site.ogImage, site.url).toString();
     <meta name="description" content={pageMeta.description} />
     <link rel="canonical" href={canonical} />
     {
-      includeAlternateLinks &&
-        Object.values(site.locales).map((localized) => (
+      showAlternateLinks &&
+        alternateLocales.map((localized) => (
           <link
             rel="alternate"
             hreflang={localized.htmlLang}
@@ -46,7 +50,7 @@ const ogImage = new URL(site.ogImage, site.url).toString();
         ))
     }
     {
-      includeAlternateLinks && (
+      showAlternateLinks && (
         <link
           rel="alternate"
           hreflang="x-default"

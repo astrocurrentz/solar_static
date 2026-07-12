@@ -1,0 +1,53 @@
+---
+import HeroProximityTitle from './about-motion/hero-proximity-title';
+import { motionMediaQuery } from './about-motion/presets';
+import ProximityNormalString from './about-motion/proximity-normal-string';
+import type { HomeHeroContent, Locale } from '../data/site';
+
+interface Props {
+  hero: HomeHeroContent;
+  locale: Locale;
+}
+
+const { hero, locale } = Astro.props;
+---
+
+<section class="home-hero" aria-labelledby="home-hero-title">
+  <div class="home-hero__body">
+    <h1 class="home-hero__title" id="home-hero-title">
+      <HeroProximityTitle
+        client:media={motionMediaQuery}
+        locale={locale}
+        text={hero.headline}
+      />
+    </h1>
+    <div class="home-hero__support">
+      <p class="home-hero__copy">
+        <span class="home-hero__copy-measure" aria-hidden="true">
+          {hero.supportingCopy}
+        </span>
+        <span class="home-hero__copy-visible">
+          <ProximityNormalString
+            client:media={motionMediaQuery}
+            locale={locale}
+            text={hero.supportingCopy}
+          />
+        </span>
+      </p>
+      <div class="home-hero__actions" aria-label="Project actions">
+        <button
+          class="home-hero__button home-hero__button--primary"
+          type="button"
+        >
+          {hero.primaryCtaLabel}
+        </button>
+        <button class="home-hero__button" type="button">
+          {hero.secondaryCtaLabel}
+        </button>
+      </div>
+    </div>
+  </div>
+  <div class="home-hero__metadata" aria-label="Studio metadata">
+    {hero.footerMetadata.map((item) => <p>{item}</p>)}
+  </div>
+</section>

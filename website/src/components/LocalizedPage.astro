@@ -9,13 +9,14 @@ import { getLocaleContent, type Locale } from '../data/site';
 
 interface Props {
   locale: Locale;
+  canonicalPath?: string;
 }
 
-const { locale } = Astro.props;
+const { locale, canonicalPath } = Astro.props;
 const content = getLocaleContent(locale);
 ---
 
-<BaseLayout locale={locale}>
+<BaseLayout locale={locale} canonicalPath={canonicalPath}>
   <Header locale={locale} />
   <main class="page-shell">
     <About content={content} part="intro" />

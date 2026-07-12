@@ -1,5 +1,18 @@
 ---
-import LocalizedPage from '../components/LocalizedPage.astro';
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+import HomeHero from '../components/HomeHero.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getLocaleContent } from '../data/site';
+
+const locale = 'en';
+const content = getLocaleContent(locale);
 ---
 
-<LocalizedPage locale="en" />
+<BaseLayout locale={locale} meta={content.home.meta} canonicalPath="/">
+  <Header locale={locale} />
+  <main class="page-shell home-page-shell">
+    <HomeHero hero={content.home.hero} locale={locale} />
+  </main>
+  <Footer />
+</BaseLayout>

@@ -1,5 +1,10 @@
 export type Locale = 'en' | 'zh';
 
+export type PageMeta = {
+  title: string;
+  description: string;
+};
+
 export type Capability = {
   title: string;
   body: string;
@@ -13,10 +18,15 @@ export type Reason = {
 export type ErrorPageContent = {
   code: number;
   status: string;
-  meta: {
-    title: string;
-    description: string;
-  };
+  meta: PageMeta;
+};
+
+export type HomeHeroContent = {
+  headline: string;
+  supportingCopy: string;
+  primaryCtaLabel: string;
+  secondaryCtaLabel: string;
+  footerMetadata: string[];
 };
 
 export type LocaleContent = {
@@ -30,14 +40,12 @@ export type LocaleContent = {
   loadingLabel: string;
   loadingPreview: {
     title: string;
-    meta: {
-      title: string;
-      description: string;
-    };
+    meta: PageMeta;
   };
-  meta: {
-    title: string;
-    description: string;
+  meta: PageMeta;
+  home: {
+    meta: PageMeta;
+    hero: HomeHeroContent;
   };
   document: {
     title: string;
@@ -81,6 +89,7 @@ export type LocaleContent = {
 };
 
 const email = 'signal@solarstatic.xyz';
+const publicLocales = ['en'] as const satisfies readonly Locale[];
 
 export const errorPages = {
   notFound: {
@@ -109,11 +118,12 @@ export const site = {
   contactEmail: email,
   favicon: '/favicon.svg',
   ogImage: '/og-image.jpg',
+  publicLocales,
   locales: {
     en: {
       htmlLang: 'en',
       dir: 'ltr',
-      path: '/en/',
+      path: '/',
       alternateLocale: 'zh',
       navigationLabel: 'Language',
       switchLabel: '中文',
@@ -131,6 +141,24 @@ export const site = {
         title: 'Solar Static Studio - About',
         description:
           'Solar Static Studio is an independent creative product studio that transforms selected ideas into distinctive visual identities and fully realized digital products.',
+      },
+      home: {
+        meta: {
+          title: 'Solar Static - Creative Product Studio',
+          description:
+            'Solar Static Studio transforms selected ideas into distinctive visual identities, digital experiences, and launch-ready products.',
+        },
+        hero: {
+          headline: 'From Idea to Digital Reality',
+          supportingCopy:
+            'We transform selected ideas into distinctive visual identities, digital experiences, and launch-ready products.',
+          primaryCtaLabel: 'View Our Work',
+          secondaryCtaLabel: 'Start a Project',
+          footerMetadata: [
+            'INDEPENDENT CREATIVE PRODUCT STUDIO',
+            'VANCOUVER, CANADA',
+          ],
+        },
       },
       document: {
         title: 'Solar Static Studio',
@@ -241,6 +269,24 @@ export const site = {
         description:
           'Solar Static Studio 是一家独立创意产品工作室，负责将经过选择的创意转化为具有辨识度的视觉系统与真正完成落地的数字产品。',
       },
+      home: {
+        meta: {
+          title: 'Solar Static - Creative Product Studio',
+          description:
+            'Solar Static Studio transforms selected ideas into distinctive visual identities, digital experiences, and launch-ready products.',
+        },
+        hero: {
+          headline: 'From Idea to Digital Reality',
+          supportingCopy:
+            'We transform selected ideas into distinctive visual identities, digital experiences, and launch-ready products.',
+          primaryCtaLabel: 'View Our Work',
+          secondaryCtaLabel: 'Start a Project',
+          footerMetadata: [
+            'INDEPENDENT CREATIVE PRODUCT STUDIO',
+            'VANCOUVER, CANADA',
+          ],
+        },
+      },
       document: {
         title: 'Solar Static Studio',
         subtitle: '我们服务谁、创造什么，以及工作室为何存在',
@@ -336,6 +382,7 @@ export const site = {
   contactEmail: string;
   favicon: string;
   ogImage: string;
+  publicLocales: readonly Locale[];
   locales: Record<Locale, LocaleContent>;
 };
 
