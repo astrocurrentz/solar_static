@@ -68,6 +68,8 @@
   --space-email-gap: 0.3rem;
   --space-email-y: 1.2rem;
   --space-footer-end: clamp(2rem, 5vw, 4rem);
+  --space-error-y: clamp(4rem, 12vw, 9rem);
+  --space-error-gap: clamp(1rem, 3vw, 1.75rem);
   --focus-ring: 0 0 0 0.18rem var(--color-focus);
 
   --type-label: clamp(0.78rem, 1.4vw, 0.95rem);
@@ -84,6 +86,8 @@
   --type-email: clamp(1.1rem, 2vw, 1.45rem);
   --type-caption: 0.78rem;
   --type-footer: 0.98rem;
+  --type-error-code: clamp(4.5rem, 16vw, 13rem);
+  --type-error-status: clamp(1.35rem, 3vw, 2.6rem);
 
   --line-tight: 0.92;
   --line-heading: 1.04;
@@ -102,6 +106,8 @@
   --language-min-height: 2.35rem;
   --site-mark-width: clamp(5.4rem, 8vw, 8rem);
   --site-mark-max-height: clamp(3.4rem, 5vw, 5rem);
+  --error-mark-width: clamp(4.5rem, 10vw, 8.5rem);
+  --error-shell-min-height: 100svh;
   --contact-copy-column: 1.3fr;
   --contact-link-min: 16rem;
   --contact-link-column: 0.7fr;

@@ -10,6 +10,15 @@ export type Reason = {
   body: string;
 };
 
+export type ErrorPageContent = {
+  code: number;
+  status: string;
+  meta: {
+    title: string;
+    description: string;
+  };
+};
+
 export type LocaleContent = {
   htmlLang: string;
   dir: 'ltr';
@@ -65,6 +74,26 @@ export type LocaleContent = {
 
 const email = 'signal@solarstatic.xyz';
 
+export const errorPages = {
+  notFound: {
+    code: 404,
+    status: 'Not Found',
+    meta: {
+      title: '404 - Not Found',
+      description: 'The requested Solar Static Studio page could not be found.',
+    },
+  },
+  serverError: {
+    code: 500,
+    status: 'Internal Server Error',
+    meta: {
+      title: '500 - Internal Server Error',
+      description:
+        'Solar Static Studio is temporarily unable to load this page.',
+    },
+  },
+} satisfies Record<string, ErrorPageContent>;
+
 export const site = {
   name: 'Solar Static Studio',
   category: 'Independent Creative Product Studio',
@@ -76,7 +105,7 @@ export const site = {
     en: {
       htmlLang: 'en',
       dir: 'ltr',
-      path: '/',
+      path: '/en/',
       alternateLocale: 'zh',
       navigationLabel: 'Language',
       switchLabel: '中文',
@@ -136,7 +165,7 @@ export const site = {
         ],
       },
       reasons: {
-        heading: 'Why Solar Static Studio',
+        heading: 'Why SSS',
         items: [
           {
             title: 'One consistent direction',
@@ -177,7 +206,7 @@ export const site = {
     zh: {
       htmlLang: 'zh-CN',
       dir: 'ltr',
-      path: '/zh/',
+      path: '/cn/',
       alternateLocale: 'en',
       navigationLabel: '语言',
       switchLabel: 'EN',

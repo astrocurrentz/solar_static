@@ -1,0 +1,27 @@
+---
+import { site, type ErrorPageContent, type Locale } from '../data/site';
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+interface Props {
+  error: ErrorPageContent;
+  locale?: Locale;
+}
+
+const { error, locale = 'en' } = Astro.props;
+const titleId = `error-${error.code}`;
+---
+
+<BaseLayout
+  locale={locale}
+  meta={error.meta}
+  canonicalPath={`/${error.code}/`}
+  includeAlternateLinks={false}
+>
+  <main class="error-shell" aria-labelledby={titleId}>
+    <div class="error-content">
+      <img class="error-mark" src={site.favicon} alt="" aria-hidden="true" />
+      <h1 class="error-code" id={titleId}>{error.code}</h1>
+      <p class="error-status">{error.status}</p>
+    </div>
+  </main>
+</BaseLayout>

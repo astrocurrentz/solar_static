@@ -1,0 +1,27 @@
+---
+import About from './About.astro';
+import Capabilities from './Capabilities.astro';
+import Contact from './Contact.astro';
+import Footer from './Footer.astro';
+import Header from './Header.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getLocaleContent, type Locale } from '../data/site';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const content = getLocaleContent(locale);
+---
+
+<BaseLayout locale={locale}>
+  <Header locale={locale} />
+  <main class="page-shell">
+    <About content={content} part="intro" />
+    <Capabilities content={content} />
+    <About content={content} part="positioning" />
+    <Contact content={content} />
+  </main>
+  <Footer />
+</BaseLayout>

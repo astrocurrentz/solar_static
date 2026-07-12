@@ -1,14 +1,28 @@
 ---
-import { getLocaleContent, site, type Locale } from '../data/site';
+import {
+  getLocaleContent,
+  site,
+  type Locale,
+  type LocaleContent,
+} from '../data/site';
 import '../styles/global.css';
 
 interface Props {
   locale: Locale;
+  meta?: LocaleContent['meta'];
+  canonicalPath?: string;
+  includeAlternateLinks?: boolean;
 }
 
-const { locale } = Astro.props;
+const {
+  locale,
+  meta,
+  canonicalPath,
+  includeAlternateLinks = true,
+} = Astro.props;
 const content = getLocaleContent(locale);
-const canonical = new URL(content.path, site.url).toString();
+const pageMeta = meta ?? content.meta;
+const canonical = new URL(canonicalPath ?? content.path, site.url).toString();
 const ogImage = new URL(site.ogImage, site.url).toString();
 ---
 
@@ -18,33 +32,38 @@ const ogImage = new URL(site.ogImage, site.url).toString();
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generator" content={Astro.generator} />
-    <title>{content.meta.title}</title>
-    <meta name="description" content={content.meta.description} />
+    <title>{pageMeta.title}</title>
+    <meta name="description" content={pageMeta.description} />
     <link rel="canonical" href={canonical} />
     {
-      Object.values(site.locales).map((localized) => (
+      includeAlternateLinks &&
+        Object.values(site.locales).map((localized) => (
+          <link
+            rel="alternate"
+            hreflang={localized.htmlLang}
+            href={new URL(localized.path, site.url).toString()}
+          />
+        ))
+    }
+    {
+      includeAlternateLinks && (
         <link
           rel="alternate"
-          hreflang={localized.htmlLang}
-          href={new URL(localized.path, site.url).toString()}
+          hreflang="x-default"
+          href={new URL(site.locales.en.path, site.url).toString()}
         />
-      ))
+      )
     }
-    <link
-      rel="alternate"
-      hreflang="x-default"
-      href={new URL('/', site.url).toString()}
-    />
     <link rel="icon" href={site.favicon} type="image/svg+xml" />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content={site.name} />
-    <meta property="og:title" content={content.meta.title} />
-    <meta property="og:description" content={content.meta.description} />
+    <meta property="og:title" content={pageMeta.title} />
+    <meta property="og:description" content={pageMeta.description} />
     <meta property="og:url" content={canonical} />
     <meta property="og:image" content={ogImage} />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content={content.meta.title} />
-    <meta name="twitter:description" content={content.meta.description} />
+    <meta name="twitter:title" content={pageMeta.title} />
+    <meta name="twitter:description" content={pageMeta.description} />
     <meta name="twitter:image" content={ogImage} />
   </head>
   <body>

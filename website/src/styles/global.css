@@ -451,10 +451,49 @@ html:lang(zh-CN) .reason-list strong {
   font-weight: var(--font-weight-regular);
 }
 
+.error-shell {
+  display: grid;
+  width: var(--page-max);
+  min-height: var(--error-shell-min-height);
+  place-items: center;
+  padding: var(--space-error-y) var(--space-page);
+}
+
+.error-content {
+  display: grid;
+  gap: var(--space-error-gap);
+  justify-items: center;
+  text-align: center;
+}
+
+.error-mark {
+  display: block;
+  width: var(--error-mark-width);
+  height: auto;
+}
+
+.error-code {
+  color: var(--color-text);
+  font-family: var(--font-display);
+  font-size: var(--type-error-code);
+  font-variation-settings: 'wght' var(--font-weight-hero-rest);
+  font-weight: var(--font-weight-hero-rest);
+  letter-spacing: 0;
+  line-height: var(--line-tight);
+}
+
+.error-status {
+  color: var(--color-brand);
+  font-size: var(--type-error-status);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-compact);
+}
+
 @media (max-width: 48rem) {
   .site-header,
   .page-shell,
-  .site-footer {
+  .site-footer,
+  .error-shell {
     padding-inline: calc(var(--space-page-mobile) / 2);
   }
 
