@@ -290,7 +290,7 @@ export const site = {
         ],
       },
       reasons: {
-        heading: '为什么选择 Solar Static Studio',
+        heading: '为什么选择 SSS',
         items: [
           {
             title: '统一的创意方向',
