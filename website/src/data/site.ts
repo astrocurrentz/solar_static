@@ -27,6 +27,7 @@ export type LocaleContent = {
   navigationLabel: string;
   switchLabel: string;
   switchAriaLabel: string;
+  loadingLabel: string;
   meta: {
     title: string;
     description: string;
@@ -110,6 +111,7 @@ export const site = {
       navigationLabel: 'Language',
       switchLabel: '中文',
       switchAriaLabel: 'View this page in Chinese',
+      loadingLabel: 'Loading Solar Static Studio',
       meta: {
         title: 'Solar Static Studio - Company About',
         description:
@@ -211,6 +213,7 @@ export const site = {
       navigationLabel: '语言',
       switchLabel: 'EN',
       switchAriaLabel: 'View this page in English',
+      loadingLabel: '正在加载 Solar Static Studio',
       meta: {
         title: 'Solar Static Studio - 公司简介',
         description:

@@ -106,6 +106,9 @@
   --language-min-height: 2.35rem;
   --site-mark-width: clamp(5.4rem, 8vw, 8rem);
   --site-mark-max-height: clamp(3.4rem, 5vw, 5rem);
+  --brand-loader-width-sm: 4.5rem;
+  --brand-loader-width-md: clamp(5.5rem, 12vw, 8rem);
+  --brand-loader-width-lg: clamp(8rem, 18vw, 12rem);
   --error-mark-width: clamp(4.5rem, 10vw, 8.5rem);
   --error-shell-min-height: 100svh;
   --contact-copy-column: 1.3fr;
@@ -113,5 +116,8 @@
   --contact-link-column: 0.7fr;
   --duration-fast: 160ms;
   --duration-reduced-motion: 0.01ms;
+  --brand-loader-cycle: 920ms;
+  --brand-loader-delay-step: 38ms;
+  --brand-loader-timing: steps(1, end);
   --motion-underline-color: var(--color-accent);
 }

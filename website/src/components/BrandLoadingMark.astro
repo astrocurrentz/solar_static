@@ -1,0 +1,228 @@
+---
+import { getLocaleContent, type Locale } from '../data/site';
+
+type LoaderSize = 'sm' | 'md' | 'lg';
+type GridCell = {
+  x: number;
+  y: number;
+};
+
+interface Props {
+  locale?: Locale;
+  size?: LoaderSize;
+  class?: string;
+}
+
+const GRID_WIDTH = 36;
+const GRID_HEIGHT = 23;
+const FRAME_SIZE = 23;
+
+const staticRows = [
+  '........................#...........',
+  '....................#...............',
+  '............................##...#..',
+  '..................#.##.#.###.#..#...',
+  '.....................#.#..##..##....',
+  '..................##...#....#.##..#.',
+  '..............#....#...#..####......',
+  '.....................#..####.......#',
+  '.....................#..####.......#',
+  '.................##.##...##.####...#',
+  '..................####.##....#......',
+  '............#..#..#.#.....##..#...#.',
+  '.............##..#.#.....##..#..##..',
+  '.............##...####.#.###.......#',
+  '...................###..#####.#.....',
+  '................#.#..#..##...##..#..',
+  '..................##...##........#..',
+  '..............####.....#..###.......',
+  '................#..###.....#.##.....',
+  '...................#...###...###....',
+  '.................#...#.#..#.#.......',
+  '........................#.....#.....',
+  '....................................',
+] as const;
+
+const jumpCandidates = [
+  [1, 0],
+  [0, -1],
+  [-1, 0],
+  [0, 1],
+  [1, 1],
+  [-1, -1],
+  [1, -1],
+  [-1, 1],
+  [2, 0],
+  [0, 2],
+  [-2, 0],
+  [0, -2],
+] as const;
+
+const horizontalFrameCells = Array.from(
+  { length: FRAME_SIZE },
+  (_, x) => x,
+).flatMap((x) => [
+  { x, y: 0 },
+  { x, y: FRAME_SIZE - 1 },
+]);
+
+const verticalFrameCells = Array.from(
+  { length: FRAME_SIZE - 2 },
+  (_, index) => index + 1,
+).flatMap((y) => [
+  { x: 0, y },
+  { x: FRAME_SIZE - 1, y },
+]);
+
+const frameCells = [...horizontalFrameCells, ...verticalFrameCells];
+
+const staticPixels = staticRows.flatMap((row, y) =>
+  Array.from(row).flatMap((cell, x) => (cell === '#' ? [{ x, y }] : [])),
+);
+
+const getShift = (
+  pixel: GridCell,
+  seed: number,
+  phase: number,
+): readonly [number, number] => {
+  for (let offset = 0; offset < jumpCandidates.length; offset += 1) {
+    const [x, y] =
+      jumpCandidates[(seed + phase * 5 + offset) % jumpCandidates.length];
+    const nextX = pixel.x + x;
+    const nextY = pixel.y + y;
+
+    if (nextX >= 0 && nextX < GRID_WIDTH && nextY >= 0 && nextY < GRID_HEIGHT) {
+      return [x, y];
+    }
+  }
+
+  return [0, 0];
+};
+
+const toTranslate = (value: number) => `${value * 100}%`;
+
+const getPixelStyle = (pixel: GridCell, index: number) => {
+  const seed = index + pixel.x * 11 + pixel.y * 7;
+  const firstShift = getShift(pixel, seed, 0);
+  const secondShift = getShift(pixel, seed, 1);
+  const thirdShift = getShift(pixel, seed, 2);
+  const fourthShift = getShift(pixel, seed, 3);
+
+  return [
+    `--pixel-delay-index: -${(seed % 19) + 1}`,
+    `--pixel-a-x: ${toTranslate(firstShift[0])}`,
+    `--pixel-a-y: ${toTranslate(firstShift[1])}`,
+    `--pixel-b-x: ${toTranslate(secondShift[0])}`,
+    `--pixel-b-y: ${toTranslate(secondShift[1])}`,
+    `--pixel-c-x: ${toTranslate(thirdShift[0])}`,
+    `--pixel-c-y: ${toTranslate(thirdShift[1])}`,
+    `--pixel-d-x: ${toTranslate(fourthShift[0])}`,
+    `--pixel-d-y: ${toTranslate(fourthShift[1])}`,
+  ].join('; ');
+};
+
+const { locale = 'en', size = 'md', class: className } = Astro.props;
+const loadingLabel = getLocaleContent(locale).loadingLabel;
+---
+
+<span
+  class:list={['brand-loading-mark', `brand-loading-mark--${size}`, className]}
+  role="status"
+>
+  <svg
+    class="brand-loading-mark__svg"
+    viewBox={`0 0 ${GRID_WIDTH} ${GRID_HEIGHT}`}
+    aria-hidden="true"
+    focusable="false"
+    shape-rendering="crispEdges"
+  >
+    <g class="brand-loading-mark__frame" fill="currentColor">
+      {
+        frameCells.map((cell) => (
+          <rect x={cell.x} y={cell.y} width="1" height="1" />
+        ))
+      }
+    </g>
+    <g class="brand-loading-mark__static" fill="currentColor">
+      {
+        staticPixels.map((pixel, index) => (
+          <rect
+            class="brand-loading-mark__pixel"
+            x={pixel.x}
+            y={pixel.y}
+            width="1"
+            height="1"
+            style={getPixelStyle(pixel, index)}
+          />
+        ))
+      }
+    </g>
+  </svg>
+  <span class="motion-sr-only">{loadingLabel}</span>
+</span>
+
+<style>
+  .brand-loading-mark {
+    display: inline-grid;
+    width: var(--brand-loader-width-md);
+    color: var(--color-brand);
+    line-height: 0;
+  }
+
+  .brand-loading-mark--sm {
+    width: var(--brand-loader-width-sm);
+  }
+
+  .brand-loading-mark--lg {
+    width: var(--brand-loader-width-lg);
+  }
+
+  .brand-loading-mark__svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: hidden;
+  }
+
+  .brand-loading-mark__pixel {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: brand-loading-mark-pixel-jitter var(--brand-loader-cycle)
+      var(--brand-loader-timing) infinite;
+    animation-delay: calc(
+      var(--brand-loader-delay-step) * var(--pixel-delay-index)
+    );
+    will-change: transform;
+  }
+
+  @keyframes brand-loading-mark-pixel-jitter {
+    0%,
+    100% {
+      transform: translate(0, 0);
+    }
+
+    18% {
+      transform: translate(var(--pixel-a-x), var(--pixel-a-y));
+    }
+
+    38% {
+      transform: translate(var(--pixel-b-x), var(--pixel-b-y));
+    }
+
+    62% {
+      transform: translate(var(--pixel-c-x), var(--pixel-c-y));
+    }
+
+    82% {
+      transform: translate(var(--pixel-d-x), var(--pixel-d-y));
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .brand-loading-mark__pixel {
+      animation: none;
+      transform: translate(0, 0);
+      will-change: auto;
+    }
+  }
+</style>
