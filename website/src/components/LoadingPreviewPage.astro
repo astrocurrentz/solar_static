@@ -1,0 +1,54 @@
+---
+import { getLocaleContent, type Locale } from '../data/site';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import BrandLoadingMark from './BrandLoadingMark.astro';
+
+interface Props {
+  locale: Locale;
+  canonicalPath: string;
+}
+
+const { locale, canonicalPath } = Astro.props;
+const content = getLocaleContent(locale);
+const titleId = `loading-preview-${locale}`;
+---
+
+<BaseLayout
+  locale={locale}
+  meta={content.loadingPreview.meta}
+  canonicalPath={canonicalPath}
+  includeAlternateLinks={false}
+>
+  <main class="loading-preview" aria-labelledby={titleId}>
+    <h1 class="motion-sr-only" id={titleId}>{content.loadingPreview.title}</h1>
+    <div class="loading-preview__marks">
+      <BrandLoadingMark locale={locale} size="sm" />
+      <BrandLoadingMark locale={locale} size="md" />
+      <BrandLoadingMark locale={locale} size="lg" />
+    </div>
+  </main>
+</BaseLayout>
+
+<style>
+  .loading-preview {
+    display: grid;
+    min-height: 100svh;
+    place-items: center;
+    padding: var(--space-page);
+  }
+
+  .loading-preview__marks {
+    display: grid;
+    width: min(100%, 54rem);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-block);
+    align-items: center;
+    justify-items: center;
+  }
+
+  @media (max-width: 48rem) {
+    .loading-preview__marks {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

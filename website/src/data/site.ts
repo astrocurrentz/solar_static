@@ -28,6 +28,13 @@ export type LocaleContent = {
   switchLabel: string;
   switchAriaLabel: string;
   loadingLabel: string;
+  loadingPreview: {
+    title: string;
+    meta: {
+      title: string;
+      description: string;
+    };
+  };
   meta: {
     title: string;
     description: string;
@@ -112,6 +119,14 @@ export const site = {
       switchLabel: '中文',
       switchAriaLabel: 'View this page in Chinese',
       loadingLabel: 'Loading Solar Static Studio',
+      loadingPreview: {
+        title: 'Loading animation preview',
+        meta: {
+          title: 'Solar Static Studio - Loading Preview',
+          description:
+            'A preview page for the Solar Static Studio brand loading animation.',
+        },
+      },
       meta: {
         title: 'Solar Static Studio - Company About',
         description:
@@ -214,6 +229,13 @@ export const site = {
       switchLabel: 'EN',
       switchAriaLabel: 'View this page in English',
       loadingLabel: '正在加载 Solar Static Studio',
+      loadingPreview: {
+        title: '加载动画预览',
+        meta: {
+          title: 'Solar Static Studio - 加载预览',
+          description: 'Solar Static Studio 品牌加载动画预览页面。',
+        },
+      },
       meta: {
         title: 'Solar Static Studio - 公司简介',
         description:
