@@ -1,0 +1,25 @@
+---
+import { motionMediaQuery } from './about-motion/presets';
+import ProximityNormalString from './about-motion/proximity-normal-string';
+import type { Locale, SimplePageContent } from '../data/site';
+
+interface Props {
+  content: SimplePageContent;
+  locale: Locale;
+}
+
+const { content, locale } = Astro.props;
+---
+
+<section class="simple-page" aria-labelledby="simple-page-heading">
+  <h1 class="simple-page__heading" id="simple-page-heading">
+    {content.heading}
+  </h1>
+  <p class="simple-page__body">
+    <ProximityNormalString
+      client:media={motionMediaQuery}
+      locale={locale}
+      text={content.body}
+    />
+  </p>
+</section>

@@ -15,6 +15,11 @@ export type Reason = {
   body: string;
 };
 
+export type NavigationItem = {
+  label: string;
+  href: string;
+};
+
 export type ErrorPageContent = {
   code: number;
   status: string;
@@ -25,18 +30,24 @@ export type HomeHeroContent = {
   headline: string;
   supportingCopy: string;
   primaryCtaLabel: string;
+  primaryCtaHref: string;
   secondaryCtaLabel: string;
+  secondaryCtaHref: string;
   footerMetadata: string[];
+};
+
+export type SimplePageContent = {
+  meta: PageMeta;
+  heading: string;
+  body: string;
 };
 
 export type LocaleContent = {
   htmlLang: string;
   dir: 'ltr';
   path: string;
-  alternateLocale: Locale;
   navigationLabel: string;
-  switchLabel: string;
-  switchAriaLabel: string;
+  primaryNavigation: NavigationItem[];
   loadingLabel: string;
   loadingPreview: {
     title: string;
@@ -60,6 +71,7 @@ export type LocaleContent = {
       body: string;
     };
   };
+  work: SimplePageContent;
   audience: {
     heading: string;
     intro: string;
@@ -82,6 +94,7 @@ export type LocaleContent = {
     body: string;
   };
   contact: {
+    meta: PageMeta;
     heading: string;
     body: string;
     label: string;
@@ -124,10 +137,21 @@ export const site = {
       htmlLang: 'en',
       dir: 'ltr',
       path: '/',
-      alternateLocale: 'zh',
-      navigationLabel: 'Language',
-      switchLabel: '中文',
-      switchAriaLabel: 'View this page in Chinese',
+      navigationLabel: 'Primary navigation',
+      primaryNavigation: [
+        {
+          label: 'Work',
+          href: '/work/',
+        },
+        {
+          label: 'About',
+          href: '/about/',
+        },
+        {
+          label: 'Contact',
+          href: '/contact/',
+        },
+      ],
       loadingLabel: 'Loading Solar Static Studio',
       loadingPreview: {
         title: 'Loading animation preview',
@@ -153,7 +177,9 @@ export const site = {
           supportingCopy:
             'We transform selected ideas into distinctive visual identities, digital experiences, and launch-ready products.',
           primaryCtaLabel: 'View Our Work',
+          primaryCtaHref: '/work/',
           secondaryCtaLabel: 'Start a Project',
+          secondaryCtaHref: '/contact/',
           footerMetadata: [
             'INDEPENDENT CREATIVE PRODUCT STUDIO',
             'VANCOUVER, CANADA',
@@ -175,6 +201,15 @@ export const site = {
           title: 'Industry-flexible. Project-selective.',
           body: 'We are defined by the quality of the idea and the value of the outcome, not by a single industry.',
         },
+      },
+      work: {
+        meta: {
+          title: 'Work - Solar Static Studio',
+          description:
+            'Selected Solar Static Studio work and case studies are coming soon.',
+        },
+        heading: 'Work',
+        body: 'Selected work and case studies are coming soon.',
       },
       audience: {
         heading: 'Who We Serve',
@@ -243,6 +278,11 @@ export const site = {
         body: 'We will help define what it should become, how it should look, and how it can exist in the digital world.',
       },
       contact: {
+        meta: {
+          title: 'Contact - Solar Static Studio',
+          description:
+            'Contact Solar Static Studio for selected ideas, collaborations, and digital product work.',
+        },
         heading: 'Contact',
         body: 'For selected ideas, collaborations, and digital product work, write to us directly.',
         label: 'Email',
@@ -252,10 +292,21 @@ export const site = {
       htmlLang: 'zh-CN',
       dir: 'ltr',
       path: '/cn/',
-      alternateLocale: 'en',
-      navigationLabel: '语言',
-      switchLabel: 'EN',
-      switchAriaLabel: 'View this page in English',
+      navigationLabel: '主导航',
+      primaryNavigation: [
+        {
+          label: 'Work',
+          href: '/work/',
+        },
+        {
+          label: 'About',
+          href: '/about/',
+        },
+        {
+          label: 'Contact',
+          href: '/contact/',
+        },
+      ],
       loadingLabel: '正在加载 Solar Static Studio',
       loadingPreview: {
         title: '加载动画预览',
@@ -280,7 +331,9 @@ export const site = {
           supportingCopy:
             'We transform selected ideas into distinctive visual identities, digital experiences, and launch-ready products.',
           primaryCtaLabel: 'View Our Work',
+          primaryCtaHref: '/work/',
           secondaryCtaLabel: 'Start a Project',
+          secondaryCtaHref: '/contact/',
           footerMetadata: [
             'INDEPENDENT CREATIVE PRODUCT STUDIO',
             'VANCOUVER, CANADA',
@@ -302,6 +355,15 @@ export const site = {
           title: '行业开放，项目精选。',
           body: '我们不被单一行业定义，而以创意质量、合作适配度与最终成果的价值来选择项目。',
         },
+      },
+      work: {
+        meta: {
+          title: 'Work - Solar Static Studio',
+          description:
+            'Selected Solar Static Studio work and case studies are coming soon.',
+        },
+        heading: 'Work',
+        body: 'Selected work and case studies are coming soon.',
       },
       audience: {
         heading: '我们服务谁',
@@ -369,6 +431,11 @@ export const site = {
         body: '我们将帮助你明确它应当成为什么、应当呈现怎样的视觉，以及应当如何真正存在于数字世界中。',
       },
       contact: {
+        meta: {
+          title: 'Contact - Solar Static Studio',
+          description:
+            'Contact Solar Static Studio for selected ideas, collaborations, and digital product work.',
+        },
         heading: '联系',
         body: '如果你正在推进一个经过认真选择的创意、合作或数字产品项目，可以直接写信给我们。',
         label: '邮箱',

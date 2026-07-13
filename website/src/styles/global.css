@@ -71,28 +71,25 @@ button:focus-visible {
   width: var(--site-mark-width);
 }
 
-.language-switch {
-  display: inline-flex;
-  min-width: var(--language-min-width);
-  min-height: var(--language-min-height);
+.primary-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-header-gap) var(--space-block);
   align-items: center;
-  justify-content: center;
-  border: var(--border-thin) solid var(--color-rule);
-  border-radius: var(--radius-pill);
+  justify-content: flex-end;
+}
+
+.primary-nav__link {
   color: var(--color-text);
   font-family: var(--font-body);
   font-size: var(--type-language);
   font-weight: var(--font-weight-semibold);
+  line-height: var(--line-compact);
   text-decoration: none;
-  transition:
-    border-color var(--duration-fast) ease,
-    color var(--duration-fast) ease,
-    background-color var(--duration-fast) ease;
+  transition: color var(--duration-fast) ease;
 }
 
-.language-switch:hover {
-  border-color: var(--color-link-hover);
-  background: var(--color-surface);
+.primary-nav__link:hover {
   color: var(--color-link-hover);
 }
 
@@ -212,6 +209,24 @@ button:focus-visible {
   text-transform: uppercase;
 }
 
+.simple-page {
+  display: grid;
+  width: var(--content-max);
+  min-height: max(30rem, var(--home-hero-min-height));
+  align-content: end;
+  gap: var(--space-heading-follow);
+  padding-block: var(--space-section);
+  border-bottom: var(--border-thin) solid var(--color-rule);
+}
+
+.simple-page__heading {
+  font-size: var(--type-heading);
+}
+
+.simple-page__body {
+  max-width: var(--hero-subtitle-max);
+}
+
 .hero {
   width: var(--content-max);
   padding-block: var(--space-hero-start) var(--space-hero-end);
@@ -267,11 +282,6 @@ html:lang(zh-CN) h3 {
   font-family: var(--font-zh-sans);
   font-variation-settings: 'wght' var(--font-weight-semibold);
   font-weight: var(--font-weight-semibold);
-}
-
-html:lang(zh-CN) .language-switch {
-  font-family: var(--font-zh-sans);
-  font-weight: var(--font-weight-medium);
 }
 
 .brand-name {
@@ -629,6 +639,10 @@ html:lang(zh-CN) .reason-list strong {
 
   .site-header {
     align-items: flex-start;
+  }
+
+  .primary-nav {
+    gap: var(--space-list-gap) var(--space-header-gap);
   }
 
   .hero {

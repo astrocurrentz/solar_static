@@ -35,15 +35,15 @@ const { hero, locale } = Astro.props;
         </span>
       </p>
       <div class="home-hero__actions" aria-label="Project actions">
-        <button
+        <a
           class="home-hero__button home-hero__button--primary"
-          type="button"
+          href={hero.primaryCtaHref}
         >
           {hero.primaryCtaLabel}
-        </button>
-        <button class="home-hero__button" type="button">
+        </a>
+        <a class="home-hero__button" href={hero.secondaryCtaHref}>
           {hero.secondaryCtaLabel}
-        </button>
+        </a>
       </div>
     </div>
   </div>

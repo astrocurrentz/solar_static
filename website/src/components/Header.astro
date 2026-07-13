@@ -8,10 +8,6 @@ interface Props {
 
 const { locale } = Astro.props;
 const content = getLocaleContent(locale);
-const showLanguageSwitch = site.publicLocales.length > 1;
-const alternate = showLanguageSwitch
-  ? getLocaleContent(content.alternateLocale)
-  : undefined;
 ---
 
 <header class="site-header">
@@ -23,18 +19,13 @@ const alternate = showLanguageSwitch
       size="md"
     />
   </a>
-  {
-    showLanguageSwitch && alternate && (
-      <nav aria-label={content.navigationLabel}>
-        <a
-          class="language-switch"
-          href={alternate.path}
-          hreflang={alternate.htmlLang}
-          aria-label={content.switchAriaLabel}
-        >
-          {content.switchLabel}
+  <nav class="primary-nav" aria-label={content.navigationLabel}>
+    {
+      content.primaryNavigation.map((item) => (
+        <a class="primary-nav__link" href={item.href}>
+          {item.label}
         </a>
-      </nav>
-    )
-  }
+      ))
+    }
+  </nav>
 </header>

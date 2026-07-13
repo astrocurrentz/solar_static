@@ -1,0 +1,18 @@
+---
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+import SimplePage from '../components/SimplePage.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getLocaleContent } from '../data/site';
+
+const locale = 'en';
+const content = getLocaleContent(locale);
+---
+
+<BaseLayout locale={locale} meta={content.work.meta} canonicalPath="/work/">
+  <Header locale={locale} />
+  <main class="page-shell">
+    <SimplePage content={content.work} locale={locale} />
+  </main>
+  <Footer />
+</BaseLayout>
