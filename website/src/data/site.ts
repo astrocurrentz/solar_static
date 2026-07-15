@@ -179,7 +179,7 @@ export const site = {
           primaryCtaLabel: 'View Our Work',
           primaryCtaHref: '/work/',
           secondaryCtaLabel: 'Start a Project',
-          secondaryCtaHref: '/contact/',
+          secondaryCtaHref: '/start-a-project/',
           footerMetadata: [
             'INDEPENDENT CREATIVE PRODUCT STUDIO',
             'VANCOUVER, CANADA',

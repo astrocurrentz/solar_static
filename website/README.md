@@ -33,3 +33,20 @@ Use these Vercel settings:
 ## Content
 
 Editable site copy, contact information, metadata, and localized paths live in `src/data/site.ts`.
+
+The project inquiry field labels, options, validation copy, and email section
+labels live in `src/data/project-inquiry-copy.ts`.
+
+## Project Inquiry Service
+
+`/start-a-project/` submits to the Vercel Function at
+`/api/project-inquiry`. Copy `.env.example` into the deployment environment and
+set all five variables. The Supabase schema and 12-month retention job are in
+`supabase/migrations/`.
+
+Create and verify schema changes with the Supabase CLI from this directory:
+
+```bash
+npx supabase migration list --local
+npx supabase db advisors
+```

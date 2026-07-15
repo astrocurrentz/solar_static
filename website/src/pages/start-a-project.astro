@@ -1,0 +1,22 @@
+---
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+import ProjectInquiryForm from '../components/project-inquiry/ProjectInquiryForm';
+import { projectInquiryCopy } from '../data/project-inquiry-copy';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import '../styles/project-inquiry.css';
+
+const locale = 'en';
+---
+
+<BaseLayout
+  locale={locale}
+  meta={projectInquiryCopy.meta}
+  canonicalPath="/start-a-project/"
+>
+  <Header locale={locale} />
+  <main class="page-shell inquiry-page-shell">
+    <ProjectInquiryForm client:load />
+  </main>
+  <Footer />
+</BaseLayout>
