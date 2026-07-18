@@ -33,6 +33,7 @@ const ProximitySegment = ({ text, locale }: ProximitySegmentProps) => {
       fromFontVariationSettings={fontVariation.from}
       radius={motionPresets.normalCursor.radius}
       ref={containerRef}
+      reserveLayout
       toFontVariationSettings={fontVariation.to}
     >
       {text}

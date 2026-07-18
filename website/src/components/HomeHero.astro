@@ -23,16 +23,11 @@ const { hero, locale } = Astro.props;
     </h1>
     <div class="home-hero__support">
       <p class="home-hero__copy">
-        <span class="home-hero__copy-measure" aria-hidden="true">
-          {hero.supportingCopy}
-        </span>
-        <span class="home-hero__copy-visible">
-          <ProximityNormalString
-            client:media={motionMediaQuery}
-            locale={locale}
-            text={hero.supportingCopy}
-          />
-        </span>
+        <ProximityNormalString
+          client:media={motionMediaQuery}
+          locale={locale}
+          text={hero.supportingCopy}
+        />
       </p>
       <div class="home-hero__actions" aria-label="Project actions">
         <a

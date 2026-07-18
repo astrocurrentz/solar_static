@@ -66,6 +66,12 @@ describe('project inquiry handler', () => {
 
   it('persists, notifies, and marks a successful inquiry as sent', async () => {
     const now = Date.now();
+    const payload = createValidPayload(now);
+    payload.logistics.deadlineFixed = true;
+    payload.logistics.deadlineConstraint =
+      'Business milestone or KPI; Something else: Annual review date.';
+    payload.value.successCriteria =
+      'Brand — stronger recognition, trust, or consistency; Details: Increase qualified inquiries by 20%.';
     const fetchImpl = vi
       .fn<typeof fetch>()
       .mockResolvedValueOnce(new Response('[]', { status: 200 }))
@@ -76,7 +82,7 @@ describe('project inquiry handler', () => {
       .mockResolvedValueOnce(new Response(null, { status: 204 }));
 
     const result = await submitProjectInquiry({
-      input: createValidPayload(now),
+      input: payload,
       env,
       fetchImpl,
       now,
@@ -90,6 +96,12 @@ describe('project inquiry handler', () => {
     const resendRequest = fetchImpl.mock.calls[2];
     expect(resendRequest?.[0]).toBe('https://api.resend.com/emails');
     expect(String(resendRequest?.[1]?.body)).toContain('SSS-NEW12345');
+    expect(String(resendRequest?.[1]?.body)).toContain(
+      payload.logistics.deadlineConstraint,
+    );
+    expect(String(resendRequest?.[1]?.body)).toContain(
+      payload.value.successCriteria,
+    );
     expect(String(fetchImpl.mock.calls[3]?.[1]?.body)).toContain('sent');
   });
 

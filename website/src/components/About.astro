@@ -1,8 +1,6 @@
 ---
 import HeroProximityTitle from './about-motion/hero-proximity-title';
 import { motionMediaQuery } from './about-motion/presets';
-import ProximityNormalString from './about-motion/proximity-normal-string';
-import ScrambleStatement from './about-motion/scramble-statement';
 import BrandText from './BrandText.astro';
 import type { LocaleContent } from '../data/site';
 
@@ -31,60 +29,15 @@ const locale = content.htmlLang === 'zh-CN' ? 'zh' : 'en';
           />
         </h1>
         <p class="hero-subtitle">{content.document.subtitle}</p>
-        <p class="core-line">
-          <ScrambleStatement
-            client:media={motionMediaQuery}
-            locale={locale}
-            text={content.document.coreLine}
-          />
-        </p>
       </section>
 
       <section class="section" aria-labelledby="about-heading">
         <h2 id="about-heading">{content.about.heading}</h2>
         <div class="copy-flow">
           {content.about.paragraphs.map((paragraph) => (
-            <p>
-              <ProximityNormalString
-                client:media={motionMediaQuery}
-                locale={locale}
-                text={paragraph}
-              />
-            </p>
+            <p>{paragraph}</p>
           ))}
         </div>
-        <aside class="callout">
-          <strong>{content.about.highlight.title}</strong>
-          <span>
-            <ProximityNormalString
-              client:media={motionMediaQuery}
-              locale={locale}
-              text={content.about.highlight.body}
-            />
-          </span>
-        </aside>
-      </section>
-
-      <section class="section" aria-labelledby="audience-heading">
-        <h2 id="audience-heading">{content.audience.heading}</h2>
-        <p>
-          <ProximityNormalString
-            client:media={motionMediaQuery}
-            locale={locale}
-            text={content.audience.intro}
-          />
-        </p>
-        <ul class="plain-list">
-          {content.audience.items.map((item) => (
-            <li>
-              <ProximityNormalString
-                client:media={motionMediaQuery}
-                locale={locale}
-                text={item}
-              />
-            </li>
-          ))}
-        </ul>
       </section>
     </>
   )
@@ -104,35 +57,26 @@ const locale = content.htmlLang === 'zh-CN' ? 'zh' : 'en';
                 {item.title}
                 {reasonSeparator}
               </strong>
-              <ProximityNormalString
-                client:media={motionMediaQuery}
-                locale={locale}
-                text={`${reasonJoiner}${item.body}`}
-              />
+              {reasonJoiner}
+              {item.body}
             </li>
           ))}
         </ul>
       </section>
 
-      <section class="section" aria-labelledby="not-heading">
-        <h2 id="not-heading">{content.not.heading}</h2>
-        <p>
-          <ProximityNormalString
-            client:media={motionMediaQuery}
-            locale={locale}
-            text={content.not.body}
-          />
-        </p>
-        <aside class="callout closing-callout">
-          <strong>{content.closing.title}</strong>
-          <span>
-            <ProximityNormalString
-              client:media={motionMediaQuery}
-              locale={locale}
-              text={content.closing.body}
-            />
-          </span>
-        </aside>
+      <section class="section" aria-labelledby="project-cta-heading">
+        <h2 id="project-cta-heading">{content.closing.title}</h2>
+        <div class="copy-flow">
+          <p>{content.closing.body}</p>
+          <div class="home-hero__actions">
+            <a
+              class="home-hero__button home-hero__button--primary"
+              href={content.closing.href}
+            >
+              {content.closing.label}
+            </a>
+          </div>
+        </div>
       </section>
     </>
   )

@@ -14,6 +14,7 @@ interface TextProps extends React.HTMLAttributes<HTMLElement> {
   containerRef: React.RefObject<HTMLElement | null>;
   radius?: number;
   falloff?: 'linear' | 'exponential' | 'gaussian';
+  reserveLayout?: boolean;
 }
 
 const parseFontVariationSettings = (settings: string) =>
@@ -60,6 +61,7 @@ const VariableFontCursorProximity = forwardRef<HTMLElement, TextProps>(
       containerRef,
       radius = 50,
       falloff = 'linear',
+      reserveLayout = false,
       className,
       ...props
     },
@@ -137,11 +139,10 @@ const VariableFontCursorProximity = forwardRef<HTMLElement, TextProps>(
               const currentLetterIndex = letterIndex;
               letterIndex += 1;
 
-              return (
+              const animatedLetter = (
                 <motion.span
                   aria-hidden="true"
                   className="motion-letter"
-                  key={currentLetterIndex}
                   ref={(element: HTMLSpanElement | null) => {
                     letterRefs.current[currentLetterIndex] = element;
                   }}
@@ -151,6 +152,33 @@ const VariableFontCursorProximity = forwardRef<HTMLElement, TextProps>(
                 >
                   {letter}
                 </motion.span>
+              );
+
+              if (!reserveLayout) {
+                return (
+                  <React.Fragment key={currentLetterIndex}>
+                    {animatedLetter}
+                  </React.Fragment>
+                );
+              }
+
+              return (
+                <span
+                  aria-hidden="true"
+                  className="motion-letter-slot"
+                  key={currentLetterIndex}
+                >
+                  <span
+                    aria-hidden="true"
+                    className="motion-letter-reserve"
+                    style={{
+                      fontVariationSettings: toFontVariationSettings,
+                    }}
+                  >
+                    {letter}
+                  </span>
+                  {animatedLetter}
+                </span>
               );
             })}
             {wordIndex < words.length - 1 && (

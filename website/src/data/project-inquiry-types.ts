@@ -24,6 +24,22 @@ export type ExistingAsset =
   | 'nothing';
 export type ContentResponsibility = 'client' | 'studio' | 'shared' | 'not_sure';
 export type BudgetBand = 'under_5k' | '5k_8k' | '8k_15k' | '15k_plus';
+export type DeadlineConstraintReason =
+  | 'launch_event'
+  | 'campaign_seasonal'
+  | 'business_kpi'
+  | 'funding_contract'
+  | 'legal_compliance'
+  | 'external_dependency'
+  | 'other';
+export type SuccessOutcome =
+  | 'brand'
+  | 'website'
+  | 'product'
+  | 'editorial'
+  | 'launch'
+  | 'operations'
+  | 'other';
 export type OngoingNeed =
   | 'none'
   | 'website_maintenance'
@@ -72,6 +88,24 @@ export const budgetBands = [
   '8k_15k',
   '15k_plus',
 ] as const satisfies readonly BudgetBand[];
+export const deadlineConstraintReasons = [
+  'launch_event',
+  'campaign_seasonal',
+  'business_kpi',
+  'funding_contract',
+  'legal_compliance',
+  'external_dependency',
+  'other',
+] as const satisfies readonly DeadlineConstraintReason[];
+export const successOutcomes = [
+  'brand',
+  'website',
+  'product',
+  'editorial',
+  'launch',
+  'operations',
+  'other',
+] as const satisfies readonly SuccessOutcome[];
 export const ongoingNeeds = [
   'none',
   'website_maintenance',
@@ -112,9 +146,11 @@ export type ProjectInquiryFormState = {
   preferredStart: string;
   targetLaunch: string;
   deadlineFixed: boolean | null;
+  deadlineConstraintReasons: DeadlineConstraintReason[];
   deadlineConstraint: string;
   budgetBand: BudgetBand | '';
   approvalProcess: string;
+  successOutcomes: SuccessOutcome[];
   successCriteria: string;
   ongoingNeeds: OngoingNeed[];
   additionalNotes: string;
@@ -204,9 +240,11 @@ export const createEmptyInquiryState = (): ProjectInquiryFormState => ({
   preferredStart: '',
   targetLaunch: '',
   deadlineFixed: null,
+  deadlineConstraintReasons: [],
   deadlineConstraint: '',
   budgetBand: '',
   approvalProcess: '',
+  successOutcomes: [],
   successCriteria: '',
   ongoingNeeds: [],
   additionalNotes: '',

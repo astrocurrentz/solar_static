@@ -1,11 +1,13 @@
 import type {
   BudgetBand,
   ContentResponsibility,
+  DeadlineConstraintReason,
   DecisionRole,
   ExistingAsset,
   OngoingNeed,
   ServiceGroup,
   ServiceType,
+  SuccessOutcome,
 } from './project-inquiry-types';
 
 type Option<T extends string> = { value: T; label: string };
@@ -98,6 +100,62 @@ export const budgetOptions: Option<BudgetBand>[] = [
   { value: '15k_plus', label: 'CAD 15k+' },
 ];
 
+export const deadlineConstraintOptions: Option<DeadlineConstraintReason>[] = [
+  { value: 'launch_event', label: 'Public launch, event, or go-live date' },
+  {
+    value: 'campaign_seasonal',
+    label: 'Marketing campaign or seasonal window',
+  },
+  { value: 'business_kpi', label: 'Business milestone or KPI' },
+  {
+    value: 'funding_contract',
+    label: 'Funding, grant, or contract commitment',
+  },
+  {
+    value: 'legal_compliance',
+    label: 'Legal, regulatory, or compliance requirement',
+  },
+  {
+    value: 'external_dependency',
+    label: 'Dependency on another team, vendor, or platform',
+  },
+  { value: 'other', label: 'Something else — add my own' },
+];
+
+export const successOutcomeOptions: Option<SuccessOutcome>[] = [
+  {
+    value: 'brand',
+    label: 'Brand — stronger recognition, trust, or consistency',
+  },
+  {
+    value: 'website',
+    label:
+      'Website — clearer communication and more of the right inquiries, sign-ups, or sales',
+  },
+  {
+    value: 'product',
+    label: 'Product — easier adoption or completion of the core user task',
+  },
+  {
+    value: 'editorial',
+    label:
+      'Editorial — content readers can navigate, understand, and use more easily',
+  },
+  {
+    value: 'launch',
+    label: 'Launch — a complete, polished result ready for real-world use',
+  },
+  {
+    value: 'operations',
+    label:
+      'Operations — easier management, publishing, maintenance, or future extension',
+  },
+  {
+    value: 'other',
+    label: 'Another outcome or specific KPI — add my own',
+  },
+];
+
 export const ongoingNeedOptions: Option<OngoingNeed>[] = [
   { value: 'none', label: 'No ongoing support expected' },
   { value: 'website_maintenance', label: 'Website or content maintenance' },
@@ -149,6 +207,21 @@ export const projectInquiryCopy = {
   errorSummary: 'Please review the highlighted fields before continuing.',
   submissionError:
     'We could not send your inquiry. Your draft is still saved on this device, so you can try again.',
+  deadlineConstraintLegend: 'What creates that constraint?',
+  deadlineConstraintCustomLabel: 'Add your constraint',
+  deadlineConstraintCustomHelp: 'A short phrase is enough.',
+  successOutcomeLegend: 'How will success be judged?',
+  successOutcomeHelp:
+    'Select every outcome that would make this project a successful investment.',
+  successDetailsLabel: 'Add a target or explain what success looks like',
+  successDetailsHelp:
+    'Include a target, benchmark, or other detail if one is already known.',
+  structuredAnswerErrors: {
+    deadlineReasons: 'Select at least one reason for the fixed deadline.',
+    deadlineCustom: 'Add the custom deadline constraint.',
+    successOutcomes: 'Select at least one success outcome.',
+    successCustom: 'Add the custom outcome or KPI.',
+  },
   sections: {
     contact: 'About You',
     project: 'The Idea',
@@ -165,3 +238,11 @@ export const budgetLabelByValue = Object.fromEntries(
 export const serviceLabelByValue = Object.fromEntries(
   serviceOptions.map((option) => [option.value, option.label]),
 ) as Record<ServiceType, string>;
+
+export const deadlineConstraintLabelByValue = Object.fromEntries(
+  deadlineConstraintOptions.map((option) => [option.value, option.label]),
+) as Record<DeadlineConstraintReason, string>;
+
+export const successOutcomeLabelByValue = Object.fromEntries(
+  successOutcomeOptions.map((option) => [option.value, option.label]),
+) as Record<SuccessOutcome, string>;

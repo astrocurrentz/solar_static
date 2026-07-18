@@ -1,7 +1,6 @@
 ---
 import About from './About.astro';
 import Capabilities from './Capabilities.astro';
-import Contact from './Contact.astro';
 import Footer from './Footer.astro';
 import Header from './Header.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
@@ -22,7 +21,6 @@ const content = getLocaleContent(locale);
     <About content={content} part="intro" />
     <Capabilities content={content} />
     <About content={content} part="positioning" />
-    <Contact content={content} />
   </main>
   <Footer />
 </BaseLayout>

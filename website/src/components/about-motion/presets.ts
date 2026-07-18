@@ -55,11 +55,6 @@ export const motionPresets = {
       bounce: 0,
     },
   },
-  scramble: {
-    maxTicks: 11,
-    scrambleSpeed: 40,
-    revealDirection: 'start',
-  },
   underline: {
     underlineHeightRatio: 0.1,
     underlinePaddingRatio: 0.015,
@@ -76,14 +71,3 @@ export const getHeadingFontVariation = (locale: Locale) =>
 
 export const getNormalFontVariation = (locale: Locale) =>
   fontVariationPresets.normal[locale];
-
-export const getScrambleRevealStep = (text: string) => {
-  const visibleLength = Array.from(text).filter(
-    (character) => character !== ' ',
-  ).length;
-
-  return Math.max(
-    1,
-    Math.ceil(visibleLength / motionPresets.scramble.maxTicks),
-  );
-};

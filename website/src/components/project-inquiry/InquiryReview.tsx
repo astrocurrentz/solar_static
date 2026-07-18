@@ -1,12 +1,14 @@
 import {
   budgetLabelByValue,
   contentResponsibilityOptions,
+  deadlineConstraintOptions,
   decisionRoleOptions,
   existingAssetOptions,
   ongoingNeedOptions,
   projectInquiryCopy,
   serviceGroupPrompts,
   serviceLabelByValue,
+  successOutcomeOptions,
 } from '../../data/project-inquiry-copy';
 import type {
   InquiryFieldErrors,
@@ -151,8 +153,18 @@ export const InquiryReview = ({
           value={state.deadlineFixed ? 'Yes' : 'No'}
         />
         <ReviewRow
-          label="Deadline constraint"
-          value={state.deadlineConstraint}
+          label="Deadline constraints"
+          value={state.deadlineConstraintReasons.map((reason) =>
+            labelFor(deadlineConstraintOptions, reason),
+          )}
+        />
+        <ReviewRow
+          label="Custom deadline constraint"
+          value={
+            state.deadlineConstraintReasons.includes('other')
+              ? state.deadlineConstraint
+              : ''
+          }
         />
         <ReviewRow
           label="Investment range"
@@ -161,7 +173,13 @@ export const InquiryReview = ({
         <ReviewRow label="Approval process" value={state.approvalProcess} />
       </ReviewSection>
       <ReviewSection title="Success & Support" step={4} onEdit={onEdit}>
-        <ReviewRow label="Success criteria" value={state.successCriteria} />
+        <ReviewRow
+          label="Success outcomes"
+          value={state.successOutcomes.map((outcome) =>
+            labelFor(successOutcomeOptions, outcome),
+          )}
+        />
+        <ReviewRow label="Success details" value={state.successCriteria} />
         <ReviewRow
           label="Ongoing needs"
           value={state.ongoingNeeds.map((need) =>

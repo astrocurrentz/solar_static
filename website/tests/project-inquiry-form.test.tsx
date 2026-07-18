@@ -2,10 +2,15 @@
 
 import { act, cleanup, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { createElement } from 'react';
+import { createElement, useState } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import ProjectInquiryForm from '../src/components/project-inquiry/ProjectInquiryForm';
+import { InquiryStep } from '../src/components/project-inquiry/InquirySteps';
+import {
+  createEmptyInquiryState,
+  type ProjectInquiryFormState,
+} from '../src/data/project-inquiry-types';
 
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
@@ -17,6 +22,23 @@ Object.defineProperty(window, 'matchMedia', {
 });
 
 Element.prototype.scrollIntoView = vi.fn();
+
+const InquiryStepHarness = ({ step }: { step: number }) => {
+  const [state, setState] = useState(createEmptyInquiryState);
+  const updateField = <K extends keyof ProjectInquiryFormState>(
+    field: K,
+    value: ProjectInquiryFormState[K],
+  ) => setState((current) => ({ ...current, [field]: value }));
+
+  return (
+    <InquiryStep
+      step={step}
+      state={state}
+      errors={{}}
+      updateField={updateField}
+    />
+  );
+};
 
 describe('ProjectInquiryForm', () => {
   beforeEach(() => {
@@ -38,6 +60,61 @@ describe('ProjectInquiryForm', () => {
       'Please review the highlighted fields',
     );
     await waitFor(() => expect(screen.getByLabelText('Name')).toHaveFocus());
+  });
+
+  it('shows fixed-deadline options and clears dependent custom values', async () => {
+    const user = userEvent.setup();
+    render(<InquiryStepHarness step={3} />);
+
+    await user.click(screen.getByLabelText('Yes, the date cannot move'));
+    const launchReason = screen.getByLabelText(
+      'Public launch, event, or go-live date',
+    );
+    const customReason = screen.getByLabelText('Something else — add my own');
+
+    await user.click(launchReason);
+    await user.click(customReason);
+    expect(launchReason).toBeChecked();
+    expect(customReason).toBeChecked();
+
+    const customInput = screen.getByLabelText('Add your constraint');
+    expect(customInput).toHaveAttribute('maxlength', '500');
+    await user.type(customInput, 'A partner launch date.');
+    await user.click(customReason);
+    expect(screen.queryByLabelText('Add your constraint')).toBeNull();
+
+    await user.click(customReason);
+    expect(screen.getByLabelText('Add your constraint')).toHaveValue('');
+    await user.click(screen.getByLabelText('No, the timing is flexible'));
+    expect(
+      screen.queryByLabelText('Public launch, event, or go-live date'),
+    ).toBeNull();
+  });
+
+  it('supports multiple success outcomes and preserves optional details', async () => {
+    const user = userEvent.setup();
+    render(<InquiryStepHarness step={4} />);
+
+    const brandOutcome = screen.getByLabelText(
+      'Brand — stronger recognition, trust, or consistency',
+    );
+    const customOutcome = screen.getByLabelText(
+      'Another outcome or specific KPI — add my own',
+    );
+    const details = screen.getByLabelText(
+      'Add a target or explain what success looks like',
+    );
+
+    await user.click(brandOutcome);
+    await user.click(customOutcome);
+    expect(brandOutcome).toBeChecked();
+    expect(customOutcome).toBeChecked();
+    expect(details).toHaveAttribute('maxlength', '1000');
+
+    await user.type(details, 'Increase qualified inquiries by 20%.');
+    await user.click(customOutcome);
+    expect(customOutcome).not.toBeChecked();
+    expect(details).toHaveValue('Increase qualified inquiries by 20%.');
   });
 
   it('completes the five chapters, submits, and clears the draft', async () => {
@@ -97,8 +174,13 @@ describe('ProjectInquiryForm', () => {
     );
     await user.click(screen.getByRole('button', { name: 'Continue' }));
 
+    await user.click(
+      await screen.findByLabelText(
+        'Brand — stronger recognition, trust, or consistency',
+      ),
+    );
     await user.type(
-      await screen.findByLabelText('How will success be judged?'),
+      screen.getByLabelText('Add a target or explain what success looks like'),
       'The right clients understand the offer.',
     );
     await user.click(screen.getByLabelText('No ongoing support expected'));
@@ -117,6 +199,12 @@ describe('ProjectInquiryForm', () => {
     expect(screen.getByText('SSS-TEST1234')).toBeInTheDocument();
     expect(localStorage.getItem('sss.projectInquiry.v1')).toBeNull();
     expect(fetchMock).toHaveBeenCalledTimes(1);
+    const requestBody = JSON.parse(
+      String(fetchMock.mock.calls[0]?.[1]?.body),
+    ) as { value: { successCriteria: string } };
+    expect(requestBody.value.successCriteria).toBe(
+      'Brand — stronger recognition, trust, or consistency; Details: The right clients understand the offer.',
+    );
   });
 
   it('restores a saved draft from the current schema', async () => {

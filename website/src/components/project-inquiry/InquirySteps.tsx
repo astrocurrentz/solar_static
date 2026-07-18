@@ -1,22 +1,28 @@
 import {
   budgetOptions,
   contentResponsibilityOptions,
+  deadlineConstraintOptions,
   decisionRoleOptions,
   existingAssetOptions,
   ongoingNeedOptions,
+  projectInquiryCopy,
   serviceGroupPrompts,
   serviceOptions,
+  successOutcomeOptions,
 } from '../../data/project-inquiry-copy';
 import type {
+  DeadlineConstraintReason,
   ExistingAsset,
   InquiryFieldErrors,
   OngoingNeed,
   ProjectInquiryFormState,
   ServiceType,
+  SuccessOutcome,
 } from '../../data/project-inquiry-types';
 import {
   getActiveServiceGroups,
   toggleExclusiveOption,
+  toggleOption,
 } from '../../lib/project-inquiry';
 import { ChoiceGroup, TextAreaField, TextField } from './InquiryControls';
 
@@ -306,77 +312,121 @@ const ScopeStep = ({ state, errors, updateField }: Omit<Props, 'step'>) => {
   );
 };
 
-const TimingStep = ({ state, errors, updateField }: Omit<Props, 'step'>) => (
-  <div className="inquiry-step-fields">
-    <div className="inquiry-field-grid inquiry-field-grid--two">
-      <TextField
-        field="preferredStart"
-        label="Preferred start"
-        value={state.preferredStart}
-        onChange={(value) => updateField('preferredStart', value)}
-        type="date"
-        optional
+const TimingStep = ({ state, errors, updateField }: Omit<Props, 'step'>) => {
+  const toggleDeadlineConstraint = (value: string) => {
+    const constraint = value as DeadlineConstraintReason;
+    const removingCustom =
+      constraint === 'other' &&
+      state.deadlineConstraintReasons.includes('other');
+
+    updateField(
+      'deadlineConstraintReasons',
+      toggleOption(state.deadlineConstraintReasons, constraint),
+    );
+    if (removingCustom) updateField('deadlineConstraint', '');
+  };
+
+  return (
+    <div className="inquiry-step-fields">
+      <div className="inquiry-field-grid inquiry-field-grid--two">
+        <TextField
+          field="preferredStart"
+          label="Preferred start"
+          value={state.preferredStart}
+          onChange={(value) => updateField('preferredStart', value)}
+          type="date"
+          optional
+        />
+        <TextField
+          field="targetLaunch"
+          label="Target completion or launch"
+          value={state.targetLaunch}
+          onChange={(value) => updateField('targetLaunch', value)}
+          type="date"
+          optional
+        />
+      </div>
+      <ChoiceGroup
+        field="deadlineFixed"
+        legend="Is the deadline fixed?"
+        options={[
+          { value: 'true', label: 'Yes, the date cannot move' },
+          { value: 'false', label: 'No, the timing is flexible' },
+        ]}
+        value={state.deadlineFixed === null ? '' : String(state.deadlineFixed)}
+        onChange={(value) => {
+          const deadlineFixed = value === 'true';
+          updateField('deadlineFixed', deadlineFixed);
+          if (!deadlineFixed) {
+            updateField('deadlineConstraintReasons', []);
+            updateField('deadlineConstraint', '');
+          }
+        }}
+        errors={errors}
       />
-      <TextField
-        field="targetLaunch"
-        label="Target completion or launch"
-        value={state.targetLaunch}
-        onChange={(value) => updateField('targetLaunch', value)}
-        type="date"
-        optional
+      {state.deadlineFixed ? (
+        <>
+          <ChoiceGroup
+            field="deadlineConstraintReasons"
+            legend={projectInquiryCopy.deadlineConstraintLegend}
+            options={deadlineConstraintOptions}
+            value={state.deadlineConstraintReasons}
+            multiple
+            onChange={toggleDeadlineConstraint}
+            errors={errors}
+          />
+          {state.deadlineConstraintReasons.includes('other') ? (
+            <TextField
+              field="deadlineConstraint"
+              label={projectInquiryCopy.deadlineConstraintCustomLabel}
+              help={projectInquiryCopy.deadlineConstraintCustomHelp}
+              value={state.deadlineConstraint}
+              onChange={(value) => updateField('deadlineConstraint', value)}
+              maxLength={500}
+              error={errors.deadlineConstraint}
+            />
+          ) : null}
+        </>
+      ) : null}
+      <ChoiceGroup
+        field="budgetBand"
+        legend="What investment range is realistically available?"
+        help="This helps us recommend a useful scope. It does not automatically accept or reject a project."
+        options={budgetOptions}
+        value={state.budgetBand}
+        onChange={(value) =>
+          updateField(
+            'budgetBand',
+            value as ProjectInquiryFormState['budgetBand'],
+          )
+        }
+        errors={errors}
+      />
+      <TextAreaField
+        field="approvalProcess"
+        label="Who will review the work, and who has final approval?"
+        value={state.approvalProcess}
+        onChange={(value) => updateField('approvalProcess', value)}
+        rows={3}
+        error={errors.approvalProcess}
       />
     </div>
-    <ChoiceGroup
-      field="deadlineFixed"
-      legend="Is the deadline fixed?"
-      options={[
-        { value: 'true', label: 'Yes, the date cannot move' },
-        { value: 'false', label: 'No, the timing is flexible' },
-      ]}
-      value={state.deadlineFixed === null ? '' : String(state.deadlineFixed)}
-      onChange={(value) => {
-        const deadlineFixed = value === 'true';
-        updateField('deadlineFixed', deadlineFixed);
-        if (!deadlineFixed) updateField('deadlineConstraint', '');
-      }}
-      errors={errors}
-    />
-    {state.deadlineFixed ? (
-      <TextAreaField
-        field="deadlineConstraint"
-        label="What creates that constraint?"
-        value={state.deadlineConstraint}
-        onChange={(value) => updateField('deadlineConstraint', value)}
-        rows={3}
-        error={errors.deadlineConstraint}
-      />
-    ) : null}
-    <ChoiceGroup
-      field="budgetBand"
-      legend="What investment range is realistically available?"
-      help="This helps us recommend a useful scope. It does not automatically accept or reject a project."
-      options={budgetOptions}
-      value={state.budgetBand}
-      onChange={(value) =>
-        updateField(
-          'budgetBand',
-          value as ProjectInquiryFormState['budgetBand'],
-        )
-      }
-      errors={errors}
-    />
-    <TextAreaField
-      field="approvalProcess"
-      label="Who will review the work, and who has final approval?"
-      value={state.approvalProcess}
-      onChange={(value) => updateField('approvalProcess', value)}
-      rows={3}
-      error={errors.approvalProcess}
-    />
-  </div>
-);
+  );
+};
 
 const SuccessStep = ({ state, errors, updateField }: Omit<Props, 'step'>) => {
+  const toggleSuccessOutcome = (value: string) => {
+    const outcome = value as SuccessOutcome;
+    const removingCustom =
+      outcome === 'other' && state.successOutcomes.includes('other');
+
+    updateField(
+      'successOutcomes',
+      toggleOption(state.successOutcomes, outcome),
+    );
+    if (removingCustom) updateField('successCriteria', state.successCriteria);
+  };
+
   const toggleOngoingNeed = (value: string) => {
     updateField(
       'ongoingNeeds',
@@ -386,13 +436,25 @@ const SuccessStep = ({ state, errors, updateField }: Omit<Props, 'step'>) => {
 
   return (
     <div className="inquiry-step-fields">
+      <ChoiceGroup
+        field="successOutcomes"
+        legend={projectInquiryCopy.successOutcomeLegend}
+        help={projectInquiryCopy.successOutcomeHelp}
+        options={successOutcomeOptions}
+        value={state.successOutcomes}
+        multiple
+        onChange={toggleSuccessOutcome}
+        errors={errors}
+      />
       <TextAreaField
         field="successCriteria"
-        label="How will success be judged?"
-        help="What would make this project a successful investment for you?"
+        label={projectInquiryCopy.successDetailsLabel}
+        help={projectInquiryCopy.successDetailsHelp}
         value={state.successCriteria}
         onChange={(value) => updateField('successCriteria', value)}
-        rows={5}
+        rows={3}
+        maxLength={1000}
+        optional={!state.successOutcomes.includes('other')}
         error={errors.successCriteria}
       />
       <ChoiceGroup

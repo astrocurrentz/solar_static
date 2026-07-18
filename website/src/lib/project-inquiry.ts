@@ -1,7 +1,15 @@
 import {
+  deadlineConstraintOptions,
+  projectInquiryCopy,
+  successOutcomeOptions,
+} from '../data/project-inquiry-copy';
+import {
+  deadlineConstraintReasons,
   PROJECT_INQUIRY_DRAFT_KEY,
   PROJECT_INQUIRY_SCHEMA_VERSION,
   createEmptyInquiryState,
+  successOutcomes,
+  type DeadlineConstraintReason,
   type ExistingAsset,
   type InquiryFieldErrors,
   type OngoingNeed,
@@ -9,6 +17,7 @@ import {
   type ProjectInquiryPayloadV1,
   type ServiceGroup,
   type ServiceType,
+  type SuccessOutcome,
 } from '../data/project-inquiry-types';
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -51,6 +60,37 @@ export const toggleExclusiveOption = <T extends string>(
     : [...withoutExclusive, value];
 };
 
+export const toggleOption = <T extends string>(current: T[], value: T) =>
+  current.includes(value)
+    ? current.filter((item) => item !== value)
+    : [...current, value];
+
+export const formatSelectedOptionSummary = <T extends string>({
+  options,
+  selected,
+  customValue,
+  details,
+  detailLabel,
+}: {
+  options: ReadonlyArray<{ value: T; label: string }>;
+  selected: T[];
+  customValue: T;
+  details: string;
+  detailLabel: string;
+}) => {
+  const selectedValues = new Set(selected);
+  const summary = options
+    .filter(
+      (option) =>
+        option.value !== customValue && selectedValues.has(option.value),
+    )
+    .map((option) => option.label);
+  const trimmedDetails = details.trim();
+
+  if (trimmedDetails) summary.push(`${detailLabel}: ${trimmedDetails}`);
+  return summary.join('; ');
+};
+
 const validateLengths = (
   state: ProjectInquiryFormState,
   errors: InquiryFieldErrors,
@@ -68,9 +108,9 @@ const validateLengths = (
     ['assetNotes', 2000],
     ['visualDirection', 3000],
     ['contentNotes', 2000],
-    ['deadlineConstraint', 1500],
+    ['deadlineConstraint', 500],
     ['approvalProcess', 2000],
-    ['successCriteria', 2500],
+    ['successCriteria', 1000],
     ['additionalNotes', 3000],
   ];
 
@@ -146,8 +186,17 @@ export const validateInquiryStep = (
     if (state.deadlineFixed === null) {
       errors.deadlineFixed = 'Tell us whether the deadline is fixed.';
     }
-    if (state.deadlineFixed && !required(state.deadlineConstraint)) {
-      errors.deadlineConstraint = 'Explain what creates the fixed deadline.';
+    if (state.deadlineFixed && state.deadlineConstraintReasons.length === 0) {
+      errors.deadlineConstraintReasons =
+        projectInquiryCopy.structuredAnswerErrors.deadlineReasons;
+    }
+    if (
+      state.deadlineFixed &&
+      state.deadlineConstraintReasons.includes('other') &&
+      !required(state.deadlineConstraint)
+    ) {
+      errors.deadlineConstraint =
+        projectInquiryCopy.structuredAnswerErrors.deadlineCustom;
     }
     if (!state.budgetBand) errors.budgetBand = 'Select an investment range.';
     if (!required(state.approvalProcess)) {
@@ -156,8 +205,16 @@ export const validateInquiryStep = (
   }
 
   if (step === 4) {
-    if (!required(state.successCriteria)) {
-      errors.successCriteria = 'Tell us how success will be judged.';
+    if (state.successOutcomes.length === 0) {
+      errors.successOutcomes =
+        projectInquiryCopy.structuredAnswerErrors.successOutcomes;
+    }
+    if (
+      state.successOutcomes.includes('other') &&
+      !required(state.successCriteria)
+    ) {
+      errors.successCriteria =
+        projectInquiryCopy.structuredAnswerErrors.successCustom;
     }
     if (state.ongoingNeeds.length === 0) {
       errors.ongoingNeeds = 'Select the ongoing support you expect.';
@@ -240,13 +297,31 @@ export const buildInquiryPayload = (
       preferredStart: optional(state.preferredStart),
       targetLaunch: optional(state.targetLaunch),
       deadlineFixed: Boolean(state.deadlineFixed),
-      deadlineConstraint: optional(state.deadlineConstraint),
+      deadlineConstraint: state.deadlineFixed
+        ? optional(
+            formatSelectedOptionSummary({
+              options: deadlineConstraintOptions,
+              selected: state.deadlineConstraintReasons,
+              customValue: 'other',
+              details: state.deadlineConstraintReasons.includes('other')
+                ? state.deadlineConstraint
+                : '',
+              detailLabel: 'Something else',
+            }),
+          )
+        : undefined,
       budgetBand:
         state.budgetBand as ProjectInquiryPayloadV1['logistics']['budgetBand'],
       approvalProcess: state.approvalProcess.trim(),
     },
     value: {
-      successCriteria: state.successCriteria.trim(),
+      successCriteria: formatSelectedOptionSummary({
+        options: successOutcomeOptions,
+        selected: state.successOutcomes,
+        customValue: 'other',
+        details: state.successCriteria,
+        detailLabel: 'Details',
+      }),
       ongoingNeeds: state.ongoingNeeds,
       additionalNotes: optional(state.additionalNotes),
     },
@@ -274,6 +349,8 @@ export const hasMeaningfulInquiryDraft = (state: ProjectInquiryFormState) =>
   ].some((value) => value.trim().length > 0) ||
   state.services.length > 0 ||
   state.existingAssets.length > 0 ||
+  state.deadlineConstraintReasons.length > 0 ||
+  state.successOutcomes.length > 0 ||
   state.ongoingNeeds.length > 0;
 
 export const restoreInquiryDraft = (
@@ -294,6 +371,29 @@ export const restoreInquiryDraft = (
       return null;
     }
     const empty = createEmptyInquiryState();
+    const restoredDeadlineConstraintReasons: DeadlineConstraintReason[] =
+      Array.isArray(savedState.deadlineConstraintReasons)
+        ? savedState.deadlineConstraintReasons.filter(
+            (value): value is DeadlineConstraintReason =>
+              deadlineConstraintReasons.includes(
+                value as DeadlineConstraintReason,
+              ),
+          )
+        : savedState.deadlineFixed === true &&
+            typeof savedState.deadlineConstraint === 'string' &&
+            required(savedState.deadlineConstraint)
+          ? ['other']
+          : [];
+    const restoredSuccessOutcomes: SuccessOutcome[] = Array.isArray(
+      savedState.successOutcomes,
+    )
+      ? savedState.successOutcomes.filter((value): value is SuccessOutcome =>
+          successOutcomes.includes(value as SuccessOutcome),
+        )
+      : typeof savedState.successCriteria === 'string' &&
+          required(savedState.successCriteria)
+        ? ['other']
+        : [];
     const state: ProjectInquiryFormState = {
       ...empty,
       ...savedState,
@@ -309,6 +409,8 @@ export const restoreInquiryDraft = (
       existingAssets: Array.isArray(savedState.existingAssets)
         ? (savedState.existingAssets as ExistingAsset[])
         : [],
+      deadlineConstraintReasons: restoredDeadlineConstraintReasons,
+      successOutcomes: restoredSuccessOutcomes,
       ongoingNeeds: Array.isArray(savedState.ongoingNeeds)
         ? (savedState.ongoingNeeds as OngoingNeed[])
         : [],

@@ -40,6 +40,7 @@ type TextFieldProps = Omit<FieldShellProps, 'children'> & {
   type?: 'text' | 'email' | 'date' | 'url';
   autoComplete?: string;
   placeholder?: string;
+  maxLength?: number;
 };
 
 export const TextField = ({
@@ -50,6 +51,7 @@ export const TextField = ({
   type = 'text',
   autoComplete,
   placeholder,
+  maxLength,
   help,
   optional,
   error,
@@ -69,6 +71,7 @@ export const TextField = ({
       onChange={(event) => onChange(event.target.value)}
       autoComplete={autoComplete}
       placeholder={placeholder}
+      maxLength={maxLength}
       aria-invalid={Boolean(error)}
       aria-describedby={error ? `inquiry-${field}-error` : undefined}
     />
@@ -80,6 +83,7 @@ type TextAreaFieldProps = Omit<FieldShellProps, 'children'> & {
   onChange: (value: string) => void;
   placeholder?: string;
   rows?: number;
+  maxLength?: number;
 };
 
 export const TextAreaField = ({
@@ -89,6 +93,7 @@ export const TextAreaField = ({
   onChange,
   placeholder,
   rows = 4,
+  maxLength,
   help,
   optional,
   error,
@@ -107,6 +112,7 @@ export const TextAreaField = ({
       onChange={(event) => onChange(event.target.value)}
       placeholder={placeholder}
       rows={rows}
+      maxLength={maxLength}
       aria-invalid={Boolean(error)}
       aria-describedby={error ? `inquiry-${field}-error` : undefined}
     />

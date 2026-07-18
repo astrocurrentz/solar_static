@@ -61,22 +61,12 @@ export type LocaleContent = {
   document: {
     title: string;
     subtitle: string;
-    coreLine: string;
   };
   about: {
     heading: string;
     paragraphs: string[];
-    highlight: {
-      title: string;
-      body: string;
-    };
   };
   work: SimplePageContent;
-  audience: {
-    heading: string;
-    intro: string;
-    items: string[];
-  };
   capabilities: {
     heading: string;
     items: Capability[];
@@ -85,13 +75,11 @@ export type LocaleContent = {
     heading: string;
     items: Reason[];
   };
-  not: {
-    heading: string;
-    body: string;
-  };
   closing: {
     title: string;
     body: string;
+    label: string;
+    href: string;
   };
   contact: {
     meta: PageMeta;
@@ -188,19 +176,15 @@ export const site = {
       },
       document: {
         title: 'Solar Static Studio',
-        subtitle: 'Who we serve, what we create, and why the studio exists',
-        coreLine: 'From Idea to Digital Reality.',
+        subtitle:
+          'An independent creative product studio turning selected ideas into distinctive visual identities and fully realized digital products.',
       },
       about: {
         heading: 'About the Studio',
         paragraphs: [
-          'Solar Static Studio is an independent creative product studio that transforms selected ideas into distinctive visual identities and fully realized digital products.',
-          'We work across strategy, identity, design, and technical execution. The goal is not to sell disconnected deliverables. It is to give a strong idea one coherent direction and carry it through to a clear, launch-ready result.',
+          'We work with founders, organizations, artists, and creative businesses that need one clear path from an early idea to a launch-ready outcome.',
+          'Strategy, identity, design, and technical execution are developed as one connected system—not as disconnected deliverables.',
         ],
-        highlight: {
-          title: 'Industry-flexible. Project-selective.',
-          body: 'We are defined by the quality of the idea and the value of the outcome, not by a single industry.',
-        },
       },
       work: {
         meta: {
@@ -211,71 +195,49 @@ export const site = {
         heading: 'Work',
         body: 'Selected work and case studies are coming soon.',
       },
-      audience: {
-        heading: 'Who We Serve',
-        intro:
-          'We work best with founders, organizations, artists, and creative businesses that:',
-        items: [
-          'Have a meaningful idea but need help defining and realizing it.',
-          'Value distinctive visual direction rather than generic templates.',
-          'Need branding, design, and digital execution to work as one system.',
-          'Want one accountable studio to move the project from early concept to launch.',
-          'Have a clear decision-maker, a realistic budget, and commitment to the work.',
-        ],
-      },
       capabilities: {
         heading: 'What We Create',
         items: [
           {
             title: 'Visual Identity',
-            body: 'Brand direction, identity systems, visual language, and the assets required to make an idea recognizable and consistent.',
+            body: 'Brand direction, identity systems, and visual languages built to make an idea recognizable and consistent.',
           },
           {
             title: 'Websites & Digital Experiences',
-            body: 'Website strategy, interface design, development, deployment, and selected interactive experiences.',
+            body: 'Strategy, interface design, development, and deployment shaped around a clear objective.',
           },
           {
             title: 'Selected Digital Products',
-            body: 'Product clarification, UI/UX, selected mobile MVP development, testing, and launch support for clearly scoped ideas.',
+            body: 'Product clarification, UI/UX, and carefully scoped MVP development for selected ideas.',
           },
           {
             title: 'Editorial & Publication Design',
-            body: 'Books, magazines, educational materials, cultural publications, and other branded editorial systems.',
+            body: 'Books, publications, learning materials, and branded editorial systems.',
           },
         ],
       },
       reasons: {
-        heading: 'Why SSS',
+        heading: 'Why Solar Static',
         items: [
           {
             title: 'One consistent direction',
-            body: 'strategy, visual identity, design, and implementation are developed as one connected system.',
+            body: 'Strategy, design, and implementation work as one connected system.',
           },
           {
             title: 'Direct collaboration',
-            body: 'clients work with the person responsible for the actual thinking, design, and delivery.',
-          },
-          {
-            title: 'From ambiguity to launch',
-            body: 'we help clarify the idea before producing the final form.',
-          },
-          {
-            title: 'Built for the project',
-            body: 'the solution is selected around the real objective, rather than forced into a preset template.',
+            body: 'Clients work directly with the person responsible for the thinking, design, and delivery.',
           },
           {
             title: 'Creative and technical depth',
-            body: 'visual judgment is combined with practical product and development capability.',
+            body: 'Distinctive visual judgment is combined with practical product and development capability.',
           },
         ],
       },
-      not: {
-        heading: 'What We Are Not',
-        body: 'Solar Static Studio is not a low-cost template provider, a general-purpose agency that accepts every kind of work, or an enterprise software contractor. We select projects where the objective, scope, decision-making, and standard of work can be clearly established.',
-      },
       closing: {
         title: 'Bring us the idea.',
-        body: 'We will help define what it should become, how it should look, and how it can exist in the digital world.',
+        body: 'We will help define what it should become and build the right form for it.',
+        label: 'Start a Project',
+        href: '/start-a-project/',
       },
       contact: {
         meta: {
@@ -342,19 +304,15 @@ export const site = {
       },
       document: {
         title: 'Solar Static Studio',
-        subtitle: '我们服务谁、创造什么，以及工作室为何存在',
-        coreLine: '从创意到数字现实',
+        subtitle:
+          '一家独立创意产品工作室，将精选创意转化为具有辨识度的视觉识别与完整落地的数字产品。',
       },
       about: {
         heading: '关于工作室',
         paragraphs: [
-          'Solar Static Studio 是一家独立创意产品工作室，负责将经过选择的创意，转化为具有辨识度的视觉系统与真正完成落地的数字产品。',
-          '我们的工作横跨策略梳理、品牌识别、视觉设计与技术实现。我们并不出售彼此割裂的单项成果，而是为一个有价值的创意建立统一方向，并将它推进到清晰、完整、可以正式上线的状态。',
+          '我们与需要从早期创意走向可发布成果的创始人、机构、艺术家和创意企业合作，为项目建立一条清晰路径。',
+          '策略、品牌识别、设计与技术实现被作为一个相互连接的系统共同开发，而非彼此割裂的交付物。',
         ],
-        highlight: {
-          title: '行业开放，项目精选。',
-          body: '我们不被单一行业定义，而以创意质量、合作适配度与最终成果的价值来选择项目。',
-        },
       },
       work: {
         meta: {
@@ -364,17 +322,6 @@ export const site = {
         },
         heading: 'Work',
         body: 'Selected work and case studies are coming soon.',
-      },
-      audience: {
-        heading: '我们服务谁',
-        intro: '我们最适合与以下创始人、机构、艺术家及创意型企业合作：',
-        items: [
-          '已经拥有有意义的创意，但需要进一步梳理、定义和落地。',
-          '重视独特的视觉方向，不希望采用缺乏个性的通用模板。',
-          '需要品牌、设计与数字实现共同形成一个完整系统。',
-          '希望由一个负责到底的工作室，将项目从早期概念推进至正式上线。',
-          '拥有明确的决策人、合理预算，并愿意认真投入项目。',
-        ],
       },
       capabilities: {
         heading: '我们提供什么',
@@ -398,7 +345,7 @@ export const site = {
         ],
       },
       reasons: {
-        heading: '为什么选择 SSS',
+        heading: '为什么选择 Solar Static',
         items: [
           {
             title: '统一的创意方向',
@@ -409,26 +356,16 @@ export const site = {
             body: '客户直接与真正负责思考、设计和交付的人沟通。',
           },
           {
-            title: '从模糊到上线',
-            body: '我们先帮助客户把创意梳理清楚，再决定最终应当采用的形式。',
-          },
-          {
-            title: '根据项目定制',
-            body: '解决方案围绕真实目标建立，而不是强行套用固定套餐或模板。',
-          },
-          {
             title: '兼具创意与技术',
-            body: '视觉判断、产品思维和实际开发能力被结合在同一个工作流程中。',
+            body: '鲜明的视觉判断与实际的产品和开发能力相结合。',
           },
         ],
       },
-      not: {
-        heading: '我们不是什么',
-        body: 'Solar Static Studio 不是低价模板供应商，不是什么项目都接的综合型代理公司，也不是承接大型企业级软件工程的技术外包商。我们只选择目标、范围、决策方式与质量标准能够被清晰建立的项目。',
-      },
       closing: {
         title: '把创意带给我们。',
-        body: '我们将帮助你明确它应当成为什么、应当呈现怎样的视觉，以及应当如何真正存在于数字世界中。',
+        body: '我们将帮助你明确它应该成为什么，并为它构建正确的形式。',
+        label: '开始项目',
+        href: '/start-a-project/',
       },
       contact: {
         meta: {
