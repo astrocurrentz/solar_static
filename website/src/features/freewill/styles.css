@@ -253,6 +253,10 @@
   min-width: var(--freewill-table-cell);
 }
 
+.freewill-controls[data-group='arrangement'] {
+  min-width: 0;
+}
+
 .freewill-check {
   display: inline-flex;
   min-height: var(--freewill-touch);

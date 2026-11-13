@@ -1,11 +1,12 @@
 export const instruments = ['drums', 'bass', 'keys', 'guitars'] as const;
-export const groups = [...instruments, 'stage'] as const;
-export const statuses = ['rdy', 'rec', 'prg', 'cue'] as const;
+export const groups = ['arrangement', ...instruments, 'stage'] as const;
+export const statuses = ['arr', 'rdy', 'rec', 'prg', 'cue'] as const;
 export type Instrument = (typeof instruments)[number];
 export type Group = (typeof groups)[number];
 export type Status = (typeof statuses)[number];
 
 export const groupStatuses = {
+  arrangement: ['arr'],
   drums: ['rdy', 'rec'],
   bass: ['rdy', 'rec'],
   keys: ['rdy', 'rec'],
@@ -27,6 +28,7 @@ export type Track = {
   order: number;
   title: string;
   progress: Record<Instrument, Record<'rdy' | 'rec', Progress>> & {
+    arrangement: Record<'arr', Progress>;
     stage: Record<'prg' | 'cue', Progress>;
   };
 };
@@ -51,6 +53,7 @@ export const freewillCopy = {
   subtitle: 'Debut album / Production tracker',
   listing: 'Production and stage preparation for the debut album.',
   groups: {
+    arrangement: 'Arrangement',
     drums: 'Drums',
     bass: 'Bass',
     keys: 'Keys',
@@ -58,6 +61,7 @@ export const freewillCopy = {
     stage: 'Program & Cue',
   },
   statuses: {
+    arr: 'Arrangement Complete',
     rdy: 'Performance Ready',
     rec: 'Recording Complete',
     prg: 'Programming Complete',
@@ -70,10 +74,10 @@ export const freewillCopy = {
   track: 'Track',
   checklist: 'Track checklist',
   filters: 'Filters',
-  instrumentFilter: 'Instrument',
+  groupFilter: 'Group',
   statusFilter: 'Status',
   allTracks: 'All tracks',
-  allGroups: 'All instruments and stage',
+  allGroups: 'All groups',
   allStatuses: 'All statuses',
   incomplete: 'Incomplete only',
   reset: 'Reset filters',
