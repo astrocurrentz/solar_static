@@ -1,10 +1,5 @@
 import { useRef, useState } from 'react';
-import {
-  applyEdit,
-  freewillApi,
-  type Album,
-  type Edit,
-} from '../../data/freewill';
+import { applyEdit, type Album, type Edit } from '../model';
 
 type Entry = { edit: Edit; phase: 'queued' | 'saving' | 'failed' };
 
@@ -14,7 +9,7 @@ function editKey(edit: Edit) {
     : `${edit.trackId}/${edit.group}/${edit.status}/${edit.field}`;
 }
 
-export function useAlbumEdits(onExpired: () => void) {
+export function useAlbumEdits(apiBase: string, onExpired: () => void) {
   const [saved, setSaved] = useState<Album | null>(null);
   const [edits, setEdits] = useState<Entry[]>([]);
   const pending = useRef(new Map<string, Entry>());
@@ -36,7 +31,7 @@ export function useAlbumEdits(onExpired: () => void) {
         entry.phase = 'saving';
         publish();
         try {
-          const response = await fetch(`${freewillApi}edit`, {
+          const response = await fetch(`${apiBase}/edit`, {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(entry.edit),

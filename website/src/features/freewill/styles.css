@@ -1,15 +1,42 @@
 .freewill {
+  --freewill-bg: #101515;
+  --freewill-surface: #171e1e;
+  --freewill-control: #202929;
+  --freewill-ink: #eef4f1;
+  --freewill-muted: #adbfba;
+  --freewill-rule: #384747;
+  --freewill-accent: #7dddc0;
+  --freewill-error: #ffad9e;
+  --freewill-backdrop: rgb(0 0 0 / 70%);
+  --freewill-width: 82rem;
+  --freewill-dialog-width: 40rem;
+  --freewill-panel-width: 25rem;
+  --freewill-touch: 2.75rem;
+  --freewill-radius: 0.6rem;
+  --freewill-gap: 0.75rem;
+  --freewill-table-cell: 7.5rem;
+  --freewill-title: clamp(3rem, 11vw, 7rem);
+  font-family: var(--font-body, system-ui, sans-serif);
   min-height: 100dvh;
-  padding: var(--space-header-y) var(--space-page) var(--space-section);
+  padding: var(--space-header-y, clamp(1.5rem, 4vw, 3rem))
+    var(--space-page, clamp(1.25rem, 5vw, 5rem))
+    var(--space-section, clamp(3.25rem, 7vw, 6.5rem));
   background: var(--freewill-bg);
   color: var(--freewill-ink);
   color-scheme: dark;
   --color-focus: var(--freewill-accent);
 }
 
+.freewill,
+.freewill *,
+.freewill *::before,
+.freewill *::after {
+  box-sizing: border-box;
+}
+
 .freewill-shell {
   display: grid;
-  gap: var(--space-block);
+  gap: var(--space-block, clamp(1.75rem, 4vw, 3rem));
   max-width: var(--freewill-width);
   margin-inline: auto;
 }
@@ -31,7 +58,7 @@
 
 .freewill-title h1 {
   margin: 0;
-  font-family: var(--font-display);
+  font-family: var(--font-display, 'Syne Variable', sans-serif);
   font-size: var(--freewill-title);
   line-height: 1;
   overflow-wrap: anywhere;
@@ -50,16 +77,16 @@
 }
 
 .freewill h2 {
-  font-family: var(--font-display);
-  font-size: var(--type-label);
+  font-family: var(--font-display, 'Syne Variable', sans-serif);
+  font-size: var(--type-label, clamp(0.78rem, 1.4vw, 0.95rem));
 }
 
 .freewill :is(button, select, textarea, input:not([type='checkbox'])) {
   min-height: var(--freewill-touch);
   min-width: 0;
   max-width: 100%;
-  padding: var(--space-callout-gap) var(--freewill-gap);
-  border: var(--border-thin) solid var(--freewill-rule);
+  padding: var(--space-callout-gap, 0.25rem) var(--freewill-gap);
+  border: var(--border-thin, 1px) solid var(--freewill-rule);
   border-radius: var(--freewill-radius);
   background: var(--freewill-control);
   color: inherit;
@@ -76,8 +103,8 @@
 }
 
 .freewill :is(input, select, textarea, summary):focus-visible {
-  outline: var(--border-thin) solid var(--freewill-accent);
-  outline-offset: var(--border-thin);
+  outline: var(--border-thin, 1px) solid var(--freewill-accent);
+  outline-offset: var(--border-thin, 1px);
 }
 
 .freewill input[type='checkbox'] {
@@ -93,7 +120,7 @@
 .freewill-dialog,
 .freewill-mobile details {
   padding: var(--freewill-gap);
-  border: var(--border-thin) solid var(--freewill-rule);
+  border: var(--border-thin, 1px) solid var(--freewill-rule);
   border-radius: var(--freewill-radius);
   background: var(--freewill-surface);
 }
@@ -108,7 +135,7 @@
 .freewill-filters label,
 .freewill-dialog label {
   display: grid;
-  gap: var(--space-callout-gap);
+  gap: var(--space-callout-gap, 0.25rem);
   min-width: 0;
   color: var(--freewill-muted);
 }
@@ -126,14 +153,14 @@
 .freewill-legend,
 .freewill-indicators {
   color: var(--freewill-muted);
-  font-size: var(--type-language);
+  font-size: var(--type-language, 0.88rem);
 }
 
 .freewill-metric dd > div {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  gap: var(--space-callout-gap);
+  gap: var(--space-callout-gap, 0.25rem);
   font-variant-numeric: tabular-nums;
 }
 
@@ -145,7 +172,7 @@
   display: block;
   width: 100%;
   height: 0.35rem;
-  margin-top: var(--space-callout-gap);
+  margin-top: var(--space-callout-gap, 0.25rem);
   overflow: hidden;
   border: 0;
   border-radius: var(--freewill-radius);
@@ -190,7 +217,7 @@
 
 .freewill-table :is(th, td) {
   padding: var(--freewill-gap);
-  border: var(--border-thin) solid var(--freewill-rule);
+  border: var(--border-thin, 1px) solid var(--freewill-rule);
   text-align: left;
   vertical-align: top;
 }
@@ -202,7 +229,7 @@
 
 .freewill-track-title {
   display: block;
-  font-weight: var(--font-weight-bold);
+  font-weight: var(--font-weight-bold, 700);
   overflow-wrap: anywhere;
 }
 
@@ -215,7 +242,7 @@
 }
 
 .freewill-indicators {
-  font-weight: var(--font-weight-regular);
+  font-weight: var(--font-weight-regular, 400);
 }
 
 .freewill-indicators [data-complete='true'] {
@@ -230,8 +257,8 @@
   display: inline-flex;
   min-height: var(--freewill-touch);
   align-items: center;
-  gap: var(--space-callout-gap);
-  font-size: var(--type-language);
+  gap: var(--space-callout-gap, 0.25rem);
+  font-size: var(--type-language, 0.88rem);
   cursor: pointer;
 }
 
@@ -240,7 +267,7 @@
   border: 0;
   background: transparent;
   color: var(--freewill-muted);
-  font-size: var(--type-language);
+  font-size: var(--type-language, 0.88rem);
   text-decoration: underline;
   text-underline-offset: 0.2em;
 }
@@ -262,7 +289,7 @@
 
 .freewill-legend div {
   display: flex;
-  gap: var(--space-callout-gap);
+  gap: var(--space-callout-gap, 0.25rem);
 }
 
 .freewill-legend dt {
@@ -330,7 +357,7 @@
 
   .freewill-mobile-content,
   .freewill-mobile-group {
-    border-top: var(--border-thin) solid var(--freewill-rule);
+    border-top: var(--border-thin, 1px) solid var(--freewill-rule);
   }
 
   .freewill-mobile-group {

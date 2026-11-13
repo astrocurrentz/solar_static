@@ -13,7 +13,7 @@ export function sessionClient(context: APIContext) {
     db: { schema: 'core' },
     cookieOptions: {
       name: 'freewill-session',
-      path: '/api/freewill',
+      path: context.url.pathname.replace(/\/[^/]+\/?$/, ''),
       httpOnly: true,
       secure: import.meta.env.PROD || context.url.protocol === 'https:',
       sameSite: 'lax',

@@ -9,7 +9,7 @@ import {
   type Group,
   type Status,
   type Track,
-} from '../../data/freewill';
+} from '../model';
 
 type Props = {
   track: Track;

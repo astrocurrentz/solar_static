@@ -29,6 +29,7 @@
     "cookie": "1.1.1",
     "motion": "^12.42.2",
     "pdf-lib": "1.17.1",
+    "pdfjs-dist": "6.5.438",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
     "tailwindcss": "^4.3.2"

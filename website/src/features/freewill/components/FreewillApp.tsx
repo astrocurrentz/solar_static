@@ -1,9 +1,5 @@
 import { useEffect, useState, type SubmitEvent } from 'react';
-import {
-  freewillApi,
-  freewillCopy as copy,
-  type Album,
-} from '../../data/freewill';
+import { freewillCopy as copy, type Album } from '../model';
 import { Dashboard } from './Dashboard';
 import { useAlbumEdits } from './useAlbumEdits';
 
@@ -20,19 +16,25 @@ function readInvite() {
   return fragment;
 }
 
-async function loadAlbum(signal?: AbortSignal) {
-  const response = await fetch(`${freewillApi}album`, { signal });
+async function loadAlbum(apiBase: string, signal?: AbortSignal) {
+  const response = await fetch(`${apiBase}/album`, { signal });
   if (response.status === 401 || response.status === 403) return null;
   if (!response.ok) throw new Error();
   return (await response.json()) as Album;
 }
 
-export default function FreewillApp() {
+type Props = {
+  apiBase: string;
+  backLink?: { href: string; label: string };
+};
+
+export default function FreewillApp({ apiBase: base, backLink }: Props) {
+  const apiBase = base.replace(/\/$/, '');
   const [view, setView] = useState<View>('loading');
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
   const [loadAttempt, setLoadAttempt] = useState(0);
-  const edits = useAlbumEdits(expire);
+  const edits = useAlbumEdits(apiBase, expire);
   const setSaved = edits.setSaved;
 
   function expire() {
@@ -55,7 +57,7 @@ export default function FreewillApp() {
         setError(copy.inviteError);
         setView('login');
       } else {
-        void fetch(`${freewillApi}invite`, {
+        void fetch(`${apiBase}/invite`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ access_token, refresh_token }),
@@ -72,7 +74,7 @@ export default function FreewillApp() {
       }
       return () => controller.abort();
     }
-    void loadAlbum(controller.signal)
+    void loadAlbum(apiBase, controller.signal)
       .then((album) => {
         if (controller.signal.aborted) return;
         setSaved(album);
@@ -82,7 +84,7 @@ export default function FreewillApp() {
         if (!controller.signal.aborted) setView('error');
       });
     return () => controller.abort();
-  }, [loadAttempt, setSaved]);
+  }, [apiBase, loadAttempt, setSaved]);
 
   async function login(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -90,7 +92,7 @@ export default function FreewillApp() {
     setBusy(true);
     setError('');
     try {
-      const response = await fetch(`${freewillApi}login`, {
+      const response = await fetch(`${apiBase}/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -122,7 +124,7 @@ export default function FreewillApp() {
     }
     setBusy(true);
     try {
-      const response = await fetch(`${freewillApi}password`, {
+      const response = await fetch(`${apiBase}/password`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ password }),
@@ -146,7 +148,7 @@ export default function FreewillApp() {
     setBusy(true);
     setError('');
     try {
-      const response = await fetch(`${freewillApi}logout`, { method: 'POST' });
+      const response = await fetch(`${apiBase}/logout`, { method: 'POST' });
       if (!response.ok) throw new Error();
       setSaved(null);
       setView('login');
@@ -160,7 +162,7 @@ export default function FreewillApp() {
   return (
     <div className="freewill-shell">
       <header className="freewill-header">
-        <a href="/work/">{copy.work}</a>
+        {backLink && <a href={backLink.href}>{backLink.label}</a>}
         {view === 'album' && (
           <button
             type="button"
@@ -261,6 +263,7 @@ export default function FreewillApp() {
       )}
       {view === 'album' && edits.album && (
         <Dashboard
+          apiBase={apiBase}
           album={edits.album}
           update={edits.update}
           retry={edits.retry}

@@ -53,7 +53,8 @@ npx supabase db advisors
 
 ## FREEWILL Album Tracker
 
-The public Work page links to `/work/freewill/`. Tracker records, edits, and exports
+The public Work page links to `/tool/albumtracker/freewill`. The previous
+`/work/freewill/` address redirects there. Tracker records, edits, and exports
 are served only through the authenticated `/api/freewill/` endpoints.
 
 Use Node.js 24. Configure the two `FREEWILL_*` variables from `.env.example`
@@ -74,3 +75,24 @@ verification. These variables are independent of the inquiry service settings.
 4. Expose the `core` schema in the Supabase Data API and set the project URL
    and publishable key in Vercel. Database policies check
    administrator membership for each authenticated read and update.
+
+### Move the tracker to another host
+
+Copy `src/features/freewill/` and use the existing Astro page and
+`src/pages/api/freewill/[action].ts` as examples of the two entry points.
+Import the feature stylesheet on the page and pass the same-origin API prefix as
+`apiBase`. Supply a `backLink` if the host has a page to return to.
+The on-demand API sets its cookie path from the mounted endpoint.
+
+Use React, Astro with a Node deployment adapter, `cookie`,
+`@supabase/ssr`, `@supabase/supabase-js`, `pdf-lib`, `@pdf-lib/fontkit`,
+`@fontpkg/unifont`, and `pdfjs-dist` at the versions in this package.
+Package the Unifont TTF with the server function and let the browser bundler serve
+the PDF.js worker from the same site. PNG uses the authenticated PDF endpoint
+and converts the complete saved checklist in the browser.
+
+Reuse the existing Supabase project and the two `FREEWILL_*` environment
+variables, or apply the three FREEWILL migrations to the destination project.
+For a database move, transfer the album tables and restore administrator
+membership using the destination Auth user IDs. Expose `core` in the Data API,
+then update the Auth Site URL and relevant redirect entries to the new host.
