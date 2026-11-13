@@ -7,7 +7,7 @@ import {
   type Instrument,
   type Status,
   type Track,
-} from '../../data/freewill';
+} from '../model';
 
 type StatusColumns = Partial<
   Record<`${Status}_completed`, boolean> &

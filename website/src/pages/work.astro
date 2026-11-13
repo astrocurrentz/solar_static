@@ -2,7 +2,8 @@
 import Footer from '../components/Footer.astro';
 import Header from '../components/Header.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { freewillCopy, freewillPath } from '../data/freewill';
+import { freewillCopy } from '../features/freewill/model';
+import { freewillPath } from '../data/tool-routes';
 import { getLocaleContent } from '../data/site';
 
 const locale = 'en';
@@ -14,7 +15,7 @@ const content = getLocaleContent(locale);
   <main class="page-shell">
     <h1 class="work-heading">{content.work.heading}</h1>
     <section class="work-tools" aria-labelledby="work-tools-heading">
-      <h2 id="work-tools-heading">{freewillCopy.tools}</h2>
+      <h2 id="work-tools-heading">{content.work.toolsHeading}</h2>
       <a href={freewillPath}>{freewillCopy.title}</a>
       <p>{freewillCopy.listing}</p>
     </section>

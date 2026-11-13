@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import {
-  freewillApi,
   freewillCopy as copy,
   getAlbumMetrics,
   getProgress,
@@ -14,10 +13,11 @@ import {
   type Group,
   type Status,
   type Track,
-} from '../../data/freewill';
+} from '../model';
 import { TrackDetails } from './TrackDetails';
 
 type Props = {
+  apiBase: string;
   album: Album;
   update: (edit: Edit) => void;
   retry: () => void;
@@ -40,7 +40,7 @@ const initialFilter: Filter = {
   status: '',
   incomplete: false,
 };
-const formats = ['csv', 'json', 'pdf'] as const;
+const formats = ['csv', 'json', 'pdf', 'png'] as const;
 
 function Metric({
   label,
@@ -176,6 +176,7 @@ function FilterBar({
 }
 
 export function Dashboard({
+  apiBase,
   album,
   update,
   retry,
@@ -207,13 +208,19 @@ export function Dashboard({
     setExporting(true);
     setExportError(false);
     try {
-      const response = await fetch(`${freewillApi}export?format=${format}`);
+      const sourceFormat = format === 'png' ? 'pdf' : format;
+      const response = await fetch(`${apiBase}/export?format=${sourceFormat}`);
       if (response.status === 401 || response.status === 403) {
         onExpired();
         return;
       }
       if (!response.ok) throw new Error();
-      const url = URL.createObjectURL(await response.blob());
+      let file = await response.blob();
+      if (format === 'png') {
+        const { renderChecklistPng } = await import('./renderChecklistPng');
+        file = await renderChecklistPng(await file.arrayBuffer());
+      }
+      const url = URL.createObjectURL(file);
       const link = document.createElement('a');
       link.href = url;
       link.download = `freewill-album.${format}`;

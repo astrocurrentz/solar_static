@@ -1,0 +1,21 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import FreewillApp from '../../../features/freewill/components/FreewillApp';
+import { freewillCopy } from '../../../features/freewill/model';
+import { freewillPath } from '../../../data/tool-routes';
+import '../../../features/freewill/styles.css';
+---
+
+<BaseLayout
+  locale="en"
+  meta={{ title: freewillCopy.title, description: freewillCopy.listing }}
+  canonicalPath={new URL(freewillPath, 'https://www.solarstatic.xyz').href}
+>
+  <main class="freewill">
+    <FreewillApp
+      client:load
+      apiBase="/api/freewill"
+      backLink={{ href: '/work/', label: 'Work' }}
+    />
+  </main>
+</BaseLayout>

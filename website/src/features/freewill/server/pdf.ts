@@ -15,7 +15,7 @@ import {
   groupStatuses,
   statuses,
   type Album,
-} from '../../data/freewill';
+} from '../model';
 
 const require = createRequire(import.meta.url);
 const ink = rgb(0.09, 0.13, 0.14);

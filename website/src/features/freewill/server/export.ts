@@ -1,9 +1,4 @@
-import {
-  getProgress,
-  groups,
-  groupStatuses,
-  type Album,
-} from '../../data/freewill';
+import { getProgress, groups, groupStatuses, type Album } from '../model';
 
 function csvField(value: string | number | boolean | null) {
   const text = String(value ?? '');

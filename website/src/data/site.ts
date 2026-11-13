@@ -66,7 +66,7 @@ export type LocaleContent = {
     heading: string;
     paragraphs: string[];
   };
-  work: SimplePageContent;
+  work: SimplePageContent & { toolsHeading: string };
   capabilities: {
     heading: string;
     items: Capability[];
@@ -192,6 +192,7 @@ export const site = {
           description: 'Selected work and tools from Solar Static Studio.',
         },
         heading: 'Work',
+        toolsHeading: 'Tools',
         body: 'Selected work and case studies are coming soon.',
       },
       capabilities: {
@@ -319,6 +320,7 @@ export const site = {
           description: 'Selected work and tools from Solar Static Studio.',
         },
         heading: 'Work',
+        toolsHeading: 'Tools',
         body: 'Selected work and case studies are coming soon.',
       },
       capabilities: {

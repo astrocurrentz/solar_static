@@ -1,6 +1,3 @@
-export const freewillPath = '/work/freewill/';
-export const freewillApi = '/api/freewill/';
-
 export const instruments = ['drums', 'bass', 'keys', 'guitars'] as const;
 export const groups = [...instruments, 'stage'] as const;
 export const statuses = ['rdy', 'rec', 'prg', 'cue'] as const;
@@ -53,8 +50,6 @@ export const freewillCopy = {
   album: 'FREEWILL',
   subtitle: 'Debut album / Production tracker',
   listing: 'Production and stage preparation for the debut album.',
-  work: 'Work',
-  tools: 'Tools',
   groups: {
     drums: 'Drums',
     bass: 'Bass',
