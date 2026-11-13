@@ -26,9 +26,9 @@ npm run verify
 
 Use these Vercel settings:
 
-- Root Directory: `website`
-- Build Command: `npm run build`
-- Output Directory: Vercel default (the Astro adapter writes `.vercel/output`)
+- Root Directory: repository root (the root build command runs from `website`)
+- Build Command: use the command in the root `vercel.json`
+- Output Directory: Vercel default (the root build puts the Astro adapter output in `.vercel/output`)
 
 ## Content
 
