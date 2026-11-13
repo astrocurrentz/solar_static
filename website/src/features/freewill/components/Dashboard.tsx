@@ -119,9 +119,9 @@ function FilterBar({
         </select>
       </label>
       <label>
-        {copy.instrumentFilter}
+        {copy.groupFilter}
         <select
-          aria-label={copy.instrumentFilter}
+          aria-label={copy.groupFilter}
           value={filter.group}
           onChange={(event) =>
             setFilter({
@@ -239,7 +239,7 @@ export function Dashboard({
     const codes = visibleStatuses(track, group, filter);
     if (!codes.length) return null;
     return (
-      <div className="freewill-controls">
+      <div className="freewill-controls" data-group={group}>
         {codes.map((status) => {
           const item = getProgress(track, group, status);
           return (

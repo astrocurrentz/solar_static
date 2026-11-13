@@ -92,7 +92,7 @@ the PDF.js worker from the same site. PNG uses the authenticated PDF endpoint
 and converts the complete saved checklist in the browser.
 
 Reuse the existing Supabase project and the two `FREEWILL_*` environment
-variables, or apply the three FREEWILL migrations to the destination project.
+variables, or apply the FREEWILL migrations to the destination project.
 For a database move, transfer the album tables and restore administrator
 membership using the destination Auth user IDs. Expose `core` in the Data API,
 then update the Auth Site URL and relevant redirect entries to the new host.

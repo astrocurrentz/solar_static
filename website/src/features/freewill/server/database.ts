@@ -14,7 +14,8 @@ type StatusColumns = Partial<
     Record<`${Status}_date` | `${Status}_note`, string | null>
 >;
 
-type TrackRow = {
+type TrackRow = Pick<StatusColumns, 'arr_date' | 'arr_note'> & {
+  arr_completed: boolean;
   id: string;
   title: string;
   order_index: number;
@@ -35,6 +36,7 @@ function readStatus(row: StatusColumns, status: Status) {
 
 function readTrack(row: TrackRow): Track {
   const progress = {} as Track['progress'];
+  progress.arrangement = { arr: readStatus(row, 'arr') };
   for (const group of instruments) {
     const entry = row.freewill_instrument_progress.find(
       (item) => item.instrument === group,
@@ -62,7 +64,7 @@ export async function loadAlbum(
     .from('freewill_tracks')
     .select(
       `
-      id, title, order_index,
+      id, title, order_index, arr_completed, arr_date, arr_note,
       freewill_instrument_progress(instrument, rdy_completed, rdy_date, rdy_note, rec_completed, rec_date, rec_note),
       freewill_stage_preparation(prg_completed, prg_date, prg_note, cue_completed, cue_date, cue_note)
     `,
@@ -89,6 +91,14 @@ export async function saveEdit(
         .maybeSingle();
     }
     const patch = { [`${edit.status}_${edit.field}`]: edit.value, updated_at };
+    if (edit.group === 'arrangement') {
+      return client
+        .from('freewill_tracks')
+        .update(patch)
+        .eq('id', edit.trackId)
+        .select('id')
+        .maybeSingle();
+    }
     if (edit.group === 'stage') {
       return client
         .from('freewill_stage_preparation')

@@ -89,7 +89,16 @@ export async function createPdf(album: Album): Promise<ArrayBuffer> {
 
   const tableWidth = wide - margin * 2;
   const trackWidth = 138;
-  const groupWidth = (tableWidth - trackWidth) / groups.length;
+  const arrangementWidth = 102;
+  const groupWidth =
+    (tableWidth - trackWidth - arrangementWidth) / (groups.length - 1);
+  let columnStart = margin + trackWidth;
+  const columns = groups.map((group) => {
+    const width = group === 'arrangement' ? arrangementWidth : groupWidth;
+    const column = { group, x: columnStart + 8, width };
+    columnStart += width;
+    return column;
+  });
   const headerTop = tall - 82;
   const firstRowTop = headerTop - 24;
 
@@ -104,15 +113,8 @@ export async function createPdf(album: Album): Promise<ArrayBuffer> {
     color: stripe,
   });
   text(copy.track, margin + 8, headerTop - 15, body, trackWidth - 16, true);
-  groups.forEach((group, index) => {
-    text(
-      copy.groups[group],
-      margin + trackWidth + index * groupWidth + 8,
-      headerTop - 15,
-      body,
-      groupWidth - 16,
-      true,
-    );
+  columns.forEach(({ group, x, width }) => {
+    text(copy.groups[group], x, headerTop - 15, body, width - 16, true);
   });
 
   album.tracks.forEach((track, index) => {
@@ -134,8 +136,7 @@ export async function createPdf(album: Album): Promise<ArrayBuffer> {
       trackWidth - 16,
       true,
     );
-    groups.forEach((group, column) => {
-      const x = margin + trackWidth + column * groupWidth + 8;
+    columns.forEach(({ group, x, width }) => {
       groupStatuses[group].forEach((status, slot) => {
         const item = getProgress(track, group, status);
         const y = top - 12 - slot * 20;
@@ -167,20 +168,12 @@ export async function createPdf(album: Album): Promise<ArrayBuffer> {
           x + 11,
           y,
           small,
-          groupWidth - 27,
+          width - 27,
           true,
           color,
         );
         if (item.note)
-          text(
-            item.note,
-            x + 11,
-            y - 8,
-            small - 1,
-            groupWidth - 27,
-            false,
-            muted,
-          );
+          text(item.note, x + 11, y - 8, small - 1, width - 27, false, muted);
       });
     });
     page.drawLine({
