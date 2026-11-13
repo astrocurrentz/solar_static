@@ -189,8 +189,7 @@ export const site = {
       work: {
         meta: {
           title: 'Work - Solar Static Studio',
-          description:
-            'Selected Solar Static Studio work and case studies are coming soon.',
+          description: 'Selected work and tools from Solar Static Studio.',
         },
         heading: 'Work',
         body: 'Selected work and case studies are coming soon.',
@@ -317,8 +316,7 @@ export const site = {
       work: {
         meta: {
           title: 'Work - Solar Static Studio',
-          description:
-            'Selected Solar Static Studio work and case studies are coming soon.',
+          description: 'Selected work and tools from Solar Static Studio.',
         },
         heading: 'Work',
         body: 'Selected work and case studies are coming soon.',

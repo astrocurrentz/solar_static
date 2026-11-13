@@ -1,0 +1,349 @@
+.freewill {
+  min-height: 100dvh;
+  padding: var(--space-header-y) var(--space-page) var(--space-section);
+  background: var(--freewill-bg);
+  color: var(--freewill-ink);
+  color-scheme: dark;
+  --color-focus: var(--freewill-accent);
+}
+
+.freewill-shell {
+  display: grid;
+  gap: var(--space-block);
+  max-width: var(--freewill-width);
+  margin-inline: auto;
+}
+
+.freewill-header,
+.freewill-section-heading,
+.freewill-dialog-heading,
+.freewill-export-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--freewill-gap);
+}
+
+.freewill-header,
+.freewill-dialog-heading {
+  justify-content: space-between;
+}
+
+.freewill-title h1 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--freewill-title);
+  line-height: 1;
+  overflow-wrap: anywhere;
+}
+
+.freewill-title p,
+.freewill h2,
+.freewill dl,
+.freewill dd {
+  margin: 0;
+}
+
+.freewill-title p {
+  margin-top: var(--freewill-gap);
+  color: var(--freewill-muted);
+}
+
+.freewill h2 {
+  font-family: var(--font-display);
+  font-size: var(--type-label);
+}
+
+.freewill :is(button, select, textarea, input:not([type='checkbox'])) {
+  min-height: var(--freewill-touch);
+  min-width: 0;
+  max-width: 100%;
+  padding: var(--space-callout-gap) var(--freewill-gap);
+  border: var(--border-thin) solid var(--freewill-rule);
+  border-radius: var(--freewill-radius);
+  background: var(--freewill-control);
+  color: inherit;
+  font: inherit;
+}
+
+.freewill button {
+  cursor: pointer;
+}
+
+.freewill button:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.freewill :is(input, select, textarea, summary):focus-visible {
+  outline: var(--border-thin) solid var(--freewill-accent);
+  outline-offset: var(--border-thin);
+}
+
+.freewill input[type='checkbox'] {
+  width: 1.15rem;
+  height: 1.15rem;
+  margin: 0;
+  accent-color: var(--freewill-accent);
+  cursor: pointer;
+}
+
+.freewill-panel,
+.freewill-metric,
+.freewill-dialog,
+.freewill-mobile details {
+  padding: var(--freewill-gap);
+  border: var(--border-thin) solid var(--freewill-rule);
+  border-radius: var(--freewill-radius);
+  background: var(--freewill-surface);
+}
+
+.freewill-signin {
+  display: grid;
+  gap: var(--freewill-gap);
+  width: min(100%, var(--freewill-panel-width));
+}
+
+.freewill-signin label,
+.freewill-filters label,
+.freewill-dialog label {
+  display: grid;
+  gap: var(--space-callout-gap);
+  min-width: 0;
+  color: var(--freewill-muted);
+}
+
+.freewill .freewill-metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 9rem), 1fr));
+  gap: var(--freewill-gap);
+  margin-top: var(--freewill-gap);
+}
+
+.freewill-metric dt,
+.freewill-metric dd span,
+.freewill-save,
+.freewill-legend,
+.freewill-indicators {
+  color: var(--freewill-muted);
+  font-size: var(--type-language);
+}
+
+.freewill-metric dd > div {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-callout-gap);
+  font-variant-numeric: tabular-nums;
+}
+
+.freewill-metric strong {
+  font-size: 1.6rem;
+}
+
+.freewill-metric progress {
+  display: block;
+  width: 100%;
+  height: 0.35rem;
+  margin-top: var(--space-callout-gap);
+  overflow: hidden;
+  border: 0;
+  border-radius: var(--freewill-radius);
+  background: var(--freewill-control);
+  accent-color: var(--freewill-accent);
+}
+
+.freewill-metric progress::-webkit-progress-bar {
+  background: var(--freewill-control);
+}
+
+.freewill-metric progress::-webkit-progress-value {
+  background: var(--freewill-accent);
+}
+
+.freewill-section-heading {
+  min-height: var(--freewill-touch);
+}
+
+.freewill-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: var(--freewill-gap);
+  margin-block: var(--freewill-gap);
+}
+
+.freewill-filters select {
+  width: 100%;
+}
+
+.freewill-filters .freewill-incomplete {
+  display: flex;
+  align-items: center;
+  min-height: var(--freewill-touch);
+}
+
+.freewill-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.freewill-table :is(th, td) {
+  padding: var(--freewill-gap);
+  border: var(--border-thin) solid var(--freewill-rule);
+  text-align: left;
+  vertical-align: top;
+}
+
+.freewill-table thead,
+.freewill-table tbody th {
+  background: var(--freewill-surface);
+}
+
+.freewill-track-title {
+  display: block;
+  font-weight: var(--font-weight-bold);
+  overflow-wrap: anywhere;
+}
+
+.freewill-indicators,
+.freewill-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 var(--freewill-gap);
+}
+
+.freewill-indicators {
+  font-weight: var(--font-weight-regular);
+}
+
+.freewill-indicators [data-complete='true'] {
+  color: var(--freewill-accent);
+}
+
+.freewill-controls {
+  min-width: var(--freewill-table-cell);
+}
+
+.freewill-check {
+  display: inline-flex;
+  min-height: var(--freewill-touch);
+  align-items: center;
+  gap: var(--space-callout-gap);
+  font-size: var(--type-language);
+  cursor: pointer;
+}
+
+.freewill .freewill-text-button {
+  padding-inline: 0;
+  border: 0;
+  background: transparent;
+  color: var(--freewill-muted);
+  font-size: var(--type-language);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.freewill-text-button:hover {
+  color: var(--freewill-accent);
+}
+
+.freewill-mobile {
+  display: none;
+}
+
+.freewill-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--freewill-gap);
+  padding-top: var(--freewill-gap);
+}
+
+.freewill-legend div {
+  display: flex;
+  gap: var(--space-callout-gap);
+}
+
+.freewill-legend dt {
+  color: var(--freewill-ink);
+}
+
+.freewill-error {
+  color: var(--freewill-error);
+}
+
+.freewill-export-buttons {
+  margin-top: var(--freewill-gap);
+}
+
+.freewill-dialog {
+  width: min(
+    calc(100% - 2 * var(--freewill-gap)),
+    var(--freewill-dialog-width)
+  );
+  max-height: calc(100dvh - 2 * var(--freewill-gap));
+  color: var(--freewill-ink);
+}
+
+.freewill-dialog::backdrop {
+  background: var(--freewill-backdrop);
+}
+
+.freewill-dialog fieldset {
+  display: grid;
+  gap: var(--freewill-gap);
+  min-width: 0;
+  margin: 0;
+  border-color: var(--freewill-rule);
+}
+
+.freewill-dialog-heading {
+  margin-bottom: var(--freewill-gap);
+}
+
+.freewill-details-fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr));
+  gap: var(--freewill-gap);
+}
+
+@media (max-width: 64rem) {
+  .freewill-table {
+    display: none;
+  }
+
+  .freewill-mobile {
+    display: grid;
+    gap: var(--freewill-gap);
+  }
+
+  .freewill-mobile summary {
+    display: list-item;
+    min-height: var(--freewill-touch);
+    cursor: pointer;
+  }
+
+  .freewill-mobile summary .freewill-track-title {
+    display: inline;
+  }
+
+  .freewill-mobile-content,
+  .freewill-mobile-group {
+    border-top: var(--border-thin) solid var(--freewill-rule);
+  }
+
+  .freewill-mobile-group {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    column-gap: var(--freewill-gap);
+  }
+}
+
+@media (max-width: 32rem) {
+  .freewill-filters label:not(.freewill-incomplete) {
+    width: 100%;
+  }
+}
