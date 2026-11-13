@@ -2,6 +2,5 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": null,
   "installCommand": "npm --prefix website ci",
-  "buildCommand": "npm --prefix website run build",
-  "outputDirectory": "website/dist"
+  "buildCommand": "npm --prefix website run build && mkdir -p .vercel && cp -R website/.vercel/output .vercel/"
 }
