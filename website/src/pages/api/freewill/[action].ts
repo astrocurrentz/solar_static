@@ -19,6 +19,8 @@ const methods = new Map([
   ['album', 'GET'],
   ['edit', 'PATCH'],
   ['login', 'POST'],
+  ['invite', 'POST'],
+  ['password', 'POST'],
   ['logout', 'POST'],
   ['export', 'GET'],
 ]);
@@ -62,9 +64,40 @@ export const ALL: APIRoute = async (context) => {
       if (error && (error.status ?? 500) >= 500)
         return fail('unavailable', 503);
       if (error || !data.user) return fail('invalid_credentials', 401);
-      if (!allowedAdmin(data.user.id)) {
+      if (!(await allowedAdmin(auth, data.user.id))) {
         await auth.auth.signOut({ scope: 'local' });
         return fail('invalid_credentials', 401);
+      }
+      return reply({ ok: true });
+    }
+
+    if (action === 'invite') {
+      const { access_token, refresh_token } = record(
+        await request.json().catch(() => null),
+      );
+      if (
+        typeof access_token !== 'string' ||
+        !access_token ||
+        access_token.length > 8192 ||
+        typeof refresh_token !== 'string' ||
+        !refresh_token ||
+        refresh_token.length > 1024
+      ) {
+        return fail('invalid_invite', 400);
+      }
+      const {
+        data: { user },
+      } = await auth.auth.getUser(access_token);
+      if (!user) return fail('invalid_invite', 401);
+      const { data, error } = await auth.auth.setSession({
+        access_token,
+        refresh_token,
+      });
+      if (error || data.user?.id !== user.id)
+        return fail('invalid_invite', 401);
+      if (!(await allowedAdmin(auth, user.id))) {
+        await auth.auth.signOut({ scope: 'local' });
+        return fail('invalid_invite', 403);
       }
       return reply({ ok: true });
     }
@@ -81,21 +114,34 @@ export const ALL: APIRoute = async (context) => {
     } = await auth.auth.getUser();
     if (error && (error.status ?? 500) >= 500) return fail('unavailable', 503);
     if (!user) return fail('sign_in_required', 401);
-    if (!allowedAdmin(user.id)) return fail('forbidden', 403);
+    if (!(await allowedAdmin(auth, user.id))) return fail('forbidden', 403);
+
+    if (action === 'password') {
+      const { password } = record(await request.json().catch(() => null));
+      if (
+        typeof password !== 'string' ||
+        password.length < 12 ||
+        new TextEncoder().encode(password).length > 72
+      ) {
+        return fail('invalid_password', 400);
+      }
+      const { error } = await auth.auth.updateUser({ password });
+      return error ? fail('password_update_failed', 400) : reply({ ok: true });
+    }
 
     if (action === 'edit') {
       const edit = parseEdit(await request.json().catch(() => null));
       if (!edit) return fail('invalid_edit', 400);
-      if (!(await saveEdit(edit))) return fail('not_found', 404);
+      if (!(await saveEdit(auth, edit))) return fail('not_found', 404);
       return reply({ edit });
     }
-    if (action === 'album') return reply(await loadAlbum());
+    if (action === 'album') return reply(await loadAlbum(auth));
 
     const format = url.searchParams.get('format');
     if (format !== 'csv' && format !== 'json' && format !== 'pdf') {
       return fail('invalid_format', 400);
     }
-    const album = await loadAlbum();
+    const album = await loadAlbum(auth);
     const headers = {
       ...privateHeaders,
       'Content-Disposition': `attachment; filename="freewill-album.${format}"`,

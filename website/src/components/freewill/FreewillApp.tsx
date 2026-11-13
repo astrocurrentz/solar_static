@@ -7,7 +7,18 @@ import {
 import { Dashboard } from './Dashboard';
 import { useAlbumEdits } from './useAlbumEdits';
 
-type View = 'loading' | 'login' | 'album' | 'error';
+type View = 'loading' | 'login' | 'password' | 'album' | 'error';
+
+function readInvite() {
+  const fragment = new URLSearchParams(window.location.hash.slice(1));
+  if (!fragment.has('access_token') && !fragment.has('error')) return null;
+  window.history.replaceState(
+    window.history.state,
+    '',
+    window.location.pathname + window.location.search,
+  );
+  return fragment;
+}
 
 async function loadAlbum(signal?: AbortSignal) {
   const response = await fetch(`${freewillApi}album`, { signal });
@@ -31,6 +42,36 @@ export default function FreewillApp() {
 
   useEffect(() => {
     const controller = new AbortController();
+    const invite = readInvite();
+    if (invite) {
+      const access_token = invite.get('access_token');
+      const refresh_token = invite.get('refresh_token');
+      if (
+        (invite.get('type') !== 'invite' &&
+          invite.get('type') !== 'recovery') ||
+        !access_token ||
+        !refresh_token
+      ) {
+        setError(copy.inviteError);
+        setView('login');
+      } else {
+        void fetch(`${freewillApi}invite`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ access_token, refresh_token }),
+        })
+          .then((response) => {
+            if (!response.ok) throw new Error();
+            if (!controller.signal.aborted) setView('password');
+          })
+          .catch(() => {
+            if (controller.signal.aborted) return;
+            setError(copy.inviteError);
+            setView('login');
+          });
+      }
+      return () => controller.abort();
+    }
     void loadAlbum(controller.signal)
       .then((album) => {
         if (controller.signal.aborted) return;
@@ -65,6 +106,37 @@ export default function FreewillApp() {
       setLoadAttempt((attempt) => attempt + 1);
     } catch {
       setError(copy.loadError);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function setPassword(event: SubmitEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const form = new FormData(event.currentTarget);
+    const password = form.get('password');
+    setError('');
+    if (password !== form.get('confirmation')) {
+      setError(copy.passwordMismatch);
+      return;
+    }
+    setBusy(true);
+    try {
+      const response = await fetch(`${freewillApi}password`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password }),
+      });
+      if (response.status === 401 || response.status === 403) {
+        setError(copy.inviteError);
+        setView('login');
+        return;
+      }
+      if (!response.ok) throw new Error();
+      setView('loading');
+      setLoadAttempt((attempt) => attempt + 1);
+    } catch {
+      setError(copy.passwordError);
     } finally {
       setBusy(false);
     }
@@ -150,6 +222,40 @@ export default function FreewillApp() {
           </label>
           <button type="submit" disabled={busy}>
             {busy ? copy.signingIn : copy.signIn}
+          </button>
+        </form>
+      )}
+      {view === 'password' && (
+        <form
+          className="freewill-panel freewill-signin"
+          onSubmit={(event) => void setPassword(event)}
+        >
+          <h2>{copy.setPassword}</h2>
+          <p>{copy.passwordRequirements}</p>
+          <label>
+            {copy.password}
+            <input
+              name="password"
+              type="password"
+              autoComplete="new-password"
+              minLength={12}
+              maxLength={72}
+              required
+            />
+          </label>
+          <label>
+            {copy.confirmPassword}
+            <input
+              name="confirmation"
+              type="password"
+              autoComplete="new-password"
+              minLength={12}
+              maxLength={72}
+              required
+            />
+          </label>
+          <button type="submit" disabled={busy}>
+            {copy.setPassword}
           </button>
         </form>
       )}

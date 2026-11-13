@@ -56,7 +56,7 @@ npx supabase db advisors
 The public Work page links to `/work/freewill/`. Tracker records, edits, and exports
 are served only through the authenticated `/api/freewill/` endpoints.
 
-Use Node.js 24. Configure the four `FREEWILL_*` variables from `.env.example`
+Use Node.js 24. Configure the two `FREEWILL_*` variables from `.env.example`
 for the tracker deployment. For local development, export the variables in your
 shell before running `npm run dev`. Use a test project and account for preview
 verification. These variables are independent of the inquiry service settings.
@@ -68,8 +68,8 @@ verification. These variables are independent of the inquiry service settings.
    and `guitars` keys. Each instrument contains boolean `rdy` and `rec` fields.
    The function fills missing records and preserves subsequent changes. Keep the
    snapshot in private storage.
-3. Create an email/password user under Supabase Authentication and set
-   `FREEWILL_ADMIN_USER_IDS` to that user's UUID. A comma-separated list permits
-   additional administrators. Account passwords are entered through Supabase.
-4. Set the project's publishable key and service-role credential in Vercel.
-   Scope each deployment to its corresponding database and administrator.
+3. Invite the administrator through Supabase Authentication. Insert the user's UUID
+   into `public.freewill_admins` in the SQL editor. Set the Auth Site URL to the
+   deployed tracker page so the invite opens password setup.
+4. Set the project URL and publishable key in Vercel. Database policies check
+   administrator membership for each authenticated read and update.

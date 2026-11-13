@@ -91,6 +91,14 @@ export const freewillCopy = {
   close: 'Close',
   email: 'Email',
   password: 'Password',
+  setPassword: 'Set your password',
+  confirmPassword: 'Confirm password',
+  passwordRequirements: 'Use at least 12 characters.',
+  passwordMismatch: 'The passwords do not match.',
+  passwordError: 'The password could not be saved. Try a different password.',
+  inviteError:
+    'This sign-in link could not be used. Try a fresh invite or sign in with your password.',
+
   signIn: 'Sign in',
   signingIn: 'Signing in…',
   signOut: 'Sign out',

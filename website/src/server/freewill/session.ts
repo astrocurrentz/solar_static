@@ -2,16 +2,10 @@ import { createServerClient } from '@supabase/ssr';
 import type { APIContext } from 'astro';
 import { parseCookie } from 'cookie';
 
-export function allowedAdmin(userId: string) {
-  return (process.env.FREEWILL_ADMIN_USER_IDS ?? '')
-    .split(',')
-    .some((id) => id.trim() === userId);
-}
-
 export function sessionClient(context: APIContext) {
   const url = process.env.FREEWILL_SUPABASE_URL;
   const key = process.env.FREEWILL_SUPABASE_PUBLISHABLE_KEY;
-  if (!url || !key || !process.env.FREEWILL_ADMIN_USER_IDS?.trim()) {
+  if (!url || !key) {
     throw new Error('FREEWILL auth configuration is missing');
   }
 
@@ -37,4 +31,17 @@ export function sessionClient(context: APIContext) {
       },
     },
   });
+}
+
+export async function allowedAdmin(
+  client: ReturnType<typeof sessionClient>,
+  userId: string,
+) {
+  const { data, error } = await client
+    .from('freewill_admins')
+    .select('user_id')
+    .eq('user_id', userId)
+    .maybeSingle();
+  if (error) throw error;
+  return data !== null;
 }

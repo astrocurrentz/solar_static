@@ -1,4 +1,4 @@
-import { createClient } from '@supabase/supabase-js';
+import type { sessionClient } from './session';
 import {
   groupStatuses,
   instruments,
@@ -21,17 +21,6 @@ type TrackRow = {
   freewill_instrument_progress: (StatusColumns & { instrument: Instrument })[];
   freewill_stage_preparation: StatusColumns | null;
 };
-
-function database() {
-  const url = process.env.FREEWILL_SUPABASE_URL;
-  const key = process.env.FREEWILL_SUPABASE_SERVICE_ROLE_KEY;
-  if (!url || !key)
-    throw new Error('FREEWILL database configuration is missing');
-
-  return createClient(url, key, {
-    auth: { persistSession: false, autoRefreshToken: false },
-  });
-}
 
 function readStatus(row: StatusColumns, status: Status) {
   const completed = row[`${status}_completed`];
@@ -66,8 +55,10 @@ function readTrack(row: TrackRow): Track {
   return { id: row.id, order: row.order_index, title: row.title, progress };
 }
 
-export async function loadAlbum(): Promise<Album> {
-  const { data, error } = await database()
+export async function loadAlbum(
+  client: ReturnType<typeof sessionClient>,
+): Promise<Album> {
+  const { data, error } = await client
     .from('freewill_tracks')
     .select(
       `
@@ -83,8 +74,10 @@ export async function loadAlbum(): Promise<Album> {
   return { tracks: data.map(readTrack) };
 }
 
-export async function saveEdit(edit: Edit) {
-  const client = database();
+export async function saveEdit(
+  client: ReturnType<typeof sessionClient>,
+  edit: Edit,
+) {
   const updated_at = new Date().toISOString();
   const result = await (async () => {
     if (edit.field === 'title') {
