@@ -10,6 +10,7 @@ export function sessionClient(context: APIContext) {
   }
 
   return createServerClient(url, key, {
+    db: { schema: 'core' },
     cookieOptions: {
       name: 'freewill-session',
       path: '/api/freewill',

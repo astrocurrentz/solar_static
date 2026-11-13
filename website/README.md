@@ -69,7 +69,8 @@ verification. These variables are independent of the inquiry service settings.
    The function fills missing records and preserves subsequent changes. Keep the
    snapshot in private storage.
 3. Invite the administrator through Supabase Authentication. Insert the user's UUID
-   into `public.freewill_admins` in the SQL editor. Set the Auth Site URL to the
+   into `core.freewill_admins` in the SQL editor. Set the Auth Site URL to the
    deployed tracker page so the invite opens password setup.
-4. Set the project URL and publishable key in Vercel. Database policies check
+4. Expose the `core` schema in the Supabase Data API and set the project URL
+   and publishable key in Vercel. Database policies check
    administrator membership for each authenticated read and update.
